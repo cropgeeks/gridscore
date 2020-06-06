@@ -1,0 +1,15 @@
+{
+  "buttonCancel": "Cancel",
+  "buttonClose": "Close",
+  "buttonExport": "Export",
+  "buttonOk": "Ok",
+  "buttonSettingsModal": "Setup",
+  "formLabelExportText": "Export result",
+  "formLabelSettingsCols": "Columns",
+  "formLabelSettingsRows": "Rows",
+  "formLabelSettingsTraits": "Traits",
+  "formLabelSettingsVarieties": "Varieties",
+  "linkExport": "Download as file",
+  "modalTitleExport": "Export",
+  "modalTitleSettings": "Setup"
+}
