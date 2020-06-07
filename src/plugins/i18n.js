@@ -37,7 +37,7 @@ export function loadLanguageAsync (lang) {
   }
 
   // If the language hasn't been loaded yet
-  return import(/* webpackChunkName: "lang-[request]" */ `@/plugins/i18n/${lang}.json`).then(
+  return import(/* webpackChunkName: "lang-[request]" */`@/plugins/i18n/${lang}.json`).then(
     messages => {
       i18n.setLocaleMessage(lang, messages.default)
       loadedLanguages.push(lang)

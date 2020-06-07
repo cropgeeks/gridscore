@@ -11,14 +11,18 @@
           <b-form-group :label="$t('formLabelSettingsRows')" label-for="rows">
             <b-form-input id="rows" :state="state.rows" type="number" min="1" required autofocus v-model="rows" />
           </b-form-group>
-          <b-form-group :label="$t('formLabelSettingsTraits')" label-for="traits">
-            <b-form-textarea id="traits" :state="state.traits" rows=6 required v-model="traits" />
-          </b-form-group>
         </b-col>
         <b-col cols=12 md=6>
           <b-form-group :label="$t('formLabelSettingsCols')" label-for="cols">
             <b-form-input id="cols" :state="state.cols" type="number" min="1" required v-model="cols" />
           </b-form-group>
+        </b-col>
+        <b-col cols=12 md=6>
+          <b-form-group :label="$t('formLabelSettingsTraits')" label-for="traits">
+            <b-form-textarea id="traits" :state="state.traits" rows=6 required v-model="traits" />
+          </b-form-group>
+        </b-col>
+        <b-col cols=12 md=6>
           <b-form-group :label="$t('formLabelSettingsVarieties')" label-for="varieties">
             <b-form-textarea id="varieties" :state="state.varieties" rows=6 required v-model="varieties" />
           </b-form-group>

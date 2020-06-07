@@ -5,9 +5,11 @@
 
       <b-form-checkbox :checked="useGps" switch @change="setUseGps" class="mx-3">Use GPS?</b-form-checkbox>
 
-      <span v-for="(trait, index) in dataset.traits" :key="`trait-${index}`">
-        <span class="mx-1" :style="{ color: colors[index % colors.length] }">⬤ {{ trait }}</span>
-      </span>
+      <div class="d-flex flex-row align-items-center flex-wrap">
+        <span v-for="(trait, index) in dataset.traits" :key="`trait-${index}`">
+          <span class="mx-1" :style="{ color: colors[index % colors.length] }">⬤ {{ trait }}</span>
+        </span>
+      </div>
 
       <b-button @click="onExportClicked" class="ml-auto">{{ $t('buttonExport') }}</b-button>
     </div>
