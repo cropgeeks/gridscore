@@ -48,7 +48,11 @@ export default {
       this.$nextTick(() => this.$refs.dataPointModal.show())
 
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(this.setGeolocation)
+        navigator.geolocation.getCurrentPosition(this.setGeolocation, null, {
+          enableHighAccuracy: false,
+          maximumAge: 15000,
+          timeout: 30000
+        })
       }
     },
     hide: function () {
