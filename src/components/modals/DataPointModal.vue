@@ -9,7 +9,11 @@
                     :key="`trait-${index}`"
                     :label-for="`trait-${index}`">
         <template v-slot:label><span :style="{ color: colors[index % colors.length] }">⬤ {{ trait }}</span></template>
-        <b-form-datepicker :id="`trait-${index}`" v-model="data[index]" reset-button reset-value="null" />
+        <b-form-datepicker :id="`trait-${index}`" v-model="data[index]" reset-button :reset-value="null" @input="(event) => onDataChanged(event, index)"/>
+      </b-form-group>
+
+      <b-form-group :label="$t('formLabelComment')" label-for="comment">
+        <b-form-input v-model="comment" id="comment" />
       </b-form-group>
     </b-form>
   </b-modal>
@@ -32,13 +36,15 @@ export default {
       data: {
       },
       name: null,
-      geolocation: null
+      geolocation: null,
+      comment: null
     }
   },
   methods: {
     show: function () {
       this.data = JSON.parse(JSON.stringify(this.dataset.data[this.row][this.col].dates))
       this.name = this.dataset.data[this.row][this.col].name
+      this.comment = this.dataset.data[this.row][this.col].comment
       this.$nextTick(() => this.$refs.dataPointModal.show())
 
       if (navigator.geolocation) {
@@ -57,12 +63,18 @@ export default {
         }
       }
     },
+    onDataChanged: function (event, index) {
+      if (event === null || event === undefined || event === '') {
+        this.data[index] = null
+      }
+    },
     onSubmit: function () {
       this.$store.dispatch('setDataPoint', {
         row: this.row,
         col: this.col,
         value: this.data,
-        geolocation: this.geolocation
+        geolocation: this.geolocation,
+        comment: this.comment
       })
       this.hide()
     }

@@ -55,7 +55,8 @@ export default {
           rowData[x + 1] = {
             name: settings.varieties.length > counter ? settings.varieties[counter++] : null,
             dates: [],
-            geolocation: null
+            geolocation: null,
+            comment: null
           }
           for (let t = 0; t < settings.traits.length; t++) {
             rowData[x + 1].dates[t] = null

@@ -46,6 +46,9 @@ const storeState = {
     ON_DATA_POINT_CHANGED_MUTATION: function (state, dataPoint) {
       state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col].dates = dataPoint.value
 
+      // Use Vue.set, because this wasn't a part of the object from the start, so needs setting to be reactive
+      Vue.set(state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col], 'comment', dataPoint.comment)
+
       if (dataPoint.geolocation) {
         state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col].geolocation = dataPoint.geolocation
       }

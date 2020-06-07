@@ -4,6 +4,7 @@
   "buttonExport": "Exportieren",
   "buttonOk": "Ok",
   "buttonSettingsModal": "Setup",
+  "formLabelComment": "Kommentar",
   "formLabelExportText": "Exportergebnis",
   "formLabelSettingsCols": "Spalten",
   "formLabelSettingsRows": "Zeilen",
