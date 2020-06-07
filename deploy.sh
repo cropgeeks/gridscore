@@ -17,6 +17,6 @@ git add -A
 git commit -m 'deploy'
 
 # if you are deploying to https://<USERNAME>.github.io/<REPO>
-git push -f git@github.com:sebastian-raubach/gridscore.git master:gh-pages
+git push -f https://github.com/sebastian-raubach/gridscore master:gh-pages
 
 cd -

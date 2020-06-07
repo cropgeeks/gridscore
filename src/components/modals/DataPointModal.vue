@@ -78,7 +78,7 @@ export default {
         col: this.col,
         value: this.data,
         geolocation: this.geolocation,
-        comment: this.comment
+        comment: (this.comment !== null && this.comment.length > 0) ? this.comment : null
       })
       this.hide()
     }
