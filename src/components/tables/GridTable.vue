@@ -13,7 +13,7 @@
         {{ data.index + 1 }}
       </template>
       <template v-slot:cell()="data">
-        <div v-on:click="onClick(data, $event)" class="text-center" :class="data.value.comment ? 'table-warning' : null">
+        <div v-on:click="onClick(data, $event)" class="text-center" :class="(data.value.comment && data.value.comment.length > 0) ? 'table-warning' : null">
           <span class="d-block">{{ data.value.name ? data.value.name.substring(0, 4) : '' }}</span>
           <template v-for="(trait, index) in dataset.traits">
             <span class="mx-1" :key="`trait-${index}`" :style="{ color: colors[index % colors.length] }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0">⬤</span>
