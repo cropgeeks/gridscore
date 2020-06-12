@@ -25,7 +25,11 @@ const storeState = {
   },
   getters: {
     dataset: (state) => state.datasets[state.datasetIndex],
-    useGps: (state) => state.useGps
+    useGps: (state) => state.useGps,
+    firstRun: (state) => {
+      const ds = state.datasets[state.datasetIndex]
+      return state.datasets.length < 2 && (ds === null || ds.data === null || ds.data.length < 1)
+    }
   },
   mutations: {
     ON_DATASET_INDEX_CHANGED_MUTATION: function (state, newDatasetIndex) {

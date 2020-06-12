@@ -9,6 +9,7 @@ export default {
   computed: {
     ...mapGetters([
       'dataset',
+      'firstRun',
       'useGps'
     ])
   }

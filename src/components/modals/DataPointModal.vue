@@ -29,6 +29,10 @@ export default {
     col: {
       type: Number,
       default: null
+    },
+    geolocation: {
+      type: Object,
+      default: null
     }
   },
   data: function () {
@@ -36,7 +40,6 @@ export default {
       data: {
       },
       name: null,
-      geolocation: null,
       comment: null
     }
   },
@@ -46,26 +49,9 @@ export default {
       this.name = this.dataset.data[this.row][this.col].name
       this.comment = this.dataset.data[this.row][this.col].comment
       this.$nextTick(() => this.$refs.dataPointModal.show())
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(this.setGeolocation, null, {
-          enableHighAccuracy: false,
-          maximumAge: 15000,
-          timeout: 30000
-        })
-      }
     },
     hide: function () {
       this.$nextTick(() => this.$refs.dataPointModal.hide())
-    },
-    setGeolocation: function (location) {
-      if (location && location.coords) {
-        this.geolocation = {
-          lat: location.coords.latitude,
-          lng: location.coords.longitude,
-          elv: location.coords.altitude
-        }
-      }
     },
     onDataChanged: function (event, index) {
       if (event === null || event === undefined || event === '') {
@@ -77,7 +63,7 @@ export default {
         row: this.row,
         col: this.col,
         value: this.data,
-        geolocation: this.geolocation,
+        geolocation: this.useGps ? this.geolocation : null,
         comment: this.comment
       })
       this.hide()

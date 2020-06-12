@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-flex flex-row align-items-center">
-      <b-button @click="$refs.settingsModal.show()">{{ $t('buttonSettingsModal') }}</b-button>
+      <b-button @click="$refs.settingsModal.show()" id="setup-button">{{ $t('buttonSettingsModal') }}</b-button>
 
       <b-form-checkbox :checked="useGps" switch @change="setUseGps" class="mx-3">Use GPS?</b-form-checkbox>
 
@@ -17,7 +17,7 @@
     <GridTable v-on:cell-clicked="onCellClicked" v-if="dataset && dataset.traits && dataset.traits.length > 0"/>
     <ExportModal ref="exportModal" :text="exportText" />
     <SettingsModal ref="settingsModal" v-on:settings-changed="onSettingsChanged" />
-    <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
+    <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" :geolocation="geolocation" />
   </div>
 </template>
 
@@ -34,7 +34,9 @@ export default {
         row: null,
         col: null
       },
-      exportText: null
+      exportText: null,
+      geolocation: null,
+      geolocationWatchId: null
     }
   },
   components: {
@@ -67,6 +69,7 @@ export default {
         data.push(rowData)
       }
       this.$store.dispatch('setData', data)
+      this.startGeoTracking()
     },
     onCellClicked: function (cell) {
       this.cell = cell
@@ -100,6 +103,29 @@ export default {
     },
     setUseGps: function (value) {
       this.$store.dispatch('setUseGps', value)
+    },
+    startGeoTracking: function () {
+      if (this.firstRun === false && this.geolocationWatchId === null) {
+        if (navigator.geolocation) {
+          this.geolocationWatchId = navigator.geolocation.watchPosition(position => {
+            if (position && position.coords) {
+              this.geolocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                elv: position.coords.altitude
+              }
+            }
+          })
+        }
+      }
+    }
+  },
+  mounted: function () {
+    this.startGeoTracking()
+  },
+  destroyed: function () {
+    if (this.geolocationWatchId && navigator.geolocation) {
+      navigator.geolocation.clearWatch(this.geolocationWatchId)
     }
   }
 }

@@ -15,9 +15,10 @@
       <template v-slot:cell()="data">
         <div v-on:click="onClick(data, $event)" class="text-center" :class="data.value.comment ? 'table-warning' : null">
           <span class="d-block">{{ data.value.name ? data.value.name.substring(0, 4) : '' }}</span>
-          <span v-for="(trait, index) in dataset.traits" :key="`trait-${index}`" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0">
-            <span class="mx-1" :style="{ color: colors[index % colors.length] }">⬤</span>
-          </span>
+          <template v-for="(trait, index) in dataset.traits">
+            <span class="mx-1" :key="`trait-${index}`" :style="{ color: colors[index % colors.length] }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0">⬤</span>
+            <span class="mx-1" :key="`trait-${index}`" :style="{ opacity: 0 }" v-else>⬤</span>
+          </template>
         </div>
       </template>
     </b-table>
@@ -90,6 +91,15 @@ export default {
   border-bottom: 1px solid;
   border-bottom-color: var(--primary) !important;
 }
+.grid-table thead th div {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
 .grid-table thead th:first-child,
 .grid-table thead th:nth-child(5n+1),
 .grid-table tbody tr th,
@@ -115,7 +125,7 @@ export default {
   cursor: pointer;
   word-break: break-all;
 }
-.grid-table .table td > div:empty::after{
+.grid-table .table td > div > span:empty::after{
   content: "\00a0";
 }
 </style>

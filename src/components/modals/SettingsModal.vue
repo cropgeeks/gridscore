@@ -5,7 +5,7 @@
            size="lg"
            @ok.prevent="onSubmit"
            ref="settingsModal">
-    <b-form @submit.prevent="onSubmit">
+    <b-form @submit.prevent="onSubmit" id="settings-form">
       <b-row>
         <b-col cols=12 md=6>
           <b-form-group :label="$t('formLabelSettingsRows')" label-for="rows">
@@ -20,11 +20,13 @@
         <b-col cols=12 md=6>
           <b-form-group :label="$t('formLabelSettingsTraits')" label-for="traits">
             <b-form-textarea id="traits" :state="state.traits" rows=6 required v-model="traits" />
+            <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="traitsFile" />
           </b-form-group>
         </b-col>
         <b-col cols=12 md=6>
           <b-form-group :label="$t('formLabelSettingsVarieties')" label-for="varieties">
             <b-form-textarea id="varieties" :state="state.varieties" rows=6 required v-model="varieties" />
+            <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="varietiesFile" />
           </b-form-group>
         </b-col>
       </b-row>
@@ -44,10 +46,40 @@ export default {
       state: {
         rows: null,
         cols: null
+      },
+      traitsFile: null,
+      varietiesFile: null
+    }
+  },
+  watch: {
+    traitsFile: function (newValue) {
+      if (newValue) {
+        this.loadTraitsFile()
+      }
+    },
+    varietiesFile: function (newValue) {
+      if (newValue) {
+        this.loadVarietiesFile()
       }
     }
   },
   methods: {
+    loadTraitsFile: function () {
+      const reader = new FileReader()
+      reader.onload = event => {
+        this.traits = event.target.result
+        this.traitsFile = null
+      }
+      reader.readAsText(this.traitsFile)
+    },
+    loadVarietiesFile: function () {
+      const reader = new FileReader()
+      reader.onload = event => {
+        this.varieties = event.target.result
+        this.varietiesFile = null
+      }
+      reader.readAsText(this.varietiesFile)
+    },
     show: function () {
       this.rows = this.dataset.rows
       this.cols = this.dataset.cols
@@ -64,10 +96,12 @@ export default {
         rows: null,
         cols: null
       }
-      this.$nextTick(() => this.$refs.settingsModal.show())
+      this.traitsFile = null
+      this.varietiesFile = null
+      this.$refs.settingsModal.show()
     },
     hide: function () {
-      this.$nextTick(() => this.$refs.settingsModal.hide())
+      this.$refs.settingsModal.hide()
     },
     onSubmit: function (e) {
       this.formValidated = true
@@ -89,5 +123,13 @@ export default {
 </script>
 
 <style>
-
+#settings-form .form-group textarea {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#settings-form .form-group textarea + .b-form-file * {
+  border-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
 </style>
