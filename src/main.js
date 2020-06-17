@@ -13,6 +13,14 @@ Vue.config.productionTip = false
 Vue.use(BootstrapVue)
 Vue.mixin(mixin)
 
+Vue.use({
+  install: function (Vue) {
+    // Make custom plotly available
+    Vue.prototype.$plotly = require('@/custom-plotly')
+    window.Plotly = Vue.prototype.$plotly
+  }
+})
+
 new Vue({
   router,
   store,

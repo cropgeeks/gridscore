@@ -11,6 +11,16 @@ const router = new Router({
       path: '/',
       name: 'home',
       component: () => import('@/views/Home.vue')
+    },
+    {
+      path: '/overtime',
+      name: 'over-time',
+      component: () => import('@/views/OverTime.vue')
+    },
+    {
+      path: '/heatmap',
+      name: 'heatmap',
+      component: () => import('@/views/Heatmap.vue')
     }
   ]
 })
