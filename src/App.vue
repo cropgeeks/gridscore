@@ -10,14 +10,17 @@
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item :to="{ name: 'over-time' }">{{ $t('menuTimeSeries') }}</b-nav-item>
+          <b-nav-item :to="{ name: 'timeline' }">{{ $t('menuTimeSeries') }}</b-nav-item>
           <b-nav-item :to="{ name: 'heatmap' }">{{ $t('menuHeatmap') }}</b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
-        <!-- <b-navbar-nav class="ml-auto">
+        <b-navbar-nav class="ml-auto">
+          <b-nav-item-dropdown :text="$t('menuLocale')" right>
+            <b-dropdown-item v-for="language in languages" :key="`locale-${language.locale}`" @click="onLocaleChanged(language)">{{ language.name }}</b-dropdown-item>
+          </b-nav-item-dropdown>
           <b-nav-item :to="{ name: 'about' }">About</b-nav-item>
-        </b-navbar-nav> -->
+        </b-navbar-nav>
       </b-collapse>
     </b-navbar>
     <b-container fluid class="mt-3">
@@ -27,8 +30,32 @@
 </template>
 
 <script>
+import { loadLanguageAsync } from '@/plugins/i18n'
+
 export default {
-  name: 'App'
+  name: 'App',
+  data: function () {
+    return {
+      languages: [{
+        locale: 'en_GB',
+        name: 'British English'
+      }, {
+        locale: 'de_DE',
+        name: 'Deutsch - Deutschland'
+      }]
+    }
+  },
+  methods: {
+    onLocaleChanged: function (language) {
+      loadLanguageAsync(language.locale).then(() => {
+        this.$i18n.locale = language.locale
+        this.$store.dispatch('setLocale', language.locale)
+      })
+    }
+  },
+  mounted: function () {
+    loadLanguageAsync(this.locale)
+  }
 }
 </script>
 

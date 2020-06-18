@@ -10,6 +10,7 @@ export default {
     ...mapGetters([
       'dataset',
       'firstRun',
+      'locale',
       'useGps'
     ])
   }

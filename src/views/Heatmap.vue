@@ -1,9 +1,12 @@
 <template>
   <div>
-    <b-form-group :label="$t('formLabelHeatmapTrait')" label-for="trait">
-      <b-form-select id="trait" :options="traits" v-model="trait" />
-    </b-form-group>
-    <div id="heatmap-chart"/>
+    <div v-if="dataset && dataset.data && dataset.data.length > 0 && dataset.traits && dataset.traits.length > 0">
+      <b-form-group :label="$t('formLabelHeatmapTrait')" label-for="trait">
+        <b-form-select id="trait" :options="traits" v-model="trait" />
+      </b-form-group>
+      <div id="heatmap-chart"/>
+    </div>
+    <h3 v-else>{{ $t('labelNoData') }}</h3>
   </div>
 </template>
 
@@ -17,6 +20,9 @@ export default {
   },
   watch: {
     trait: function () {
+      this.update()
+    },
+    locale: function () {
       this.update()
     }
   },

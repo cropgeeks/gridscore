@@ -16,7 +16,7 @@
         <div v-on:click="onClick(data, $event)" class="text-center" :class="(data.value.comment && data.value.comment.length > 0) ? 'table-warning' : null">
           <span class="d-block">{{ data.value.name ? data.value.name.substring(0, 4) : '' }}</span>
           <template v-for="(trait, index) in dataset.traits">
-            <span class="mx-1" :key="`trait-${index}`" :style="{ color: colors[index % colors.length] }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0">⬤</span>
+            <span class="mx-1" :key="`trait-${index}`" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0">⬤</span>
             <span class="mx-1" :key="`trait-${index}`" :style="{ opacity: 0 }" v-else>⬤</span>
           </template>
         </div>
@@ -29,6 +29,12 @@
 import Vue from 'vue'
 
 export default {
+  props: {
+    visibleTraits: {
+      type: Array,
+      default: null
+    }
+  },
   data: function () {
     return {
       markedColumns: []

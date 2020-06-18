@@ -1,24 +1,15 @@
-# gridscore
+# GridScore
 
-## Project setup
-```
-npm install
-```
+<p align="center">
+  <img src="https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/gridscore.svg?sanitize=true" width="200" alt="Logo">
+</p>
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+![GitHub](https://img.shields.io/github/license/sebastian-raubach/gridscore)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/sebastian-raubach/gridscore)
+![GitHub last commit](https://img.shields.io/github/last-commit/sebastian-raubach/gridscore)
 
-### Compiles and minifies for production
-```
-npm run build
-```
+![](https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/screenshot-grid.png "Grid view")
+![](https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/screenshot-timeline.png "Timeline")
+![](https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/screenshot-heatmap.png "Heatmap")
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+GridScore is a field trial phenotyping app for time-based data. It lets you keep track of events that happen in the field on a plot-level basis. This could be anything from plant emergence to flowering date.

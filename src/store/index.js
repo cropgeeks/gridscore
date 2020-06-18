@@ -19,6 +19,7 @@ const dataset = {
 
 const storeState = {
   state: {
+    locale: 'en_GB',
     datasetIndex: 0,
     datasets: [dataset],
     useGps: true
@@ -29,7 +30,8 @@ const storeState = {
     firstRun: (state) => {
       const ds = state.datasets[state.datasetIndex]
       return state.datasets.length < 2 && (ds === null || ds.data === null || ds.data.length < 1)
-    }
+    },
+    locale: (state) => state.locale
   },
   mutations: {
     ON_DATASET_INDEX_CHANGED_MUTATION: function (state, newDatasetIndex) {
@@ -59,6 +61,9 @@ const storeState = {
     },
     ON_USE_GPS_CHANGED_MUTATION: function (state, newUseGps) {
       state.useGps = newUseGps
+    },
+    ON_LOCALE_CHANGED_MUDATION: function (state, newLocale) {
+      state.locale = newLocale
     }
   },
   actions: {
@@ -82,6 +87,9 @@ const storeState = {
     },
     setUseGps: function ({ commit }, useGps) {
       commit('ON_USE_GPS_CHANGED_MUTATION', useGps)
+    },
+    setLocale: function ({ commit }, locale) {
+      commit('ON_LOCALE_CHANGED_MUDATION', locale)
     }
   },
   plugins: [ createPersistedState({

@@ -1,10 +1,12 @@
 {
+  "appTitle": "GridScore",
   "buttonCancel": "Abbrechen",
   "buttonClose": "Schließen",
   "buttonExport": "Exportieren",
+  "buttonToggleGps": "GPS nutzen?",
   "buttonOk": "Ok",
   "buttonOpenFile": "Aus Datei laden",
-  "buttonSettingsModal": "Setup",
+  "buttonSettingsModal": "Einstellungen",
   "chartLabelHeatmapCol": "Spalte",
   "chartLabelHeatmapRow": "Zeile",
   "chartLabelTimeseriesPlotsScores": "Beete bewertet [%]",
@@ -16,9 +18,17 @@
   "formLabelSettingsRows": "Zeilen",
   "formLabelSettingsTraits": "Merkmalsnamen",
   "formLabelSettingsVarieties": "Sortennamen",
+  "formPlaceholderExportLoading": "Lade...",
+  "labelHomeIntro": "Starte mit dem Einstellen des Versuchs.",
+  "labelNoData": "Keine Daten gefunden.",
   "linkExport": "Als Datei herunterladen",
   "menuHeatmap": "Feld-Heatmap",
+  "menuLocale": "Sprache",
   "menuTimeSeries": "Zeitreihe",
+  "modalTextSetupWarning": "Dies wird alle bisherigen Daten löschen. Fortfahren?",
+  "modalTitleSetupWarning": "Bestätigung",
   "modalTitleExport": "Exportieren",
-  "modalTitleSettings": "Setup"
+  "modalTitleSettings": "Einstellungen",
+  "pageAboutParagraphOne": "GridScore ist eine Feldversuch-Phänotypisierungs-App für zeitbasierte Daten. Mit ihm kann man Ereignisse die im Feld auftreten auf einem Beet-Level festhalten. Dies könnten zum Beispiel das Hervortreten der Pflanze oder die Blütezeit sein.",
+  "pageAboutParagraphTwo": "GridScore wurde entwickelt von <a href='https://hutton.ac.uk/staff/sebastian-raubach'>Sebastian Raubach</a>. Bei Fragen, Anregungen oder generellem Feedback bitte direkt an <a href='mailto:sebastian.raubach@hutton.ac.uk'>Sebastian</a> wenden."
 }

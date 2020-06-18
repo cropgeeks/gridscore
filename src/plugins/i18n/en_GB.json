@@ -1,7 +1,9 @@
 {
+  "appTitle": "GridScore",
   "buttonCancel": "Cancel",
   "buttonClose": "Close",
   "buttonExport": "Export",
+  "buttonToggleGps": "Use GPS?",
   "buttonOk": "Ok",
   "buttonOpenFile": "Load from file",
   "buttonSettingsModal": "Setup",
@@ -16,9 +18,17 @@
   "formLabelSettingsRows": "Rows",
   "formLabelSettingsTraits": "Trait names",
   "formLabelSettingsVarieties": "Variety names",
+  "formPlaceholderExportLoading": "Loading...",
+  "labelHomeIntro": "Start by setting up your trial.",
+  "labelNoData": "No data found.",
   "linkExport": "Download as file",
   "menuHeatmap": "Field heatmap",
+  "menuLocale": "Language",
   "menuTimeSeries": "Time series",
+  "modalTextSetupWarning": "This will delete your existing data. Are you sure?",
+  "modalTitleSetupWarning": "Confirmation",
   "modalTitleExport": "Export",
-  "modalTitleSettings": "Setup"
+  "modalTitleSettings": "Setup",
+  "pageAboutParagraphOne": "GridScore is a field trial phenotyping app for time-based data. It lets you keep track of events that happen in the field on a plot-level basis. This could be anything from plant emergence to flowering date.",
+  "pageAboutParagraphTwo": "GridScore has been developed by <a href='https://hutton.ac.uk/staff/sebastian-raubach'>Sebastian Raubach</a>. If you have any questions, suggestions or general feedback, please contact <a href='mailto:sebastian.raubach@hutton.ac.uk'>Sebastian</a>."
 }

@@ -45,7 +45,9 @@ export default {
       formValidated: false,
       state: {
         rows: null,
-        cols: null
+        cols: null,
+        traits: null,
+        varieties: null
       },
       traitsFile: null,
       varietiesFile: null
@@ -94,7 +96,9 @@ export default {
       this.formValidated = false
       this.state = {
         rows: null,
-        cols: null
+        cols: null,
+        traits: null,
+        varieties: null
       }
       this.traitsFile = null
       this.varietiesFile = null
@@ -105,17 +109,27 @@ export default {
     },
     onSubmit: function (e) {
       this.formValidated = true
-      this.state.rows = this.rows > 0
-      this.state.cols = this.cols > 0
+      this.state = {
+        rows: this.rows > 0,
+        cols: this.cols > 0,
+        traits: (this.traits !== null) && (this.traits.length > 0),
+        varieties: (this.varieties !== null) && (this.varieties.length > 0)
+      }
 
-      if (this.state.rows && this.state.cols) {
-        this.$emit('settings-changed', {
-          rows: parseInt(this.rows),
-          cols: parseInt(this.cols),
-          traits: this.traits.split('\n'),
-          varieties: this.varieties.split('\n')
+      if (this.state.rows && this.state.cols && this.state.traits && this.state.varieties) {
+        this.$bvModal.msgBoxConfirm(this.$t('modalTextSetupWarning'), {
+          title: this.$t('modalTitleSetupWarning')
+        }).then(value => {
+          if (value === true) {
+            this.$emit('settings-changed', {
+              rows: parseInt(this.rows),
+              cols: parseInt(this.cols),
+              traits: this.traits.split('\n'),
+              varieties: this.varieties.split('\n')
+            })
+            this.hide()
+          }
         })
-        this.hide()
       }
     }
   }

@@ -13,14 +13,19 @@ const router = new Router({
       component: () => import('@/views/Home.vue')
     },
     {
-      path: '/overtime',
-      name: 'over-time',
-      component: () => import('@/views/OverTime.vue')
+      path: '/timeline',
+      name: 'timeline',
+      component: () => import('@/views/Timeline.vue')
     },
     {
       path: '/heatmap',
       name: 'heatmap',
       component: () => import('@/views/Heatmap.vue')
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('@/views/About.vue')
     }
   ]
 })
