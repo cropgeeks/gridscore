@@ -64,7 +64,7 @@ export default {
         col: this.col,
         value: this.data,
         geolocation: this.useGps ? this.geolocation : null,
-        comment: (this.comment !== null && this.comment.length > 0) ? this.comment : null
+        comment: (this.comment !== undefined && this.comment !== null && this.comment.length > 0) ? this.comment : null
       })
       this.hide()
     }

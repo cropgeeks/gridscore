@@ -6,6 +6,9 @@ module.exports = {
     msTileColor: '#000000',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black',
-    start_url: '/index.html'
+    start_url: '/index.html',
+    workboxOptions: {
+      skipWaiting: true
+    }
   }
 }

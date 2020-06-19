@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="d-flex flex-row align-items-center top-banner">
+    <div class="d-flex flex-row align-items-end top-banner">
       <b-button @click="$refs.settingsModal.show()" id="setup-button">{{ $t('buttonSettingsModal') }}</b-button>
 
-      <b-form-checkbox :checked="useGps" switch @change="setUseGps" class="mx-3">{{ $t('buttonToggleGps') }}</b-form-checkbox>
+      <b-form-checkbox :checked="useGps" switch @change="setUseGps" class="mx-3 my-2">{{ $t('buttonToggleGps') }}</b-form-checkbox>
 
       <b-button-group class="d-flex flex-row align-items-center flex-wrap">
         <b-button v-for="(trait, index) in dataset.traits" :key="`trait-${index}`" variant="light" @click="toggleVisibility(index)">
@@ -15,7 +15,7 @@
     </div>
 
     <GridTable v-on:cell-clicked="onCellClicked" v-if="dataset && dataset.traits && dataset.traits.length > 0" :visibleTraits="visibleTraits" />
-    <h3 class="ml-3 mt-3">🡅 {{ $t('labelHomeIntro') }}</h3>
+    <h3 class="ml-3 mt-3" v-else>🡅 {{ $t('labelHomeIntro') }}</h3>
     <ExportModal ref="exportModal" />
     <SettingsModal ref="settingsModal" v-on:settings-changed="onSettingsChanged" />
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" :geolocation="geolocation" />
