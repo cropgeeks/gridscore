@@ -21,6 +21,15 @@ if (process.env.NODE_ENV === 'production') {
     },
     updated () {
       console.log('New content is available; please refresh.')
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (registrations) {
+          for (let registration of registrations) {
+            registration.update()
+          }
+        })
+      }
+
       setTimeout(() => {
         window.location.reload(true)
       }, 1000)

@@ -10,7 +10,7 @@
                    label-for="exportText">
       <b-form-textarea rows="8" readonly :value="text" id="exportText" :placeholder="$t('formPlaceholderExportLoading')" />
     </b-input-group>
-    <a :href="getHref" :download="getFilename" v-if="text">{{ $t('linkExport') }}</a>
+    <a :href="getHref" :download="getFilename" v-if="text && (text !== $t('labelNoData'))">{{ $t('linkExport') }}</a>
   </b-modal>
 </template>
 
@@ -39,6 +39,10 @@ export default {
     },
     updateText: function () {
       this.text = null
+
+      if (!this.dataset || !this.dataset.data || this.dataset.data.length < 1 || !this.dataset.traits || this.dataset.traits.length < 1) {
+        this.text = this.$t('labelNoData')
+      }
 
       let result = 'Variety\tLat\tLng\tElv\tComment\t' + this.dataset.traits.join('\t')
 

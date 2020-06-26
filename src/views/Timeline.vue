@@ -14,6 +14,10 @@ export default {
   },
   methods: {
     plot: function () {
+      if (!this.dataset || !this.dataset.data || this.dataset.data.length < 1 || !this.dataset.traits || this.dataset.traits.length < 1) {
+        return
+      }
+
       this.$plotly.purge('timeseries-chart')
 
       const plots = this.dataset.rows * this.dataset.cols
