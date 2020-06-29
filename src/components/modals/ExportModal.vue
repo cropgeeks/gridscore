@@ -10,6 +10,7 @@
                    label-for="exportText">
       <b-form-textarea rows="8" readonly :value="text" id="exportText" :placeholder="$t('formPlaceholderExportLoading')" />
     </b-input-group>
+    <b-form-checkbox switch v-model="showDates">{{ $t('labelCheckboxExportUseDates') }}</b-form-checkbox>
     <a :href="getHref" :download="getFilename" v-if="text && (text !== $t('labelNoData'))">{{ $t('linkExport') }}</a>
   </b-modal>
 </template>
@@ -18,7 +19,8 @@
 export default {
   data: function () {
     return {
-      text: null
+      text: null,
+      showDates: 0
     }
   },
   computed: {
@@ -27,6 +29,11 @@ export default {
     },
     getHref: function () {
       return 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.text)
+    }
+  },
+  watch: {
+    showDates: function () {
+      this.updateText()
     }
   },
   methods: {
@@ -44,26 +51,29 @@ export default {
         this.text = this.$t('labelNoData')
       }
 
-      let result = 'Variety\tLat\tLng\tElv\tComment\t' + this.dataset.traits.join('\t')
+      let result = 'Variety\tLat\tLng\tElv\tComment\t' + this.dataset.traits.map(t => t.name).join('\t')
 
       for (let y = 0; y < this.dataset.rows; y++) {
         for (let x = 0; x < this.dataset.cols; x++) {
           const cell = this.dataset.data[y][x + 1]
-          if (cell && cell.dates && cell.dates.length > 0 && !cell.dates.every(c => c === null || c.length < 1)) {
-            result += '\n'
-            result += cell.name
+          if (cell) {
+            const data = this.showDates ? cell.dates : cell.values
+            if (data && data.length > 0 && !data.every(c => c === null || c.length < 1)) {
+              result += '\n'
+              result += cell.name
 
-            if (cell.geolocation) {
-              result += '\t' + (cell.geolocation.lat ? cell.geolocation.lat : '')
-              result += '\t' + (cell.geolocation.lng ? cell.geolocation.lng : '')
-              result += '\t' + (cell.geolocation.elv ? cell.geolocation.elv : '')
-            } else {
-              result += '\t\t\t'
+              if (cell.geolocation) {
+                result += '\t' + (cell.geolocation.lat ? cell.geolocation.lat : '')
+                result += '\t' + (cell.geolocation.lng ? cell.geolocation.lng : '')
+                result += '\t' + (cell.geolocation.elv ? cell.geolocation.elv : '')
+              } else {
+                result += '\t\t\t'
+              }
+
+              result += '\t' + (cell.comment ? cell.comment : '')
+
+              result += '\t' + data.join('\t')
             }
-
-            result += '\t' + (cell.comment ? cell.comment : '')
-
-            result += '\t' + cell.dates.join('\t')
           }
         }
       }

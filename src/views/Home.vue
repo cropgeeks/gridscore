@@ -7,7 +7,7 @@
 
       <b-button-group class="d-flex flex-row align-items-center flex-wrap">
         <b-button v-for="(trait, index) in dataset.traits" :key="`trait-${index}`" variant="light" @click="toggleVisibility(index)">
-          <span class="mx-1" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }">⬤ {{ trait }}</span>
+          <span class="mx-1" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }">⬤ {{ trait.name }}</span>
         </b-button>
       </b-button-group>
 
@@ -62,12 +62,10 @@ export default {
         for (let x = 0; x < settings.cols; x++) {
           rowData[x + 1] = {
             name: settings.varieties.length > counter ? settings.varieties[counter++] : null,
-            dates: [],
+            dates: new Array(settings.traits.length).fill(null),
+            values: new Array(settings.traits.length).fill(null),
             geolocation: null,
             comment: null
-          }
-          for (let t = 0; t < settings.traits.length; t++) {
-            rowData[x + 1].dates[t] = null
           }
         }
         data.push(rowData)

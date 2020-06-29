@@ -51,7 +51,7 @@ export default {
         traces[index] = {
           type: 'scatter',
           mode: 'lines+markers',
-          name: this.dataset.traits[index],
+          name: this.dataset.traits[index].name,
           line: {
             color: this.colors[index % this.colors.length]
           },

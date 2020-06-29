@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 
+const localStorage = window.localStorage
+
 Vue.use(Vuex)
 
 var name = process.env.VUE_APP_INSTANCE_NAME
@@ -50,7 +52,8 @@ const storeState = {
       state.datasets[state.datasetIndex].data = newData
     },
     ON_DATA_POINT_CHANGED_MUTATION: function (state, dataPoint) {
-      state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col].dates = dataPoint.value
+      state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col].dates = dataPoint.dates
+      state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col].values = dataPoint.values
 
       // Use Vue.set, because this wasn't a part of the object from the start, so needs setting to be reactive
       Vue.set(state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col], 'comment', dataPoint.comment)
@@ -92,9 +95,43 @@ const storeState = {
       commit('ON_LOCALE_CHANGED_MUDATION', locale)
     }
   },
-  plugins: [ createPersistedState({
-    key: name
-  }) ]
+  plugins: [createPersistedState({
+    key: name,
+    storage: {
+      getItem: key => {
+        var result = JSON.parse(localStorage.getItem(key))
+
+        if (result && result.datasets && result.datasets.length > 0) {
+          result.datasets.forEach(d => {
+            if (d.traits && d.traits.length > 0) {
+              if ((d.traits[0] !== null) && (typeof d.traits[0] !== 'object')) {
+                d.traits = d.traits.map(t => {
+                  return {
+                    name: t,
+                    type: 'date'
+                  }
+                })
+              }
+            }
+
+            if (d.data && d.data.length > 0) {
+              d.data.forEach(r => {
+                Object.keys(r).forEach(c => {
+                  if (!r[c].values) {
+                    r[c].values = JSON.parse(JSON.stringify(r[c].dates))
+                  }
+                })
+              })
+            }
+          })
+        }
+
+        return JSON.stringify(result)
+      },
+      setItem: (key, value) => localStorage.setItem(key, value),
+      removeItem: key => localStorage.removeItem(key)
+    }
+  })]
 }
 
 const store = new Vuex.Store(storeState)

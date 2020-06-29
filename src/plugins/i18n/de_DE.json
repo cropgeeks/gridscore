@@ -1,7 +1,9 @@
 {
   "appTitle": "GridScore",
+  "buttonAdd": "Hinzufügen",
   "buttonCancel": "Abbrechen",
   "buttonClose": "Schließen",
+  "buttonDelete": "Löschen",
   "buttonExport": "Exportieren",
   "buttonToggleGps": "GPS nutzen?",
   "buttonOk": "Ok",
@@ -16,9 +18,10 @@
   "formLabelHeatmapTrait": "Merkmal",
   "formLabelSettingsCols": "Spalten",
   "formLabelSettingsRows": "Zeilen",
-  "formLabelSettingsTraits": "Merkmalsnamen",
+  "formLabelSettingsTraits": "Merkmal hinzufügen",
   "formLabelSettingsVarieties": "Sortennamen",
   "formPlaceholderExportLoading": "Lade...",
+  "labelCheckboxExportUseDates": "Daten benutzen?",
   "labelHomeIntro": "Starte mit dem Einstellen des Versuchs.",
   "labelNoData": "Keine Daten gefunden.",
   "linkExport": "Als Datei herunterladen",
@@ -29,6 +32,10 @@
   "modalTitleSetupWarning": "Bestätigung",
   "modalTitleExport": "Exportieren",
   "modalTitleSettings": "Einstellungen",
-  "pageAboutParagraphOne": "GridScore ist eine Feldversuch-Phänotypisierungs-App für zeitbasierte Daten. Mit ihm kann man Ereignisse die im Feld auftreten auf einem Beet-Level festhalten. Dies könnten zum Beispiel das Hervortreten der Pflanze oder die Blütezeit sein.",
-  "pageAboutParagraphTwo": "GridScore wurde entwickelt von <a href='https://hutton.ac.uk/staff/sebastian-raubach'>Sebastian Raubach</a>. Bei Fragen, Anregungen oder generellem Feedback bitte direkt an <a href='mailto:sebastian.raubach@hutton.ac.uk'>Sebastian</a> wenden."
+  "pageAboutParagraphOne": "GridScore ist eine Feldversuch-Phänotypisierungs-App für Merkmalsdaten. Mit ihm kann man festhalten was im Feld auf einem Beet-Level passiert. Dies könnten zum Beispiel das Hervortreten der Pflanze, die Blütezeit, Pflanzenhöhe, Blütenfarbe usw. sein.",
+  "pageAboutParagraphTwo": "GridScore wurde entwickelt von <a href='https://hutton.ac.uk/staff/sebastian-raubach'>Sebastian Raubach</a>. Bei Fragen, Anregungen oder generellem Feedback bitte direkt an <a href='mailto:sebastian.raubach@hutton.ac.uk'>Sebastian</a> wenden.",
+  "traitTypeDate": "Datum",
+  "traitTypeFloat": "Fließkommazahl",
+  "traitTypeInt": "Ganzzahl",
+  "traitTypeText": "Freitext"
 }
