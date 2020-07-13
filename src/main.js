@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from '@/App.vue'
 import {
+  BadgePlugin,
   LayoutPlugin,
   ModalPlugin,
   DropdownPlugin,
@@ -28,6 +29,7 @@ import './registerServiceWorker'
 
 Vue.config.productionTip = false
 
+Vue.use(BadgePlugin)
 Vue.use(LayoutPlugin)
 Vue.use(ModalPlugin)
 Vue.use(DropdownPlugin)

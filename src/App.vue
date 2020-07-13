@@ -17,7 +17,10 @@
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-nav-item-dropdown :text="$t('menuLocale')" right>
-            <b-dropdown-item v-for="language in languages" :key="`locale-${language.locale}`" @click="onLocaleChanged(language)">{{ language.name }}</b-dropdown-item>
+            <b-dropdown-item v-for="language in languages" :key="`locale-${language.locale}`" @click="onLocaleChanged(language)">
+              <span class="mr-2">{{ language.icon }}</span>
+              <span>{{ language.name }}</span>
+            </b-dropdown-item>
           </b-nav-item-dropdown>
           <b-nav-item :to="{ name: 'about' }">About</b-nav-item>
         </b-navbar-nav>
@@ -38,10 +41,12 @@ export default {
     return {
       languages: [{
         locale: 'en_GB',
-        name: 'British English'
+        name: 'British English',
+        icon: '🇬🇧'
       }, {
         locale: 'de_DE',
-        name: 'Deutsch - Deutschland'
+        name: 'Deutsch - Deutschland',
+        icon: '🇩🇪'
       }]
     }
   },

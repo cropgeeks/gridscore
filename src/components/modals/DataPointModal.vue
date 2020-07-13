@@ -8,7 +8,9 @@
       <b-form-group v-for="(trait, index) in dataset.traits"
                     :key="`trait-${index}`"
                     :label-for="`trait-${index}`">
-        <template v-slot:label><span :style="{ color: colors[index % colors.length] }">⬤ {{ trait.name }} <b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span></template>
+        <template v-slot:label>
+          <span :style="{ color: colors[index % colors.length] }">⬤ {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
+        </template>
 
         <b-form-datepicker v-if="trait.type === 'date'"       :id="`trait-${index}`" v-model="values[index]" reset-button :reset-value="null" @input="(event) => onDataChanged(event, index)"/>
         <b-form-input      v-else-if="trait.type === 'int'"   :id="`trait-${index}`" v-model="values[index]" type="number" />

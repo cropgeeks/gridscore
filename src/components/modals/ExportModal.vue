@@ -10,8 +10,8 @@
                    label-for="exportText">
       <b-form-textarea rows="8" readonly :value="text" id="exportText" :placeholder="$t('formPlaceholderExportLoading')" />
     </b-input-group>
-    <b-form-checkbox switch v-model="showDates">{{ $t('labelCheckboxExportUseDates') }}</b-form-checkbox>
-    <a :href="getHref" :download="getFilename" v-if="text && (text !== $t('labelNoData'))">{{ $t('linkExport') }}</a>
+    <b-form-checkbox class="mb-2" switch v-model="showDates">{{ $t('labelCheckboxExportUseDates') }}</b-form-checkbox>
+    <a :href="getHref" :download="getFilename" v-if="text && (text !== $t('labelNoData'))">&#128190; {{ $t('linkExport') }}</a>
   </b-modal>
 </template>
 
