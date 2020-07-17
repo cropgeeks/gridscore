@@ -12,6 +12,7 @@ import {
   ButtonGroupPlugin,
   FormPlugin,
   FormCheckboxPlugin,
+  FormDatepickerPlugin,
   FormInputPlugin,
   FormGroupPlugin,
   FormTextareaPlugin,
@@ -41,6 +42,7 @@ Vue.use(ButtonGroupPlugin)
 Vue.use(FormPlugin)
 Vue.use(FormInputPlugin)
 Vue.use(FormCheckboxPlugin)
+Vue.use(FormDatepickerPlugin)
 Vue.use(FormGroupPlugin)
 Vue.use(FormTextareaPlugin)
 Vue.use(FormFilePlugin)
