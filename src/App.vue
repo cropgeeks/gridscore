@@ -69,4 +69,9 @@ export default {
 @import '~bootstrap/scss/bootstrap';
 @import '~bootstrap-vue/src/index.scss';
 @import '~bootswatch/dist/sandstone/bootswatch';
+
+html {
+  position: relative;
+  min-height: 100%;
+}
 </style>

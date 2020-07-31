@@ -8,6 +8,7 @@ import {
   BVModalPlugin,
   NavbarPlugin,
   TablePlugin,
+  ImagePlugin,
   ButtonPlugin,
   ButtonGroupPlugin,
   FormPlugin,
@@ -31,6 +32,7 @@ import './registerServiceWorker'
 Vue.config.productionTip = false
 
 Vue.use(BadgePlugin)
+Vue.use(ImagePlugin)
 Vue.use(LayoutPlugin)
 Vue.use(ModalPlugin)
 Vue.use(DropdownPlugin)

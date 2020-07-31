@@ -5,6 +5,8 @@
   "buttonClose": "Close",
   "buttonDelete": "Delete",
   "buttonExport": "Export",
+  "buttonSave": "Save",
+  "buttonTakePhoto": "Tag photo",
   "buttonToggleGps": "Use GPS?",
   "buttonOk": "Ok",
   "buttonOpenFile": "Load from file",

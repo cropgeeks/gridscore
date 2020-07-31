@@ -22,10 +22,16 @@
         <b-form-input v-model="comment" id="comment" />
       </b-form-group>
     </b-form>
+    <template>
+      <b-button @click="$refs.imageModal.show()">&#128247; {{ $t('buttonTakePhoto') }}</b-button>
+    </template>
+    <ImageModal :name="name" ref="imageModal" />
   </b-modal>
 </template>
 
 <script>
+import ImageModal from '@/components/modals/ImageModal'
+
 export default {
   props: {
     row: {
@@ -48,8 +54,13 @@ export default {
       dates: {
       },
       name: null,
-      comment: null
+      comment: null,
+      imageFile: null,
+      imageData: null
     }
+  },
+  components: {
+    ImageModal
   },
   methods: {
     getTraitTypeText: function (trait) {
@@ -67,6 +78,8 @@ export default {
       }
     },
     show: function () {
+      this.imageFile = null
+      this.imageData = null
       this.values = JSON.parse(JSON.stringify(this.dataset.data[this.row][this.col].values))
       this.dates = JSON.parse(JSON.stringify(this.dataset.data[this.row][this.col].dates))
       this.name = this.dataset.data[this.row][this.col].name
