@@ -12,4 +12,4 @@
 ![](https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/screenshot-timeline.jpg "Timeline")
 ![](https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/screenshot-heatmap.jpg "Heatmap")
 
-GridScore is a field trial phenotyping app for time-based data. It lets you keep track of events that happen in the field on a plot-level basis. This could be anything from plant emergence to flowering date.
+GridScore is a field trial phenotyping app for trait data. It lets you keep track of what's happening in the field on a plot-level basis. This could be anything from plant emergence, flowering date, plant height, flower colour, etc.
