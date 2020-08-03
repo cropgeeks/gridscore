@@ -62,6 +62,18 @@ export default {
     }
   },
   methods: {
+    toBase64: function (file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => resolve(reader.result)
+        reader.onerror = error => reject(error)
+      })
+    },
+    getDateTime: function (date) {
+      const dateString = date.toISOString()
+      return `${dateString.split('T')[0]}_${dateString.split('T')[1].split('.')[0].replace(/:/g, '-')}`
+    },
     downloadImage: function () {
       if (this.imageFile) {
         var dl = document.createElement('a')
