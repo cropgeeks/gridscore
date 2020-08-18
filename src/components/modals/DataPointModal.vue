@@ -3,6 +3,7 @@
            :ok-title="$t('buttonOk')"
            :cancel-title="$t('buttonCancel')"
            @ok.prevent="onSubmit"
+           @shown="setFocus"
            ref="dataPointModal">
     <b-form @submit.prevent="onSubmit">
       <b-form-group v-for="(trait, index) in dataset.traits"
@@ -12,10 +13,10 @@
           <span :style="{ color: colors[index % colors.length] }">⬤ {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
         </template>
 
-        <b-form-datepicker v-if="trait.type === 'date'"       :id="`trait-${index}`" v-model="values[index]" reset-button :reset-value="null" @input="(event) => onDataChanged(event, index)"/>
-        <b-form-input      v-else-if="trait.type === 'int'"   :id="`trait-${index}`" v-model="values[index]" type="number" />
-        <b-form-input      v-else-if="trait.type === 'float'" :id="`trait-${index}`" v-model="values[index]" type="number" :step="0.02" />
-        <b-form-input      v-else-if="trait.type === 'text'"  :id="`trait-${index}`" v-model="values[index]" type="text" />
+        <b-form-datepicker v-if="trait.type === 'date'"       :id="`trait-${index}`" :ref="`trait-${index}`" @keyup.enter="traverseForm(index + 1)" v-model="values[index]" reset-button :reset-value="null" @input="(event) => onDataChanged(event, index)"/>
+        <b-form-input      v-else-if="trait.type === 'int'"   :id="`trait-${index}`" :ref="`trait-${index}`" @keyup.enter="traverseForm(index + 1)" v-model="values[index]" type="number" />
+        <b-form-input      v-else-if="trait.type === 'float'" :id="`trait-${index}`" :ref="`trait-${index}`" @keyup.enter="traverseForm(index + 1)" v-model="values[index]" type="number" :step="0.02" />
+        <b-form-input      v-else-if="trait.type === 'text'"  :id="`trait-${index}`" :ref="`trait-${index}`" @keyup.enter="traverseForm(index + 1)" v-model="values[index]" type="text" />
       </b-form-group>
 
       <b-form-group :label="$t('formLabelComment')" label-for="comment">
@@ -88,6 +89,23 @@ export default {
     },
     hide: function () {
       this.$nextTick(() => this.$refs.dataPointModal.hide())
+    },
+    setFocus: function () {
+      // Focus the first non-empty trait input
+      // for (let i = 0; i < this.dataset.traits.length; i++) {
+      //   if (this.values[i] === undefined || this.values[i] === null || this.values[i] === '') {
+      //     this.$refs[`trait-${i}`][0].focus()
+      //     break
+      //   }
+      // }
+
+      // Focus the first trait input
+      this.$refs['trait-0'][0].focus()
+    },
+    traverseForm: function (newIndex) {
+      let i = newIndex % this.values.length
+
+      this.$refs[`trait-${i}`][0].focus()
     },
     onDataChanged: function (event, index) {
       if (event === null || event === undefined || event === '') {
