@@ -4,7 +4,7 @@
              striped
              hover
              sticky-header="100vh"
-             class="grid-table mb-0"
+             class="grid-table mb-0 position-relative"
              @head-clicked="onHeadClicked"
              :items="dataset.data"
              :fields="getFields"
@@ -13,7 +13,7 @@
         {{ data.index + 1 }}
       </template>
       <template v-slot:cell()="data">
-        <div v-on:click="onClick(data, $event)" class="text-center" :class="(data.value.comment && data.value.comment.length > 0) ? 'table-warning' : null">
+        <div v-on:click="onClick(data, $event)" :class="`text-center ${getClass(data)}`">
           <span class="d-block">{{ data.value.name ? data.value.name.substring(0, 4) : '' }}</span>
           <template v-for="(trait, index) in dataset.traits">
             <span class="mx-1" :key="`trait-${index}`" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0">⬤</span>
@@ -33,6 +33,10 @@ export default {
     visibleTraits: {
       type: Array,
       default: null
+    },
+    highlightPosition: {
+      type: Object,
+      default: () => null
     }
   },
   data: function () {
@@ -41,6 +45,17 @@ export default {
     }
   },
   computed: {
+    highlightCell: function () {
+      if (this.highlightPosition) {
+        // Compute the index of the cell that should be highlighted based on the given highlight position
+        return {
+          col: Math.floor(this.dataset.cols * this.highlightPosition.x / 100.0),
+          row: this.dataset.rows - Math.ceil(this.dataset.rows * this.highlightPosition.y / 100.0)
+        }
+      } else {
+        return null
+      }
+    },
     getFields: function () {
       let result = [{
         key: '0',
@@ -67,6 +82,18 @@ export default {
     }
   },
   methods: {
+    getClass: function (data) {
+      const rowIndex = data.index
+      const colIndex = parseInt(data.field.key) - 1
+
+      if (this.highlightCell && (rowIndex === this.highlightCell.row) && (colIndex === this.highlightCell.col)) {
+        // If this is the user's position, return success
+        return 'table-success'
+      } else {
+        // Else, check if there's a comment, then show warning colour
+        return (data.value.comment && data.value.comment.length > 0) ? 'table-warning' : null
+      }
+    },
     onHeadClicked: function (key) {
       Vue.set(this.markedColumns, key - 1, !this.markedColumns[key - 1])
     },

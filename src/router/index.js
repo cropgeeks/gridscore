@@ -23,6 +23,11 @@ const router = new Router({
       component: () => import('@/views/Heatmap.vue')
     },
     {
+      path: '/locations',
+      name: 'location-map',
+      component: () => import('@/views/LocationMap.vue')
+    },
+    {
       path: '/about',
       name: 'about',
       component: () => import('@/views/About.vue')

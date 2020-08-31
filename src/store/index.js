@@ -48,6 +48,12 @@ const storeState = {
     ON_TRAITS_CHANGED_MUTATION: function (state, newTraits) {
       state.datasets[state.datasetIndex].traits = newTraits
     },
+    ON_CORNER_POINTS_CHANGED_MUTATION: function (state, newCornerPoints) {
+      state.datasets[state.datasetIndex].cornerPoints = newCornerPoints
+    },
+    ON_DATASET_CHANGED: function (state, newDataset) {
+      Vue.set(state.datasets, state.datasetIndex, newDataset)
+    },
     ON_DATA_CHANGED_MUTATION: function (state, newData) {
       state.datasets[state.datasetIndex].data = newData
     },
@@ -65,7 +71,7 @@ const storeState = {
     ON_USE_GPS_CHANGED_MUTATION: function (state, newUseGps) {
       state.useGps = newUseGps
     },
-    ON_LOCALE_CHANGED_MUDATION: function (state, newLocale) {
+    ON_LOCALE_CHANGED_MUTATION: function (state, newLocale) {
       state.locale = newLocale
     }
   },
@@ -82,8 +88,14 @@ const storeState = {
     setTraits: function ({ commit }, traits) {
       commit('ON_TRAITS_CHANGED_MUTATION', traits)
     },
+    setCornerPoints: function ({ commit }, cornerPoints) {
+      commit('ON_CORNER_POINTS_CHANGED_MUTATION', cornerPoints)
+    },
     setData: function ({ commit }, data) {
       commit('ON_DATA_CHANGED_MUTATION', data)
+    },
+    setDataset: function ({ commit }, dataset) {
+      commit('ON_DATASET_CHANGED', dataset)
     },
     setDataPoint: function ({ commit }, dataPoint) {
       commit('ON_DATA_POINT_CHANGED_MUTATION', dataPoint)
@@ -92,7 +104,7 @@ const storeState = {
       commit('ON_USE_GPS_CHANGED_MUTATION', useGps)
     },
     setLocale: function ({ commit }, locale) {
-      commit('ON_LOCALE_CHANGED_MUDATION', locale)
+      commit('ON_LOCALE_CHANGED_MUTATION', locale)
     }
   },
   plugins: [createPersistedState({
@@ -103,6 +115,7 @@ const storeState = {
 
         if (result && result.datasets && result.datasets.length > 0) {
           result.datasets.forEach(d => {
+            // This is updating the old format to the new one where traits have types
             if (d.traits && d.traits.length > 0) {
               if ((d.traits[0] !== null) && (typeof d.traits[0] !== 'object')) {
                 d.traits = d.traits.map(t => {

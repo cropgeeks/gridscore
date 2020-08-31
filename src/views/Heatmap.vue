@@ -133,7 +133,7 @@ export default {
         }
 
         var layout = {
-          height: 25 * rows,
+          height: (25 * rows) + 200,
           xaxis: {
             showgrid: false,
             tickmode: 'array',

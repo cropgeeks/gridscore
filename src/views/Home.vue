@@ -14,10 +14,10 @@
       <b-button @click="onExportClicked" class="ml-auto">{{ $t('buttonExport') }}</b-button>
     </div>
 
-    <GridTable v-on:cell-clicked="onCellClicked" v-if="dataset && dataset.traits && dataset.traits.length > 0" :visibleTraits="visibleTraits" />
+    <GridTable v-on:cell-clicked="onCellClicked" v-if="dataset && dataset.traits && dataset.traits.length > 0" :visibleTraits="visibleTraits" :highlightPosition="userPosition" />
     <h3 class="ml-3 mt-3" v-else>🡅 {{ $t('labelHomeIntro') }}</h3>
     <ExportModal ref="exportModal" />
-    <SettingsModal ref="settingsModal" v-on:settings-changed="onSettingsChanged" />
+    <SettingsModal ref="settingsModal" v-on:settings-changed="onSettingsChanged" :geolocation="geolocation" />
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" :geolocation="geolocation" />
   </div>
 </template>
@@ -27,6 +27,8 @@ import GridTable from '@/components/tables/GridTable'
 import DataPointModal from '@/components/modals/DataPointModal'
 import SettingsModal from '@/components/modals/SettingsModal'
 import ExportModal from '@/components/modals/ExportModal'
+
+const fixPer = require('fix-perspective')
 
 export default {
   data: function () {
@@ -46,6 +48,23 @@ export default {
     SettingsModal,
     ExportModal
   },
+  computed: {
+    userPosition: function () {
+      if (this.dataset.cornerPoints && (this.dataset.cornerPoints.length === 4) && this.geolocation) {
+        const from = this.dataset.cornerPoints.map(c => { return { x: c[0], y: c[1] } })
+        const to = [
+          { x: 0, y: 0 },
+          { x: 100, y: 0 },
+          { x: 100, y: 100 },
+          { x: 0, y: 100 }
+        ]
+        const perspT = fixPer(from, to)
+        return perspT(this.geolocation.lat, this.geolocation.lng)
+      } else {
+        return null
+      }
+    }
+  },
   methods: {
     toggleVisibility: function (index) {
       this.visibleTraits.splice(index, 1, !this.visibleTraits[index])
@@ -54,6 +73,10 @@ export default {
       this.$store.dispatch('setRows', settings.rows)
       this.$store.dispatch('setCols', settings.cols)
       this.$store.dispatch('setTraits', settings.traits)
+      // TODO: Change this to acual values
+      if (settings.cornerPoints && settings.cornerPoints.length === 4) {
+        this.$store.dispatch('setCornerPoints', settings.cornerPoints)
+      }
       this.visibleTraits = settings.traits.map(t => true)
       let data = []
       let counter = 0
@@ -84,8 +107,9 @@ export default {
       this.$store.dispatch('setUseGps', value)
     },
     startGeoTracking: function () {
-      if (this.firstRun === false && this.geolocationWatchId === null) {
+      if (this.geolocationWatchId === null) {
         if (navigator.geolocation) {
+          const options = { enableHighAccuracy: false, maximumAge: 1000, timeout: 20000 }
           this.geolocationWatchId = navigator.geolocation.watchPosition(position => {
             if (position && position.coords) {
               this.geolocation = {
@@ -94,7 +118,7 @@ export default {
                 elv: position.coords.altitude
               }
             }
-          })
+          }, null, options)
         }
       }
     }

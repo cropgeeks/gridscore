@@ -8,6 +8,7 @@ import {
   BVModalPlugin,
   NavbarPlugin,
   TablePlugin,
+  CollapsePlugin,
   ImagePlugin,
   ButtonPlugin,
   ButtonGroupPlugin,
@@ -29,6 +30,15 @@ import mixin from '@/mixin'
 import { i18n } from '@/plugins/i18n.js'
 import './registerServiceWorker'
 
+import { Icon } from 'leaflet'
+
+delete Icon.Default.prototype._getIconUrl
+Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+})
+
 Vue.config.productionTip = false
 
 Vue.use(BadgePlugin)
@@ -37,6 +47,7 @@ Vue.use(LayoutPlugin)
 Vue.use(ModalPlugin)
 Vue.use(DropdownPlugin)
 Vue.use(BVModalPlugin)
+Vue.use(CollapsePlugin)
 Vue.use(NavbarPlugin)
 Vue.use(TablePlugin)
 Vue.use(ButtonPlugin)

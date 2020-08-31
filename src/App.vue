@@ -12,6 +12,7 @@
         <b-navbar-nav>
           <b-nav-item :to="{ name: 'timeline' }">{{ $t('menuTimeSeries') }}</b-nav-item>
           <b-nav-item :to="{ name: 'heatmap' }">{{ $t('menuHeatmap') }}</b-nav-item>
+          <b-nav-item :to="{ name: 'location-map' }">{{ $t('menuLocationMap') }}</b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
