@@ -47,7 +47,7 @@
                 <template v-slot:append>
                   <b-button variant="success" :title="$t('buttonAdd')" @click="addTrait">＋</b-button>
                 </template>
-                <b-form-input id="trait" :state="state.traits" required v-model="trait" />
+                <b-form-input id="trait" :state="state.traits" ref="traitName" required v-model="trait" v-on:keyup.enter="addTrait" />
               </b-input-group>
             </b-form-group>
           </b-col>
@@ -133,6 +133,8 @@ export default {
           name: this.trait,
           type: 'date'
         })
+        this.trait = null
+        this.$refs.traitName.focus()
       }
     },
     loadVarietiesFile: function () {
