@@ -109,7 +109,7 @@ export default {
     startGeoTracking: function () {
       if (this.geolocationWatchId === null) {
         if (navigator.geolocation) {
-          const options = { enableHighAccuracy: false, maximumAge: 1000, timeout: 20000 }
+          const options = { enableHighAccuracy: true, maximumAge: 100, timeout: 20000 }
           this.geolocationWatchId = navigator.geolocation.watchPosition(position => {
             if (position && position.coords) {
               this.geolocation = {

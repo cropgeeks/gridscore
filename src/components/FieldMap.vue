@@ -34,6 +34,11 @@ import GpsInput from '@/components/GpsInput'
 import Map from '@/components/Map'
 
 export default {
+  data: function () {
+    return {
+      locations: [null, null, null, null]
+    }
+  },
   props: {
     geolocation: {
       type: Object,
@@ -46,15 +51,6 @@ export default {
     cols: {
       type: Number,
       default: 1
-    }
-  },
-  computed: {
-    locations: function () {
-      if (this.dataset && this.dataset.cornerPoints) {
-        return this.dataset.cornerPoints.map(l => [l[0], l[1]])
-      } else {
-        return [null, null, null, null]
-      }
     }
   },
   components: {
@@ -70,6 +66,11 @@ export default {
     },
     getCornerPoints: function () {
       return this.locations
+    }
+  },
+  mounted: function () {
+    if (this.dataset && this.dataset.cornerPoints && this.dataset.cornerPoints.length === 4) {
+      this.locations = this.dataset.cornerPoints.map(l => [l[0], l[1]])
     }
   }
 }

@@ -86,7 +86,7 @@ export default {
     locations: {
       deep: true,
       handler: function (newValue) {
-        if (this.locations) {
+        if (newValue) {
           this.updateMarkers()
           this.updateBounds()
         }
@@ -109,6 +109,8 @@ export default {
       // If the bounds are valid, move the map
       if (bounds.isValid()) {
         this.$refs.fieldMap.fitBounds(bounds.pad(0.1))
+      } else if (bounds.getCenter()) {
+        this.$refs.fieldMap.panTo(bounds.getCenter())
       }
     },
     invalidateSize: function () {
