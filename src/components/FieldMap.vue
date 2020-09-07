@@ -1,5 +1,6 @@
 <template>
   <div>
+    <span class="text-info">{{ $t('pageFieldLayoutText') }}</span>
     <b-row>
       <b-col cols=6>
         <b-form-group :label="$t('formLabelFieldLayoutRowCol', { row: 1, col: 1 })" label-for="top-left">
