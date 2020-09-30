@@ -48,13 +48,24 @@
                            @keyup.enter="traverseForm(index + 1)"
                            v-model="values[index]"
                            type="text" />
-        <b-form-select     v-else-if="trait.type === 'categorical' && trait.restrictions && trait.restrictions.categories"
+        <template v-if="trait.type === 'categorical' && trait.restrictions && trait.restrictions.categories">
+          <b-form-select   v-if="trait.restrictions.categories.length > 3"
                            :id="`trait-${index}`"
                            :ref="`trait-${index}`"
                            :state="formState[index]"
                            @keyup.enter="traverseForm(index + 1)"
                            v-model="values[index]"
                            :options="[{ value: null, text: $t('formSelectCategory') }, ...trait.restrictions.categories]" />
+          <b-form-radio-group v-else
+                           :id="`trait-${index}`"
+                           :ref="`trait-${index}`"
+                           :state="formState[index]"
+                           buttons
+                           button-variant="outline-secondary"
+                           @keyup.enter="traverseForm(index + 1)"
+                           v-model="values[index]"
+                           :options="[...trait.restrictions.categories, { value: null, text: '⦸' }]" />
+        </template>
       </b-form-group>
 
       <b-form-group :label="$t('formLabelComment')" label-for="comment">
@@ -149,7 +160,9 @@ export default {
     traverseForm: function (newIndex) {
       let i = newIndex % this.values.length
 
-      this.$refs[`trait-${i}`][0].focus()
+      if (this.$refs[`trait-${i}`][0] && this.$refs[`trait-${i}`][0].focus) {
+        this.$refs[`trait-${i}`][0].focus()
+      }
     },
     onDataChanged: function (event, index) {
       if (event === null || event === undefined || event === '') {

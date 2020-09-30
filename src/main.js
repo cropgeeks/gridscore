@@ -18,6 +18,7 @@ import {
   FormInputPlugin,
   FormGroupPlugin,
   FormTextareaPlugin,
+  FormRadioPlugin,
   FormFilePlugin,
   ListGroupPlugin,
   FormSelectPlugin,
@@ -55,6 +56,7 @@ Vue.use(ButtonGroupPlugin)
 Vue.use(FormPlugin)
 Vue.use(FormInputPlugin)
 Vue.use(FormCheckboxPlugin)
+Vue.use(FormRadioPlugin)
 Vue.use(FormDatepickerPlugin)
 Vue.use(FormGroupPlugin)
 Vue.use(FormTextareaPlugin)
