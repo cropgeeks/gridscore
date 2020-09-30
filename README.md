@@ -22,7 +22,7 @@ All your data is stored in the app and can be exported at any time. This, howeve
 
 ### Setup
 ![](https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/screenshot-setup.png "Setup")
-The setup screen is used to define some basic characteristics of your field trial. Row and column counts as well as a list of germplasm/variety names is used to identify each plot uniquely. Traits are then defined along with their type which can be one of 'integer', 'floating point', 'date' or 'text'.
+The setup screen is used to define some basic characteristics of your field trial. Row and column counts as well as a list of germplasm/variety names is used to identify each plot uniquely. Traits are then defined along with their type which can be one of 'integer', 'floating point', 'date', 'text' or 'categorical' (pick from a list of options).
 
 Optionally, the corner points of the field can be configured. This can either be done my walking to the corners of the field and clicking the button to get your GPS position or by manually entering the location. Defining the corner points allows GridScore to show your recorded data in the context of the field plots as well as to highlight your location in the data recording table for easier navigation and orientation.
 

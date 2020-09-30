@@ -51,7 +51,10 @@ export default {
   computed: {
     userPosition: function () {
       if (this.dataset.cornerPoints && (this.dataset.cornerPoints.length === 4) && this.geolocation) {
-        const from = this.dataset.cornerPoints.map(c => { return { x: c[0], y: c[1] } })
+        const from = this.dataset.cornerPoints.filter(c => c !== null).map(c => { return { x: c[0], y: c[1] } })
+        if (from.length !== 4) {
+          return null
+        }
         const to = [
           { x: 0, y: 0 },
           { x: 100, y: 0 },

@@ -32,10 +32,11 @@ export default {
 
       const rows = this.dataset.rows
       const cols = this.dataset.cols
+      const actualTrait = this.dataset.traits[this.trait]
       let hasData = false
       let data = null
 
-      if (this.dataset.traits[this.trait].type === 'date' || this.dataset.traits[this.trait].type === 'text') {
+      if (actualTrait.type === 'date' || actualTrait.type === 'text') {
         outer:
         for (let row = 1; row <= rows; row++) {
           for (let col = 1; col <= cols; col++) {
@@ -58,7 +59,7 @@ export default {
       }
 
       if (hasData === true) {
-        if (this.dataset.traits[this.trait].type === 'date' || this.dataset.traits[this.trait].type === 'text') {
+        if (actualTrait.type === 'date' || actualTrait.type === 'text') {
           let minDateString = '9999-12-31'
 
           for (let row = 1; row <= rows; row++) {
@@ -103,6 +104,7 @@ export default {
             colorscale: [[0, '#dddddd'], [1, this.colors[this.trait % this.colors.length]]]
           }]
         } else {
+          const isCategorical = actualTrait.type === 'categorical' && actualTrait.restrictions && actualTrait.restrictions.categories
           data = [{
             x: Array.from({ length: cols }, (v, k) => k + 1),
             y: Array.from({ length: rows }, (v, k) => k + 1),
@@ -112,7 +114,12 @@ export default {
                 const value = this.dataset.data[rows - index - 1][col].values[this.trait]
 
                 if (value) {
-                  result.push(value)
+                  if (isCategorical) {
+                    // Use the index, because the heatmap doesn't support categorical data
+                    result.push(actualTrait.restrictions.categories.indexOf(value))
+                  } else {
+                    result.push(value)
+                  }
                 } else {
                   result.push(NaN)
                 }
@@ -122,13 +129,24 @@ export default {
             text: this.dataset.data.map((row, index) => {
               let result = []
               for (let col = 1; col <= cols; col++) {
-                result.push(this.dataset.data[rows - index - 1][col].name)
+                if (isCategorical) {
+                  // Plot the actual category rather than just its index
+                  result.push(`x: ${col}<br>y: ${rows - index - 1}<br>z: ${this.dataset.data[rows - index - 1][col].values[this.trait]}<br>${this.dataset.data[rows - index - 1][col].name}`)
+                } else {
+                  result.push(this.dataset.data[rows - index - 1][col].name)
+                }
               }
               return result
             }),
             type: 'heatmap',
             hoverongaps: false,
-            colorscale: [[0, '#dddddd'], [1, this.colors[this.trait % this.colors.length]]]
+            colorscale: [[0, '#dddddd'], [1, this.colors[this.trait % this.colors.length]]],
+            hoverinfo: isCategorical ? 'text' : 'all',
+            colorbar: isCategorical ? {
+              tickmode: 'array',
+              tickvals: actualTrait.restrictions.categories.map((c, i) => i),
+              ticktext: actualTrait.restrictions.categories
+            } : null
           }]
         }
 

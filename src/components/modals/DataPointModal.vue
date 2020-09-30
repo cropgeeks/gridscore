@@ -5,7 +5,7 @@
            @ok.prevent="onSubmit"
            @shown="setFocus"
            ref="dataPointModal">
-    <b-form @submit.prevent="onSubmit">
+    <b-form @submit.prevent="onSubmit" :validated="formValidated">
       <b-form-group v-for="(trait, index) in dataset.traits"
                     :key="`trait-${index}`"
                     :label-for="`trait-${index}`">
@@ -13,10 +13,48 @@
           <span :style="{ color: colors[index % colors.length] }">⬤ {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
         </template>
 
-        <b-form-datepicker v-if="trait.type === 'date'"       :id="`trait-${index}`" :ref="`trait-${index}`" @keyup.enter="traverseForm(index + 1)" v-model="values[index]" reset-button :reset-value="null" @input="(event) => onDataChanged(event, index)"/>
-        <b-form-input      v-else-if="trait.type === 'int'"   :id="`trait-${index}`" :ref="`trait-${index}`" @keyup.enter="traverseForm(index + 1)" v-model="values[index]" type="number" />
-        <b-form-input      v-else-if="trait.type === 'float'" :id="`trait-${index}`" :ref="`trait-${index}`" @keyup.enter="traverseForm(index + 1)" v-model="values[index]" type="number" :step="0.02" />
-        <b-form-input      v-else-if="trait.type === 'text'"  :id="`trait-${index}`" :ref="`trait-${index}`" @keyup.enter="traverseForm(index + 1)" v-model="values[index]" type="text" />
+        <b-form-datepicker v-if="trait.type === 'date'"
+                           :id="`trait-${index}`"
+                           :ref="`trait-${index}`"
+                           :state="formState[index]"
+                           @keyup.enter="traverseForm(index + 1)"
+                           v-model="values[index]"
+                           reset-button
+                           :reset-value="null"
+                           @input="(event) => onDataChanged(event, index)"/>
+        <b-form-input      v-else-if="trait.type === 'int'"
+                           :id="`trait-${index}`"
+                           :ref="`trait-${index}`"
+                           :state="formState[index]"
+                           @keyup.enter="traverseForm(index + 1)"
+                           v-model.number="values[index]"
+                           type="number"
+                           :min="(trait.restrictions && trait.restrictions.min !== null && trait.restrictions.min !== undefined) ? trait.restrictions.min : null"
+                           :max="(trait.restrictions && trait.restrictions.max !== null && trait.restrictions.max !== undefined) ? trait.restrictions.max : null" />
+        <b-form-input      v-else-if="trait.type === 'float'"
+                           :id="`trait-${index}`"
+                           :ref="`trait-${index}`"
+                           :state="formState[index]"
+                           @keyup.enter="traverseForm(index + 1)"
+                           v-model.number="values[index]"
+                           type="number"
+                           :min="(trait.restrictions && trait.restrictions.min !== null && trait.restrictions.min !== undefined) ? trait.restrictions.min : null"
+                           :max="(trait.restrictions && trait.restrictions.max !== null && trait.restrictions.max !== undefined) ? trait.restrictions.max : null"
+                           :step="0.02" />
+        <b-form-input      v-else-if="trait.type === 'text'"
+                           :id="`trait-${index}`"
+                           :ref="`trait-${index}`"
+                           :state="formState[index]"
+                           @keyup.enter="traverseForm(index + 1)"
+                           v-model="values[index]"
+                           type="text" />
+        <b-form-select     v-else-if="trait.type === 'categorical' && trait.restrictions && trait.restrictions.categories"
+                           :id="`trait-${index}`"
+                           :ref="`trait-${index}`"
+                           :state="formState[index]"
+                           @keyup.enter="traverseForm(index + 1)"
+                           v-model="values[index]"
+                           :options="[{ value: null, text: $t('formSelectCategory') }, ...trait.restrictions.categories]" />
       </b-form-group>
 
       <b-form-group :label="$t('formLabelComment')" label-for="comment">
@@ -57,7 +95,9 @@ export default {
       name: null,
       comment: null,
       imageFile: null,
-      imageData: null
+      imageData: null,
+      formValidated: false,
+      formState: []
     }
   },
   components: {
@@ -74,11 +114,15 @@ export default {
           return this.$t('traitTypeFloat')
         case 'text':
           return this.$t('traitTypeText')
+        case 'categorical':
+          return this.$t('traitTypeCategorical')
         default:
           return null
       }
     },
     show: function () {
+      this.formValidated = false
+      this.formState = this.dataset.traits.map(t => null)
       this.imageFile = null
       this.imageData = null
       this.values = JSON.parse(JSON.stringify(this.dataset.data[this.row][this.col].values))
@@ -114,6 +158,29 @@ export default {
       }
     },
     onSubmit: function () {
+      this.formState = this.dataset.traits.map((t, i) => {
+        if (this.values[i] === '' || this.values[i] === null) {
+          return true
+        } else if (t.restrictions) {
+          if (t.type === 'categorical') {
+            // Check whether the value is one of the pre-defined categories
+            return t.restrictions.categories.indexOf(this.values[i]) !== -1
+          } else if (t.type === 'int' || t.type === 'float') {
+            // Check whether the value lies between the required min and max
+            return t.restrictions.min <= this.values[i] && this.values[i] <= t.restrictions.max
+          }
+        } else {
+          return true
+        }
+      })
+      this.formValidated = true
+
+      for (let i = 0; i < this.formState.length; i++) {
+        if (this.formState[i] === false) {
+          return
+        }
+      }
+
       this.values.forEach((v, i) => {
         // Ignore empty values, set them to null
         if (this.values[i] === '' || this.values[i] === null) {

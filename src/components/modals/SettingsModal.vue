@@ -31,12 +31,15 @@
           </b-col>
           <b-col cols=12 md=6>
             <b-list-group v-if="newTraits && newTraits.length > 0" class="mb-3 trait-list">
-              <b-list-group-item v-for="(trait, index) in newTraits" :key="`trait-${index}`" class="d-flex justify-content-between align-items-center">
+              <b-list-group-item v-for="(trait, index) in newTraits" :key="`trait-${index}`" class="d-flex justify-content-between align-items-center" :variant="getVariant(trait)">
                 <span>{{ trait.name }}</span>
 
                 <b-input-group class="trait-type-select">
                   <template v-slot:append>
-                    <b-button variant="danger" :title="$t('buttonDelete')" @click="removeTrait(index)">×</b-button>
+                    <b-button-group>
+                      <b-button variant="info" :title="$t('buttonConfigure')" @click="configureTrait(index)" v-if="trait.type === 'int' || trait.type === 'float' || trait.type === 'categorical'">⚙</b-button>
+                      <b-button variant="danger" :title="$t('buttonDelete')" @click="removeTrait(index)">×</b-button>
+                    </b-button-group>
                   </template>
                   <b-form-select v-model="trait.type" :options="traitTypes" />
                 </b-input-group>
@@ -60,12 +63,14 @@
       </b-form>
     </b-modal>
     <ImportExportModal :isImport="isImport" v-on:dataset-changed="reset" ref="importExportModal" />
+    <TraitConfigurationModal :trait="traitToConfigure" v-on:config-changed="updateTraitConfig" ref="traitConfigModal" />
   </div>
 </template>
 
 <script>
 import FieldMap from '@/components/FieldMap'
 import ImportExportModal from '@/components/modals/ImportExportModal'
+import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
 
 export default {
   props: {
@@ -81,6 +86,7 @@ export default {
       isImport: true,
       newTraits: null,
       trait: null,
+      traitToConfigure: null,
       varieties: null,
       formValidated: false,
       traitTypes: [{
@@ -95,6 +101,9 @@ export default {
       }, {
         value: 'text',
         text: this.$t('traitTypeText')
+      }, {
+        value: 'categorical',
+        text: this.$t('traitTypeCategorical')
       }],
       state: {
         rows: null,
@@ -114,15 +123,44 @@ export default {
   },
   components: {
     FieldMap,
-    ImportExportModal
+    ImportExportModal,
+    TraitConfigurationModal
   },
   methods: {
+    getVariant: function (trait) {
+      if (trait.type === 'categorical' && (!trait.restrictions || trait.restrictions.length < 0)) {
+        return 'danger'
+      } else {
+        return null
+      }
+    },
+    updateTraitConfig: function (newConfig) {
+      switch (this.traitToConfigure.type) {
+        case 'int':
+        case 'float':
+          this.traitToConfigure.restrictions = {
+            min: newConfig.min,
+            max: newConfig.max
+          }
+          break
+        case 'categorical':
+          this.traitToConfigure.restrictions = {
+            categories: newConfig.categories
+          }
+          break
+      }
+    },
     showImportExportModal: function (isImportNew) {
       this.isImport = isImportNew
       this.$refs.importExportModal.show()
     },
     invalidateMap: function () {
       this.$nextTick(() => this.$refs.map.invalidateSize())
+    },
+    configureTrait: function (index) {
+      this.traitToConfigure = this.newTraits[index]
+
+      this.$nextTick(() => this.$refs.traitConfigModal.show())
     },
     removeTrait: function (index) {
       this.newTraits.splice(index, 1)
@@ -131,7 +169,8 @@ export default {
       if (this.trait && this.trait.length > 0) {
         this.newTraits.push({
           name: this.trait,
-          type: 'date'
+          type: 'date',
+          restrictions: null
         })
         this.trait = null
         this.$refs.traitName.focus()
@@ -180,6 +219,10 @@ export default {
         cols: this.cols > 0,
         traits: (this.newTraits !== null) && (this.newTraits.length > 0),
         varieties: (this.varieties !== null) && (this.varieties.length > 0)
+      }
+
+      if (this.newTraits.filter(t => t.type === 'categorical' && (!t.restrictions || !t.restrictions.categories || t.restrictions.categories.length < 1)).length > 0) {
+        return
       }
 
       if (this.state.rows && this.state.cols && this.state.traits && this.state.varieties) {
