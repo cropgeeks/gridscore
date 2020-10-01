@@ -20,9 +20,11 @@ import {
   FormTextareaPlugin,
   FormRadioPlugin,
   FormFilePlugin,
+  TabsPlugin,
   ListGroupPlugin,
   FormSelectPlugin,
-  InputGroupPlugin
+  InputGroupPlugin,
+  TooltipPlugin
 } from 'bootstrap-vue'
 
 import router from '@/router'
@@ -46,6 +48,7 @@ Vue.use(BadgePlugin)
 Vue.use(ImagePlugin)
 Vue.use(LayoutPlugin)
 Vue.use(ModalPlugin)
+Vue.use(TabsPlugin)
 Vue.use(DropdownPlugin)
 Vue.use(BVModalPlugin)
 Vue.use(CollapsePlugin)
@@ -64,6 +67,7 @@ Vue.use(FormFilePlugin)
 Vue.use(ListGroupPlugin)
 Vue.use(FormSelectPlugin)
 Vue.use(InputGroupPlugin)
+Vue.use(TooltipPlugin)
 Vue.mixin(mixin)
 
 Vue.use({

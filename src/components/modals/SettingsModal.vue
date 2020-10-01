@@ -24,8 +24,11 @@
             <b-form-group :label="$t('formLabelSettingsCols')" label-for="cols">
               <b-form-input id="cols" :state="state.cols" number type="number" :min="1" required v-model.number="cols" />
             </b-form-group>
-            <b-form-group :label="$t('formLabelSettingsVarieties')" label-for="varieties">
-              <b-form-textarea id="varieties" :state="state.varieties" rows=6 required v-model="varieties" />
+            <b-form-group label-for="varieties">
+              <template v-slot:label>
+                <span>{{ $t('formLabelSettingsVarieties') }}</span> <span v-b-tooltip="$t('tooltipSettingsVarieties')"> 🛈</span>
+              </template>
+              <b-form-textarea id="varieties" :state="state.varieties" rows=6 required :placeholder="$t('formPlaceholderVarieties')" v-model="varieties" />
               <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="varietiesFile" />
             </b-form-group>
           </b-col>

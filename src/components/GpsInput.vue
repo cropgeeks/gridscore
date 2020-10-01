@@ -6,7 +6,7 @@
 
     <b-input-group-append>
       <!-- Button that sets user's current position -->
-      <b-button @click="setGps">📍</b-button>
+      <b-button @click="setGps" v-b-tooltip="$t('tooltipSettingsGetLocation')">📍</b-button>
     </b-input-group-append>
   </b-input-group>
 </template>

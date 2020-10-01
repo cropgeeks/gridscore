@@ -120,6 +120,9 @@ export default {
 </script>
 
 <style>
+.grid-table {
+  table-layout: fixed;
+}
 .grid-table thead th {
   border-bottom: 1px solid;
   border-bottom-color: var(--primary) !important;

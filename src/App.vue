@@ -75,4 +75,8 @@ html {
   position: relative;
   min-height: 100%;
 }
+
+.tooltip {
+  text-transform: initial !important;
+}
 </style>

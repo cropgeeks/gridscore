@@ -6,12 +6,25 @@
            ok-only
            ref="exportModal">
     <b-progress :value="100" height="5px" variant="info" animated v-if="!text" />
-    <b-input-group :label="$t('formLabelExportText')"
-                   label-for="exportText">
-      <b-form-textarea rows="8" readonly :value="text" id="exportText" :placeholder="$t('formPlaceholderExportLoading')" />
-    </b-input-group>
-    <b-form-checkbox class="mb-2" switch v-model="showDates">{{ $t('labelCheckboxExportUseDates') }}</b-form-checkbox>
-    <a :href="getHref" :download="getFilename" v-if="text && (text !== $t('labelNoData'))">&#128190; {{ $t('linkExport') }}</a>
+    <template v-else>
+      <b-tabs content-class="mt-3">
+        <b-tab :title="$t('tabTitleExportData')" active>
+          <b-form-group :label="$t('formLabelExportText')"
+                         label-for="exportText">
+            <b-form-textarea rows="8" readonly :value="text" id="exportText" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
+          </b-form-group>
+          <b-form-checkbox class="mb-2" switch v-model="showDates">{{ $t('labelCheckboxExportUseDates') }}</b-form-checkbox>
+          <a :href="getHref" :download="getFilenameData" v-if="text && (text !== $t('labelNoData'))">&#128190; {{ $t('linkExport') }}</a>
+        </b-tab>
+        <b-tab :title="$t('tabTitleExportTraits')">
+          <b-form-group :label="$t('formLabelExportTraits')"
+                         label-for="exportTraits">
+            <b-form-textarea rows="8" readonly :value="traits" id="exportTraits" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
+          </b-form-group>
+          <a :href="getHref" :download="getFilenameTraits" v-if="traits && (traits !== $t('labelNoData'))">&#128190; {{ $t('linkExport') }}</a>
+        </b-tab>
+      </b-tabs>
+    </template>
   </b-modal>
 </template>
 
@@ -19,39 +32,54 @@
 export default {
   data: function () {
     return {
-      text: null,
       showDates: 0
     }
   },
   computed: {
-    getFilename: function () {
-      return new Date().toISOString().split('T')[0] + '.txt'
+    getFilenameData: function () {
+      return `data-${new Date().toISOString().split('T')[0]}.txt`
+    },
+    getFilenameTraits: function () {
+      return `traits-${new Date().toISOString().split('T')[0]}.txt`
     },
     getHref: function () {
       return 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.text)
-    }
-  },
-  watch: {
-    showDates: function () {
-      this.updateText()
-    }
-  },
-  methods: {
-    show: function () {
-      this.$nextTick(() => this.$refs.exportModal.show())
-      this.updateText()
     },
-    hide: function () {
-      this.$nextTick(() => this.$refs.exportModal.hide())
-    },
-    updateText: function () {
-      this.text = null
-
-      if (!this.dataset || !this.dataset.data || this.dataset.data.length < 1 || !this.dataset.traits || this.dataset.traits.length < 1) {
-        this.text = this.$t('labelNoData')
+    traits: function () {
+      if (!this.dataset || !this.dataset.traits || this.dataset.traits.length < 1) {
+        return
       }
 
-      let result = 'Variety\tLat\tLng\tElv\tComment\t' + this.dataset.traits.map(t => t.name).join('\t')
+      let result = 'Name\tShort Name\tDescription\tData Type\tUnit Name\tUnit Abbreviation\tUnit Descriptions\tTrait categories (comma separated)\n'
+
+      result += this.dataset.traits.map(t => {
+        let type
+        switch (t.type) {
+          case 'int':
+          case 'float':
+          case 'categorical':
+            type = t.type
+            break
+          case 'date':
+          case 'text':
+          default:
+            type = 'char'
+            break
+        }
+
+        const categories = (t.type === 'categorical' && t.restrictions && t.restrictions.categories) ? `[[${t.restrictions.categories.join(',')}]]` : ''
+
+        return `${t.name}\t${t.name.substring(0, 10)}\t${t.name}\t${type}\t\t\t\t${categories}`
+      }).join('\n')
+
+      return result
+    },
+    text: function () {
+      if (!this.dataset || !this.dataset.data || this.dataset.data.length < 1 || !this.dataset.traits || this.dataset.traits.length < 1) {
+        return this.$t('labelNoData')
+      }
+
+      let result = `Line/Trait\t${this.dataset.traits.map(t => t.name).join('\t')}\tLat\tLng\tElv\tComment`
 
       for (let y = 0; y < this.dataset.rows; y++) {
         for (let x = 0; x < this.dataset.cols; x++) {
@@ -62,6 +90,8 @@ export default {
               result += '\n'
               result += cell.name
 
+              result += '\t' + data.join('\t')
+
               if (cell.geolocation) {
                 result += '\t' + (cell.geolocation.lat ? cell.geolocation.lat : '')
                 result += '\t' + (cell.geolocation.lng ? cell.geolocation.lng : '')
@@ -71,14 +101,20 @@ export default {
               }
 
               result += '\t' + (cell.comment ? cell.comment : '')
-
-              result += '\t' + data.join('\t')
             }
           }
         }
       }
 
-      this.text = result
+      return result
+    }
+  },
+  methods: {
+    show: function () {
+      this.$nextTick(() => this.$refs.exportModal.show())
+    },
+    hide: function () {
+      this.$nextTick(() => this.$refs.exportModal.hide())
     }
   }
 }
