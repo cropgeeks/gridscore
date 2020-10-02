@@ -50,7 +50,7 @@ export default {
         return
       }
 
-      let result = 'Name\tShort Name\tDescription\tData Type\tUnit Name\tUnit Abbreviation\tUnit Descriptions\tTrait categories (comma separated)\n'
+      let result = 'Name\tShort Name\tDescription\tData Type\tUnit Name\tUnit Abbreviation\tUnit Descriptions\tTrait categories (comma separated)\tMin (only for numeric traits)\tMax (only for numeric traits)\n'
 
       result += this.dataset.traits.map(t => {
         let type
@@ -68,8 +68,10 @@ export default {
         }
 
         const categories = (t.type === 'categorical' && t.restrictions && t.restrictions.categories) ? `[[${t.restrictions.categories.join(',')}]]` : ''
+        const min = ((t.type === 'int' || t.type === 'float') && t.restrictions && t.restrictions.min !== undefined && t.restrictions.min !== null) ? t.restrictions.min : ''
+        const max = ((t.type === 'int' || t.type === 'float') && t.restrictions && t.restrictions.max !== undefined && t.restrictions.max !== null) ? t.restrictions.max : ''
 
-        return `${t.name}\t${t.name.substring(0, 10)}\t${t.name}\t${type}\t\t\t\t${categories}`
+        return `${t.name}\t${t.name.substring(0, 10)}\t${t.name}\t${type}\t\t\t\t${categories}\t${min}\t${max}`
       }).join('\n')
 
       return result
