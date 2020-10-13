@@ -6,7 +6,7 @@ const localStorage = window.localStorage
 
 Vue.use(Vuex)
 
-var name = process.env.VUE_APP_INSTANCE_NAME
+let name = process.env.VUE_APP_INSTANCE_NAME
 
 if (!name) {
   name = 'gridscore-' + window.location.pathname
@@ -16,7 +16,8 @@ const dataset = {
   cols: 1,
   rows: 1,
   traits: [],
-  data: []
+  data: [],
+  brapiConfig: null
 }
 
 const storeState = {
@@ -53,6 +54,9 @@ const storeState = {
     },
     ON_DATASET_CHANGED: function (state, newDataset) {
       Vue.set(state.datasets, state.datasetIndex, newDataset)
+    },
+    ON_BRAPI_CONFIG_CHANGED: function (state, newBrapiConfig) {
+      state.datasets[state.datasetIndex].brapiConfig = newBrapiConfig
     },
     ON_DATA_CHANGED_MUTATION: function (state, newData) {
       state.datasets[state.datasetIndex].data = newData
@@ -97,6 +101,9 @@ const storeState = {
     setDataset: function ({ commit }, dataset) {
       commit('ON_DATASET_CHANGED', dataset)
     },
+    setBrapiConfig: function ({ commit }, brapiConfig) {
+      commit('ON_BRAPI_CONFIG_CHANGED', brapiConfig)
+    },
     setDataPoint: function ({ commit }, dataPoint) {
       commit('ON_DATA_POINT_CHANGED_MUTATION', dataPoint)
     },
@@ -111,7 +118,7 @@ const storeState = {
     key: name,
     storage: {
       getItem: key => {
-        var result = JSON.parse(localStorage.getItem(key))
+        const result = JSON.parse(localStorage.getItem(key))
 
         if (result && result.datasets && result.datasets.length > 0) {
           result.datasets.forEach(d => {

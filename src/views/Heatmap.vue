@@ -150,7 +150,7 @@ export default {
           }]
         }
 
-        var layout = {
+        const layout = {
           height: (25 * rows) + 200,
           xaxis: {
             showgrid: false,

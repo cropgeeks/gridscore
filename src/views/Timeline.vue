@@ -59,7 +59,7 @@ export default {
           y: []
         }
 
-        var counter = 0
+        let counter = 0
         dates.forEach(d => {
           counter += t[d]
           traces[index].y.push(counter)
@@ -70,7 +70,7 @@ export default {
         t.y = t.y.map(y => y / plots * 100)
       })
 
-      var layout = {
+      const layout = {
         xaxis: {
           showgrid: true,
           zeroline: true,

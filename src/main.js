@@ -24,7 +24,8 @@ import {
   ListGroupPlugin,
   FormSelectPlugin,
   InputGroupPlugin,
-  TooltipPlugin
+  TooltipPlugin,
+  SpinnerPlugin
 } from 'bootstrap-vue'
 
 import router from '@/router'
@@ -68,6 +69,7 @@ Vue.use(ListGroupPlugin)
 Vue.use(FormSelectPlugin)
 Vue.use(InputGroupPlugin)
 Vue.use(TooltipPlugin)
+Vue.use(SpinnerPlugin)
 Vue.mixin(mixin)
 
 Vue.use({

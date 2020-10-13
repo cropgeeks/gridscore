@@ -76,7 +76,7 @@ export default {
     },
     downloadImage: function () {
       if (this.imageFile) {
-        var dl = document.createElement('a')
+        let dl = document.createElement('a')
         dl.setAttribute('href', this.imageData)
         dl.setAttribute('download', `${this.getDateTime(this.imageDate)}_${this.name}.${this.imageFile.name.split('.').pop()}`)
         dl.click()

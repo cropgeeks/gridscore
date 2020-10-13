@@ -45,13 +45,16 @@ export default {
     }
   },
   computed: {
-    highlightCell: function () {
+    highlightRow: function () {
       if (this.highlightPosition) {
-        // Compute the index of the cell that should be highlighted based on the given highlight position
-        return {
-          col: Math.floor(this.dataset.cols * this.highlightPosition.x / 100.0),
-          row: this.dataset.rows - Math.ceil(this.dataset.rows * this.highlightPosition.y / 100.0)
-        }
+        return this.dataset.rows - Math.ceil(this.dataset.rows * this.highlightPosition.y / 100.0)
+      } else {
+        return null
+      }
+    },
+    highlightCol: function () {
+      if (this.highlightPosition) {
+        return Math.floor(this.dataset.cols * this.highlightPosition.x / 100.0)
       } else {
         return null
       }
@@ -86,13 +89,35 @@ export default {
       const rowIndex = data.index
       const colIndex = parseInt(data.field.key) - 1
 
-      if (this.highlightCell && (rowIndex === this.highlightCell.row) && (colIndex === this.highlightCell.col)) {
-        // If this is the user's position, return success
-        return 'table-success'
-      } else {
-        // Else, check if there's a comment, then show warning colour
-        return (data.value.comment && data.value.comment.length > 0) ? 'table-warning' : null
+      if (this.highlightRow && this.highlightCol) {
+        if ((rowIndex === this.highlightRow) && (colIndex === this.highlightCol)) {
+          return 'table-success'
+        } else {
+          const rowWithinBounds = Math.max(0, Math.min(this.dataset.rows - 1, this.highlightRow))
+          const colWithinBounds = Math.max(0, Math.min(this.dataset.cols - 1, this.highlightCol))
+
+          let result = ''
+          if (rowIndex === 0 && rowWithinBounds === 0 && colIndex === colWithinBounds) {
+            result += ' gps-border-top'
+          }
+          if (rowIndex === this.dataset.rows - 1 && rowWithinBounds === this.dataset.rows - 1 && colIndex === colWithinBounds) {
+            result += ' gps-border-bottom'
+          }
+          if (colIndex === 0 && colWithinBounds === 0 && rowIndex === rowWithinBounds) {
+            result += ' gps-border-left'
+          }
+          if (colIndex === this.dataset.cols - 1 && colWithinBounds === this.dataset.cols - 1 && rowIndex === rowWithinBounds) {
+            result += ' gps-border-right'
+          }
+
+          if (result.length > 0) {
+            return result
+          }
+        }
       }
+
+      // Else, check if there's a comment, then show warning colour
+      return (data.value.comment && data.value.comment.length > 0) ? 'table-warning' : null
     },
     onHeadClicked: function (key) {
       Vue.set(this.markedColumns, key - 1, !this.markedColumns[key - 1])
@@ -163,5 +188,17 @@ export default {
 }
 .grid-table .table td > div > span:empty::after{
   content: "\00a0";
+}
+.grid-table .gps-border-top {
+  border-top: 5px solid var(--success);
+}
+.grid-table .gps-border-left {
+  border-left: 5px solid var(--success);
+}
+.grid-table .gps-border-right {
+  border-right: 5px solid var(--success);
+}
+.grid-table .gps-border-bottom {
+  border-bottom: 5px solid var(--success);
 }
 </style>

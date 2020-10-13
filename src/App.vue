@@ -27,6 +27,8 @@
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
+
+    <!-- The main content -->
     <b-container fluid class="mt-3">
       <router-view :key="$route.path" />
     </b-container>
@@ -52,6 +54,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * When the locale is changed, update the i18n settings
+     * @param language The newly selected locale
+     */
     onLocaleChanged: function (language) {
       loadLanguageAsync(language.locale).then(() => {
         this.$i18n.locale = language.locale
@@ -66,6 +72,7 @@ export default {
 </script>
 
 <style lang="scss">
+// Import the bootswatch theme
 @import '~bootswatch/dist/sandstone/variables';
 @import '~bootstrap/scss/bootstrap';
 @import '~bootstrap-vue/src/index.scss';

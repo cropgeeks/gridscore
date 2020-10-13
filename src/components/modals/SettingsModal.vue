@@ -5,9 +5,11 @@
             size="xl"
             @ok.prevent="onSubmit"
             ref="settingsModal">
+      <!-- Custom modal header -->
       <template v-slot:modal-header="{ close }">
         <h5 class="modal-title">{{ $t('modalTitleSettings') }}</h5>
 
+        <!-- Import and export buttons for json -->
         <b-button-group>
           <b-button variant="light" size="sm" @click="showImportExportModal(true)">{{ $t('buttonImport') }}</b-button>
           <b-button variant="light" size="sm" @click="showImportExportModal(false)">{{ $t('buttonExport') }}</b-button>
@@ -18,44 +20,64 @@
       <b-form @submit.prevent="onSubmit" id="settings-form">
         <b-row>
           <b-col cols=12 md=6>
+            <!-- Field layout rows -->
             <b-form-group :label="$t('formLabelSettingsRows')" label-for="rows">
               <b-form-input id="rows" :state="state.rows" number type="number" :min="1" required autofocus v-model.number="rows" />
             </b-form-group>
+            <!-- Field layout cols -->
             <b-form-group :label="$t('formLabelSettingsCols')" label-for="cols">
               <b-form-input id="cols" :state="state.cols" number type="number" :min="1" required v-model.number="cols" />
             </b-form-group>
+            <!-- Field layout varieties -->
             <b-form-group label-for="varieties">
+              <!-- Variety label -->
               <template v-slot:label>
-                <span>{{ $t('formLabelSettingsVarieties') }}</span> <span v-b-tooltip="$t('tooltipSettingsVarieties')"> 🛈</span>
+                <span>{{ $t('formLabelSettingsVarieties') }}</span><span id="variety-label"> 🛈</span>
+                <!-- Tooltip for the variety label info icon -->
+                <b-tooltip target="variety-label">
+                  <div>{{ $t('tooltipSettingsVarieties') }}</div>
+                  <div><b-img fluid src="img/variety-order.svg" width=75 height=75 /></div>
+                </b-tooltip>
               </template>
+              <!-- Variety names input -->
               <b-form-textarea id="varieties" :state="state.varieties" rows=6 required :placeholder="$t('formPlaceholderVarieties')" v-model="varieties" />
+              <!-- Variety names file loading -->
               <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="varietiesFile" />
             </b-form-group>
           </b-col>
           <b-col cols=12 md=6>
+            <!-- Trait definitions -->
             <b-list-group v-if="newTraits && newTraits.length > 0" class="mb-3 trait-list">
-              <b-list-group-item v-for="(trait, index) in newTraits" :key="`trait-${index}`" class="d-flex justify-content-between align-items-center" :variant="getVariant(trait)">
+              <b-list-group-item v-for="(trait, index) in newTraits" :key="`trait-${index}`" class="d-flex justify-content-between align-items-center" :variant="getTraitVariant(trait)">
                 <span>{{ trait.name }}</span>
 
+                <!-- Trait data type selection -->
                 <b-input-group class="trait-type-select">
+                  <b-form-select v-model="trait.type" :options="traitTypes" />
+
                   <template v-slot:append>
                     <b-button-group>
+                      <!-- Configuration button for numeric and categorical traits -->
                       <b-button variant="info" :title="$t('buttonConfigure')" @click="configureTrait(index)" v-if="trait.type === 'int' || trait.type === 'float' || trait.type === 'categorical'">⚙</b-button>
-                      <b-button variant="danger" :title="$t('buttonDelete')" @click="removeTrait(index)">×</b-button>
+                      <!-- Delete trait -->
+                      <b-button variant="danger" :title="$t('buttonDelete')" @click="newTraits.splice(index, 1)">×</b-button>
                     </b-button-group>
                   </template>
-                  <b-form-select v-model="trait.type" :options="traitTypes" />
                 </b-input-group>
               </b-list-group-item>
             </b-list-group>
             <b-form-group :label="$t('formLabelSettingsTraits')" label-for="trait">
               <b-input-group>
+                <!-- New trait name -->
+                <b-form-input id="trait" :state="state.traits" ref="traitName" required v-model="trait" v-on:keyup.enter="addTrait" />
                 <template v-slot:append>
                   <b-button variant="success" :title="$t('buttonAdd')" @click="addTrait">＋</b-button>
                 </template>
-                <b-form-input id="trait" :state="state.traits" ref="traitName" required v-model="trait" v-on:keyup.enter="addTrait" />
               </b-input-group>
             </b-form-group>
+
+            <!-- Trait BrAPI import -->
+            <b-button @click="$refs.brapiTraitImportModal.show()">{{ $t('buttonBrapiTraitImport') }}</b-button>
           </b-col>
         </b-row>
         <!-- Map used for defining the field's corner points -->
@@ -65,13 +87,19 @@
         </b-collapse>
       </b-form>
     </b-modal>
+
+    <!-- Modal to show json import/export -->
     <ImportExportModal :isImport="isImport" v-on:dataset-changed="reset" ref="importExportModal" />
+    <!-- Modal to show configuration options for a selected trait -->
     <TraitConfigurationModal :trait="traitToConfigure" v-on:config-changed="updateTraitConfig" ref="traitConfigModal" />
+    <!-- Modal for trait import via BrAPI -->
+    <BrapiTraitImportModal ref="brapiTraitImportModal" @traits-selected="loadBrapiTraits" />
   </div>
 </template>
 
 <script>
 import FieldMap from '@/components/FieldMap'
+import BrapiTraitImportModal from '@/components/modals/BrapiTraitImportModal'
 import ImportExportModal from '@/components/modals/ImportExportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
 
@@ -126,17 +154,82 @@ export default {
   },
   components: {
     FieldMap,
+    BrapiTraitImportModal,
     ImportExportModal,
     TraitConfigurationModal
   },
   methods: {
-    getVariant: function (trait) {
+    /**
+     * Loads the given selected BrAPI traits into the list of new traits for this dataset
+     * @param brapiTraits The traits selected in the BrAPI modal dialog
+     */
+    loadBrapiTraits: function (brapiTraits) {
+      if (brapiTraits && brapiTraits.length > 0) {
+        brapiTraits.forEach(t => {
+          let type = 'text'
+          let restrictions = {}
+
+          // Map the BrAPI data type to the internal data type
+          if (t.scale && t.scale.dataType) {
+            switch (t.scale.dataType) {
+              case 'Date':
+                type = 'date'
+                break
+              case 'Text':
+                type = 'text'
+                break
+              case 'Numeric':
+                type = 'float'
+                break
+              case 'Duration':
+                type = 'int'
+                break
+              case 'Ordinal':
+                type = 'categorical'
+                break
+              default:
+                type = 'text'
+                break
+            }
+          }
+
+          // Check if there are any value restrictions on the trait
+          if (t.scale && t.scale.validValues) {
+            if (t.scale.validValues.min !== undefined && t.scale.validValues.min !== null) {
+              restrictions.min = t.scale.validValues.min
+            }
+            if (t.scale.validValues.max !== undefined && t.scale.validValues.max !== null) {
+              restrictions.max = t.scale.validValues.max
+            }
+            if (t.scale.validValues.categories && t.scale.validValues.categories.length > 0) {
+              restrictions.categories = t.scale.validValues.categories.map(c => c.value)
+            }
+          }
+
+          this.newTraits.push({
+            brapiId: t.observationVariableDbId,
+            name: t.observationVariableName,
+            type: type,
+            restrictions: Object.keys(restrictions).length < 1 ? null : restrictions
+          })
+        })
+      }
+    },
+    /**
+     * Returns the bootstrap variant given a trait based on whether its required restrictions are set
+     * @param trait The trait in question
+     */
+    getTraitVariant: function (trait) {
       if (trait.type === 'categorical' && (!trait.restrictions || trait.restrictions.length < 0)) {
         return 'danger'
       } else {
         return null
       }
     },
+    /**
+     * Sets the trait configuration (restrictions) on the currently selected trait based on the provided new configuration
+     * @param newConfig The new configuration
+     */
     updateTraitConfig: function (newConfig) {
       switch (this.traitToConfigure.type) {
         case 'int':
@@ -153,21 +246,32 @@ export default {
           break
       }
     },
+    /**
+     * Opens the import/export modal and sets the field that indicates whether it's an import or export request.
+     * @param isImportNew `true` if import, `false` otherwise
+     */
     showImportExportModal: function (isImportNew) {
       this.isImport = isImportNew
       this.$refs.importExportModal.show()
     },
+    /**
+     * Invalidates the map's size to make sure it's showing all its tiles properly
+     */
     invalidateMap: function () {
       this.$nextTick(() => this.$refs.map.invalidateSize())
     },
+    /**
+     * Opens the trait configuration modal and sets the trait at the given index as the selected trait
+     * @param index The index of the trait to configure
+     */
     configureTrait: function (index) {
       this.traitToConfigure = this.newTraits[index]
 
       this.$nextTick(() => this.$refs.traitConfigModal.show())
     },
-    removeTrait: function (index) {
-      this.newTraits.splice(index, 1)
-    },
+    /**
+     * Adds a new trait to the list based on the content of the trait name input field. Empties and re-focusses the input field after the operation.
+     */
     addTrait: function () {
       if (this.trait && this.trait.length > 0) {
         this.newTraits.push({
@@ -179,6 +283,9 @@ export default {
         this.$refs.traitName.focus()
       }
     },
+    /**
+     * Loads the variety list from the file selected by the file input.
+     */
     loadVarietiesFile: function () {
       const reader = new FileReader()
       reader.onload = event => {
@@ -187,6 +294,9 @@ export default {
       }
       reader.readAsText(this.varietiesFile)
     },
+    /**
+     * Resets the modal state based on the current configuration of the dataset
+     */
     reset: function () {
       this.rows = this.dataset.rows
       this.cols = this.dataset.cols
@@ -208,14 +318,24 @@ export default {
       this.trait = null
       this.varietiesFile = null
     },
+    /**
+     * Shows the resets modal dialog
+     */
     show: function () {
       this.reset()
       this.$refs.settingsModal.show()
     },
+    /**
+     * Hides the modal dialog
+     */
     hide: function () {
       this.$refs.settingsModal.hide()
     },
+    /**
+     * Submit the result and re-create the current dataset with the new configuration.
+     */
     onSubmit: function (e) {
+      // Validate the form
       this.formValidated = true
       this.state = {
         rows: this.rows > 0,
@@ -224,15 +344,19 @@ export default {
         varieties: (this.varieties !== null) && (this.varieties.length > 0)
       }
 
+      // If a trait is missing it's configuration, return
       if (this.newTraits.filter(t => t.type === 'categorical' && (!t.restrictions || !t.restrictions.categories || t.restrictions.categories.length < 1)).length > 0) {
         return
       }
 
+      // If everything is set, continue
       if (this.state.rows && this.state.cols && this.state.traits && this.state.varieties) {
+        // Ask for confirmation
         this.$bvModal.msgBoxConfirm(this.$t('modalTextSetupWarning'), {
           title: this.$t('modalTitleSetupWarning')
         }).then(value => {
           if (value === true) {
+            // If confirmed, emit an event with the new configuration
             this.$emit('settings-changed', {
               rows: parseInt(this.rows),
               cols: parseInt(this.cols),
@@ -240,6 +364,7 @@ export default {
               varieties: this.varieties.split('\n'),
               cornerPoints: this.$refs.map.getCornerPoints()
             })
+            // Hide the modal
             this.hide()
           }
         })

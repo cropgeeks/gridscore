@@ -104,7 +104,7 @@ export default {
     },
     updateBounds: function () {
       // Calculate bounds around all locations
-      var bounds = L.latLngBounds()
+      let bounds = L.latLngBounds()
       this.locations.filter(l => l !== null).forEach(l => bounds.extend(l))
       // If the bounds are valid, move the map
       if (bounds.isValid()) {
@@ -124,22 +124,22 @@ export default {
   },
   mounted: function () {
     // Add OSM as the default
-    var openstreetmap = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const openstreetmap = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       id: 'OpenStreetMap',
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       subdomains: ['a', 'b', 'c']
     })
 
-    var map = this.$refs.fieldMap.mapObject
+    const map = this.$refs.fieldMap.mapObject
     map.addLayer(openstreetmap)
 
     // Add an additional satellite layer
-    var satellite = L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    const satellite = L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       id: 'Esri WorldImagery',
       attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     })
 
-    var baseMaps = {
+    const baseMaps = {
       'OpenStreetMap': openstreetmap,
       'Esri WorldImagery': satellite
     }

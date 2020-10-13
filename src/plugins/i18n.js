@@ -6,7 +6,7 @@ import enGB from '@/plugins/i18n/en_GB.json'
 
 Vue.use(VueI18n)
 
-var messages = {
+let messages = {
   en_GB: enGB,
   de_DE: deDE
 }

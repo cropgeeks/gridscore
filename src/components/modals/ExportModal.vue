@@ -57,13 +57,15 @@ export default {
         switch (t.type) {
           case 'int':
           case 'float':
-          case 'categorical':
-            type = t.type
+            type = 'numeric'
             break
           case 'date':
           case 'text':
+          case 'categorical':
+            type = t.type
+            break
           default:
-            type = 'char'
+            type = 'text'
             break
         }
 
