@@ -28,6 +28,7 @@ const storeState = {
     useGps: true
   },
   getters: {
+    brapiConfig: (state) => state.datasets[state.datasetIndex].brapiConfig,
     dataset: (state) => state.datasets[state.datasetIndex],
     useGps: (state) => state.useGps,
     firstRun: (state) => {
@@ -56,6 +57,10 @@ const storeState = {
       Vue.set(state.datasets, state.datasetIndex, newDataset)
     },
     ON_BRAPI_CONFIG_CHANGED: function (state, newBrapiConfig) {
+      if (newBrapiConfig && newBrapiConfig.url && newBrapiConfig.url.indexOf('/', newBrapiConfig.url.length - 1) === -1) {
+        newBrapiConfig.url += '/'
+      }
+
       state.datasets[state.datasetIndex].brapiConfig = newBrapiConfig
     },
     ON_DATA_CHANGED_MUTATION: function (state, newData) {

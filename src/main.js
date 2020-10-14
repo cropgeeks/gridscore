@@ -36,6 +36,8 @@ import './registerServiceWorker'
 
 import { Icon } from 'leaflet'
 
+require('es6-promise/auto')
+
 delete Icon.Default.prototype._getIconUrl
 Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),

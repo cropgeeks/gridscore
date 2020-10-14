@@ -20,10 +20,8 @@
 <script>
 export default {
   data: function () {
-    const storeBrapiUrl = this.brapiConfig && this.brapiConfig.url ? this.brapiConfig.url : 'http://localhost:8080/germinate-demo-api/v4.2.0/api/brapi/v2/'
-
     return {
-      brapiUrl: storeBrapiUrl
+      brapiUrl: null
     }
   },
   props: {
@@ -42,6 +40,7 @@ export default {
   },
   methods: {
     show: function () {
+      this.brapiUrl = this.brapiConfig && this.brapiConfig.url ? this.brapiConfig.url : null
       this.$nextTick(() => this.$refs.brapiModal.show())
     },
     hide: function () {

@@ -8,6 +8,7 @@ export default {
   },
   computed: {
     ...mapGetters([
+      'brapiConfig',
       'dataset',
       'firstRun',
       'locale',

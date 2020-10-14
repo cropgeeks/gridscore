@@ -24,7 +24,7 @@
 <script>
 import BrapiModal from '@/components/modals/BrapiModal'
 
-import axios from 'axios'
+import brapi from '@/mixin/brapi'
 
 export default {
   data: function () {
@@ -74,6 +74,7 @@ export default {
   components: {
     BrapiModal
   },
+  mixins: [ brapi ],
   methods: {
     show: function () {
       this.formState = true
@@ -100,27 +101,20 @@ export default {
     },
     getTraits: function () {
       this.loading = true
-      axios({
-        url: `${this.dataset.brapiConfig.url}variables`,
-        params: {
-          page: 0,
-          pageSize: 2147483647
-        },
-        method: 'GET',
-        crossDomain: true,
-        responseType: 'json',
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-        }
-      }).then(response => {
-        if (response && response.data && response.data.result && response.data.result.data) {
-          this.traits = response.data.result.data
-        } else {
+      this.brapiGetVariables()
+        .then(response => {
+          if (response && response.data && response.data.result && response.data.result.data) {
+            this.traits = response.data.result.data
+          } else {
+            this.traits = []
+          }
+          this.loading = false
+        })
+        .catch(err => {
+          console.error(err)
           this.traits = []
-        }
-
-        this.loading = false
-      })
+          this.loading = false
+        })
     }
   }
 }
