@@ -81,8 +81,6 @@ export default {
       this.selectedTraits = []
       this.traits = []
 
-      // this.getTraits()
-
       this.$nextTick(() => this.$refs.brapiTraitImportModal.show())
     },
     hide: function () {
@@ -110,8 +108,7 @@ export default {
           }
           this.loading = false
         })
-        .catch(err => {
-          console.error(err)
+        .catch(() => {
           this.traits = []
           this.loading = false
         })

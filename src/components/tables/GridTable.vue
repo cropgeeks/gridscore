@@ -2,7 +2,7 @@
   <div>
     <b-table responsive
              striped
-             hover
+             foot-clone
              sticky-header="100vh"
              class="grid-table mb-0 position-relative"
              @head-clicked="onHeadClicked"
@@ -10,6 +10,9 @@
              :fields="getFields"
              ref="table">
       <template v-slot:cell(0)="data">
+        {{ data.index + 1 }}
+      </template>
+      <template v-slot:cell(last)="data">
         {{ data.index + 1 }}
       </template>
       <template v-slot:cell()="data">
@@ -45,6 +48,9 @@ export default {
     }
   },
   computed: {
+    lastIndex: function () {
+      return this.dataset.cols + 1
+    },
     highlightRow: function () {
       if (this.highlightPosition) {
         return this.dataset.rows - Math.ceil(this.dataset.rows * this.highlightPosition.y / 100.0)
@@ -75,6 +81,13 @@ export default {
           thClass: 'text-center'
         })
       }
+
+      result.push({
+        key: 'last',
+        label: '',
+        class: 'text-left',
+        isRowHeader: true
+      })
 
       return result
     }
@@ -152,6 +165,10 @@ export default {
   border-bottom: 1px solid;
   border-bottom-color: var(--primary) !important;
 }
+.grid-table tfoot th {
+  border-top: 1px solid;
+  border-top-color: var(--primary) !important;
+}
 .grid-table thead th div {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -163,11 +180,20 @@ export default {
 }
 .grid-table thead th:first-child,
 .grid-table thead th:nth-child(5n+1),
+.grid-table tfoot th:first-child,
+.grid-table tfoot th:nth-child(5n+1),
 .grid-table tbody tr th,
 .grid-table tr td:nth-child(5n+1) {
   border-right: 1px solid;
   border-right-color: var(--primary) !important;
 }
+.grid-table thead th:last-child,
+.grid-table tfoot th:last-child,
+.grid-table tr th:last-child {
+  border-left: 1px solid;
+  border-left-color: var(--primary) !important;
+}
+
 .grid-table tr:nth-child(5n) th,
 .grid-table tr:nth-child(5n) td {
   border-bottom: 1px solid;
