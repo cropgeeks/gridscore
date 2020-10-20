@@ -25,6 +25,7 @@ const storeState = {
     locale: 'en_GB',
     datasetIndex: 0,
     datasets: [dataset],
+    serverUrl: null,
     useGps: true
   },
   getters: {
@@ -35,6 +36,7 @@ const storeState = {
       const ds = state.datasets[state.datasetIndex]
       return state.datasets.length < 2 && (ds === null || ds.data === null || ds.data.length < 1)
     },
+    serverUrl: (state) => state.serverUrl,
     locale: (state) => state.locale
   },
   mutations: {
@@ -62,6 +64,9 @@ const storeState = {
       }
 
       state.datasets[state.datasetIndex].brapiConfig = newBrapiConfig
+    },
+    ON_SERVER_URL_CHANGED: function (state, newServerUrl) {
+      state.serverUrl = newServerUrl
     },
     ON_DATA_CHANGED_MUTATION: function (state, newData) {
       state.datasets[state.datasetIndex].data = newData
@@ -108,6 +113,9 @@ const storeState = {
     },
     setBrapiConfig: function ({ commit }, brapiConfig) {
       commit('ON_BRAPI_CONFIG_CHANGED', brapiConfig)
+    },
+    setServerUrl: function ({ commit }, serverUrl) {
+      commit('ON_SERVER_URL_CHANGED', serverUrl)
     },
     setDataPoint: function ({ commit }, dataPoint) {
       commit('ON_DATA_POINT_CHANGED_MUTATION', dataPoint)

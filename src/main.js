@@ -74,6 +74,17 @@ Vue.use(TooltipPlugin)
 Vue.use(SpinnerPlugin)
 Vue.mixin(mixin)
 
+// Set base URL based on environment
+let baseUrl = './api/'
+
+if (process.env.VUE_APP_BASE_URL) {
+  baseUrl = process.env.VUE_APP_BASE_URL
+}
+
+console.log(baseUrl)
+
+store.commit('ON_SERVER_URL_CHANGED', baseUrl)
+
 Vue.use({
   install: function (Vue) {
     // Make custom plotly available

@@ -1,5 +1,7 @@
 import { mapGetters } from 'vuex'
 
+const axios = require('axios').default
+
 export default {
   data: function () {
     return {
@@ -12,7 +14,41 @@ export default {
       'dataset',
       'firstRun',
       'locale',
+      'serverUrl',
       'useGps'
     ])
+  },
+  methods: {
+    postConfigForSharing: function () {
+      return this.axios('config', this.dataset, 'post')
+    },
+    getConfigFromSharing: function (uuid) {
+      return this.axios(`config/${uuid}`)
+    },
+    axios: function (url, params = null, method = 'get') {
+      let requestData = null
+      let requestParams = null
+
+      // Stringify the data object for non-GET requests
+      if (params !== null || params !== undefined) {
+        if (method === 'get') {
+          requestParams = params
+        } else {
+          requestData = params
+        }
+      }
+
+      return axios({
+        baseURL: this.serverUrl,
+        url: url,
+        params: requestParams,
+        data: requestData,
+        method: method,
+        crossDomain: true,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      })
+    }
   }
 }

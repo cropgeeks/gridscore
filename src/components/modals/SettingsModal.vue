@@ -19,7 +19,7 @@
       </template>
       <b-form @submit.prevent="onSubmit" id="settings-form">
         <b-row>
-          <b-col cols=12 md=6>
+          <b-col cols=12 lg=6>
             <!-- Field layout rows -->
             <b-form-group :label="$t('formLabelSettingsRows')" label-for="rows">
               <b-form-input id="rows" :state="state.rows" number type="number" :min="1" required autofocus v-model.number="rows" />
@@ -45,7 +45,7 @@
               <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="varietiesFile" />
             </b-form-group>
           </b-col>
-          <b-col cols=12 md=6>
+          <b-col cols=12 lg=6>
             <!-- Trait definitions -->
             <b-list-group v-if="newTraits && newTraits.length > 0" class="mb-3 trait-list">
               <b-list-group-item v-for="(trait, index) in newTraits" :key="`trait-${index}`" class="d-flex justify-content-between align-items-center" :variant="getTraitVariant(trait)">
@@ -89,7 +89,7 @@
     </b-modal>
 
     <!-- Modal to show json import/export -->
-    <ImportExportModal :isImport="isImport" v-on:dataset-changed="reset" ref="importExportModal" />
+    <ImportExportModal :isImport="isImport" v-on:dataset-changed="hide" ref="importExportModal" />
     <!-- Modal to show configuration options for a selected trait -->
     <TraitConfigurationModal :trait="traitToConfigure" v-on:config-changed="updateTraitConfig" ref="traitConfigModal" />
     <!-- Modal for trait import via BrAPI -->

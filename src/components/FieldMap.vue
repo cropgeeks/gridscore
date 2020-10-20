@@ -54,6 +54,11 @@ export default {
       default: 1
     }
   },
+  watch: {
+    'dataset.cornerPoints': function (newValue) {
+      this.refresh()
+    }
+  },
   components: {
     GpsInput,
     Map
@@ -67,12 +72,15 @@ export default {
     },
     getCornerPoints: function () {
       return this.locations
+    },
+    refresh: function () {
+      if (this.dataset && this.dataset.cornerPoints && this.dataset.cornerPoints.length === 4) {
+        this.locations = this.dataset.cornerPoints.map(l => [l[0], l[1]])
+      }
     }
   },
   mounted: function () {
-    if (this.dataset && this.dataset.cornerPoints && this.dataset.cornerPoints.length === 4) {
-      this.locations = this.dataset.cornerPoints.map(l => [l[0], l[1]])
-    }
+    this.refresh()
   }
 }
 </script>
