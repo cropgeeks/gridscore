@@ -81,8 +81,6 @@ if (process.env.VUE_APP_BASE_URL) {
   baseUrl = process.env.VUE_APP_BASE_URL
 }
 
-console.log(baseUrl)
-
 store.commit('ON_SERVER_URL_CHANGED', baseUrl)
 
 Vue.use({
