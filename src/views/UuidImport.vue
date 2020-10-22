@@ -68,4 +68,7 @@ export default {
 </script>
 
 <style>
+.jumbotron > h1 {
+  word-wrap: break-word;
+}
 </style>

@@ -18,7 +18,7 @@
       <b-button @click="() => {showCamera = true}">{{ $t('formLabelImportDataServerUuid') }}</b-button>
       <template v-if="showCamera">
         <p class="text-muted mt-3">{{ $t('formDescriptionImportDataServerUuid') }}</p>
-        <QrcodeStream @decode="onDecode" />
+        <QrcodeStream @decode="onDecode" @init="scrollToCamera" ref="cameraInput" />
         <p class="text-danger mt-3" v-if="serverError">{{ serverError }}</p>
       </template>
     </b-form>
@@ -94,6 +94,16 @@ export default {
     QrcodeStream
   },
   methods: {
+    scrollToCamera: async function (promise) {
+      try {
+        await promise
+
+        this.$nextTick(() => this.$refs.cameraInput.$el.scrollIntoView())
+      } catch (error) {
+        console.error(error)
+        this.serverError = error.name
+      }
+    },
     onDecode: function (uuid) {
       if (uuid.indexOf('/') !== -1) {
         uuid = uuid.substring(uuid.lastIndexOf('/') + 1)
