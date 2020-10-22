@@ -52,7 +52,6 @@ export default {
       dataFile: null,
       svg: null,
       serverUuid: null,
-      clientUuid: null,
       serverError: null,
       showCamera: false
     }
@@ -61,6 +60,12 @@ export default {
     isImport: {
       type: Boolean,
       default: true
+    }
+  },
+  computed: {
+    shareUrl: function () {
+      const uuidPart = this.$router.resolve({ name: 'uuid-import', params: { uuid: this.serverUuid } }).href
+      return `${window.location.origin}/${uuidPart}`
     }
   },
   watch: {
@@ -72,7 +77,7 @@ export default {
         this.loadDataFile()
       }
     },
-    serverUuid: async function (newValue) {
+    shareUrl: function (newValue) {
       if (newValue) {
         this.$nextTick(() => codeWriter.writeToDom(this.$refs.svg, newValue, 300, 300))
       } else {
@@ -85,6 +90,9 @@ export default {
   },
   methods: {
     onDecode: function (uuid) {
+      if (uuid.indexOf('/') !== -1) {
+        uuid = uuid.substring(uuid.lastIndexOf('/') + 1)
+      }
       this.getConfigFromSharing(uuid)
         .then(result => {
           if (result && result.data) {
@@ -142,7 +150,6 @@ export default {
       this.dataFile = null
       this.svg = null
       this.serverUuid = null
-      this.clientUuid = null
       this.serverError = null
       this.showCamera = false
       this.updateConfig()

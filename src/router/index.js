@@ -10,27 +10,32 @@ const router = new Router({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/views/Home.vue')
+      component: () => import('@/views/Home')
+    },
+    {
+      path: '/uuid-import/:uuid',
+      name: 'uuid-import',
+      component: () => import('@/views/UuidImport')
     },
     {
       path: '/timeline',
       name: 'timeline',
-      component: () => import('@/views/Timeline.vue')
+      component: () => import('@/views/Timeline')
     },
     {
       path: '/heatmap',
       name: 'heatmap',
-      component: () => import('@/views/Heatmap.vue')
+      component: () => import('@/views/Heatmap')
     },
     {
       path: '/locations',
       name: 'location-map',
-      component: () => import('@/views/LocationMap.vue')
+      component: () => import('@/views/LocationMap')
     },
     {
       path: '/about',
       name: 'about',
-      component: () => import('@/views/About.vue')
+      component: () => import('@/views/About')
     }
   ]
 })

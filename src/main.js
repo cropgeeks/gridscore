@@ -25,7 +25,8 @@ import {
   FormSelectPlugin,
   InputGroupPlugin,
   TooltipPlugin,
-  SpinnerPlugin
+  SpinnerPlugin,
+  JumbotronPlugin
 } from 'bootstrap-vue'
 
 import router from '@/router'
@@ -72,6 +73,7 @@ Vue.use(FormSelectPlugin)
 Vue.use(InputGroupPlugin)
 Vue.use(TooltipPlugin)
 Vue.use(SpinnerPlugin)
+Vue.use(JumbotronPlugin)
 Vue.mixin(mixin)
 
 // Set base URL based on environment
