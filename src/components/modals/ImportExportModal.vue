@@ -65,7 +65,12 @@ export default {
   computed: {
     shareUrl: function () {
       const uuidPart = this.$router.resolve({ name: 'uuid-import', params: { uuid: this.serverUuid } }).href
-      return `${window.location.origin}/${uuidPart}`
+      let url = window.location.href
+      if (!url.lastIndexOf('/') !== url.length + 1) {
+        url += '/'
+      }
+
+      return `${url}${uuidPart}`
     }
   },
   watch: {
