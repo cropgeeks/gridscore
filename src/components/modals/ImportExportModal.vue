@@ -64,10 +64,10 @@ export default {
   },
   computed: {
     shareUrl: function () {
-      const uuidPart = this.$router.resolve({ name: 'uuid-import', params: { uuid: this.serverUuid } }).href
+      const uuidPart = this.$router.resolve({ name: 'uuid-import', params: { uuid: this.serverUuid } }).resolved.path
       let url = window.location.href
       if (!url.lastIndexOf('/') !== url.length + 1) {
-        url += '/'
+        url = url.substring(0, url.length - 1)
       }
 
       return `${url}${uuidPart}`
