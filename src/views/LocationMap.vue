@@ -3,23 +3,53 @@
     <LMap :zoom="3" :bounds="bounds" ref="locationMap">
       <!-- Draw a polygon connecting all markers -->
       <LPolygon :lat-lngs="corners" v-if="corners" :fillOpacity="0.1" />
-      <!-- Data points -->
-      <LMarker v-for="(location, index) in locations" :key="`map-location-${index}`" :lat-lng="location" />
       <!-- Grid lines -->
       <LPolyline v-for="(line, index) in gridLines" :key="`grid-line-${index}`" :lat-lngs="line" :weight="1" />
     </LMap>
+    <!-- Popup content -->
+    <div v-if="selectedLocation" ref="popupContent">
+      <h4>{{ selectedLocation.name }}</h4>
+      <b-badge class="text-white" target="_blank" :href="`https://www.google.com/maps/place/${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng}/@${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng},14z`" v-if="selectedLocation.geolocation">📍 {{ selectedLocation.geolocation.lat.toFixed(4) }}; {{ selectedLocation.geolocation.lng.toFixed(4) }}</b-badge>
+      <hr />
+      <div v-for="(trait, index) in Object.keys(selectedLocationData)" :key="`selected-location-trait-${index}`">
+        <h5>{{ trait }}</h5>
+        <dl class="row">
+          <dt class="col-6 text-muted"><span>{{ selectedLocationData[trait].value }}</span></dt>
+          <dd class="col-6 text-right"><b-badge>📅 {{ selectedLocationData[trait].date }}</b-badge></dd>
+        </dl>
+      </div>
+    </div>
   </b-row>
 </template>
 
 <script>
-import { LMap, LMarker, LPolygon, LPolyline } from 'vue2-leaflet'
+import { LMap, LPolygon, LPolyline } from 'vue2-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 const fixPer = require('fix-perspective')
 
 export default {
+  data: function () {
+    return {
+      selectedLocation: null
+    }
+  },
   computed: {
+    selectedLocationData: function () {
+      let result = {}
+
+      this.dataset.traits.forEach((t, i) => {
+        if (this.selectedLocation.values[i] !== null) {
+          result[t.name] = {
+            value: this.selectedLocation.values[i],
+            date: this.selectedLocation.dates[i]
+          }
+        }
+      })
+
+      return result
+    },
     /** The corner points of the field */
     corners: function () {
       if (this.dataset && this.dataset.cornerPoints && this.dataset.cornerPoints.length === 4) {
@@ -106,9 +136,34 @@ export default {
   },
   components: {
     LMap,
-    LMarker,
     LPolygon,
     LPolyline
+  },
+  methods: {
+    updateMarkers: function () {
+      if (this.dataset && this.dataset.data) {
+        const map = this.$refs.locationMap.mapObject
+        this.dataset.data.forEach(row => {
+          Object.keys(row).forEach(key => {
+            const col = row[key]
+
+            if (col.geolocation) {
+              let marker = L.marker(L.latLng(col.geolocation.lat, col.geolocation.lng)).bindPopup('')
+              marker.on('click', e => {
+                let popup = e.target.getPopup()
+                this.selectedLocation = col
+                // Set the popup content on click
+                this.$nextTick(() => popup.setContent(this.$refs.popupContent))
+              })
+              marker.addTo(map)
+            }
+          })
+        })
+      }
+    },
+    onMarkerClicked: function (e) {
+      console.log(e)
+    }
   },
   mounted: function () {
     // Add OSM as the default
@@ -133,6 +188,8 @@ export default {
     }
 
     L.control.layers(baseMaps).addTo(map)
+
+    this.updateMarkers()
   }
 }
 </script>
@@ -140,5 +197,8 @@ export default {
 <style>
 .location-map {
   height: 100vh;
+}
+.leaflet-popup-content {
+  min-width: 200px!important;
 }
 </style>

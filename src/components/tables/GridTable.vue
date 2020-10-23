@@ -123,6 +123,7 @@ export default {
       // Get col and row index
       const rowIndex = data.index
       const colIndex = parseInt(data.field.key) - 1
+      let result = ''
 
       // If the user position in the field is known
       if (this.highlightRow && this.highlightCol) {
@@ -134,7 +135,6 @@ export default {
           const rowWithinBounds = Math.max(0, Math.min(this.dataset.rows - 1, this.highlightRow))
           const colWithinBounds = Math.max(0, Math.min(this.dataset.cols - 1, this.highlightCol))
 
-          let result = ''
           // If we're the first row and the user is in the first row and the user is in the same column, indicate the user is above
           if (rowIndex === 0 && rowWithinBounds === 0 && colIndex === colWithinBounds) {
             result += ' gps-border-top'
@@ -151,15 +151,15 @@ export default {
           if (colIndex === this.dataset.cols - 1 && colWithinBounds === this.dataset.cols - 1 && rowIndex === rowWithinBounds) {
             result += ' gps-border-right'
           }
-
-          if (result.length > 0) {
-            return result
-          }
         }
       }
 
       // Else, check if there's a comment, then show warning colour
-      return (data.value.comment && data.value.comment.length > 0) ? 'table-warning' : null
+      if (data.value.comment && data.value.comment.length > 0) {
+        result += ' table-warning'
+      }
+
+      return result.length > 0 ? result : null
     },
     /** Mark the column on user click */
     onHeadClicked: function (key) {
