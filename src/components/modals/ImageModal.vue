@@ -5,10 +5,14 @@
            @ok.prevent="downloadImage"
            ref="imageModal"
            content-class="image-modal">
+    <!-- Preview the image -->
     <b-img fluid rounded :src="imageData" class="image" v-if="imageData" />
+    <!-- Input for selecting (or taking) the image -->
     <b-form-file v-model="imageFile" accept="image/*" capture class="form" />
 
+    <!-- Show image date if available -->
     <b-badge v-if="imageDate">&#128197; {{ imageDate.toLocaleString() }}</b-badge><br/>
+    <!-- Show geolocation if available -->
     <b-badge target="_blank" :href="`https://www.google.com/maps/place/${imageGps.latitude},${imageGps.longitude}/@${imageGps.latitude},${imageGps.longitude},9z`" v-if="imageGps">&#x1F4CD; {{ imageGps.latitude }}; {{ imageGps.longitude }}</b-badge>
   </b-modal>
 </template>
@@ -26,6 +30,7 @@ export default {
     }
   },
   props: {
+    /** The variety name to use as the title */
     name: {
       type: String,
       default: null
@@ -34,23 +39,30 @@ export default {
   watch: {
     imageFile: async function (newValue) {
       if (newValue) {
+        // If there is a new image file, reset data
         this.imageGps = null
         this.imageDate = null
+        // Convert to base64 for displaying
         this.imageData = await this.toBase64(newValue)
 
         if (newValue.lastModified) {
+          // If there is a last modified date, use it
           this.imageDate = new Date(newValue.lastModified)
         } else {
+          // Use current date as fallback as this is required for the filename
           this.imageDate = new Date()
         }
 
+        // Extract exif data
         exifr.parse(newValue)
           .then(exif => {
+            // Try and extract the exact date
             if (exif.DateTimeOriginal) {
               this.imageDate = exif.DateTimeOriginal
             } else if (exif.CreateTime) {
               this.imageDate = exif.CreateTime
             }
+            // Get the georeference information
             if (exif.latitude && exif.longitude) {
               this.imageGps = {
                 latitude: exif.latitude,
@@ -62,7 +74,12 @@ export default {
     }
   },
   methods: {
+    /**
+     * Converts the user selected file into base64
+     * @param file The image file
+     */
     toBase64: function (file) {
+      // Return a promise as we can't wait for this
       return new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.readAsDataURL(file)
@@ -70,10 +87,17 @@ export default {
         reader.onerror = error => reject(error)
       })
     },
+    /**
+     * Returns the datetime string based on the given date
+     * @param date The date to convert
+     */
     getDateTime: function (date) {
       const dateString = date.toISOString()
       return `${dateString.split('T')[0]}_${dateString.split('T')[1].split('.')[0].replace(/:/g, '-')}`
     },
+    /**
+     * Downloads the image as a file attachment
+     */
     downloadImage: function () {
       if (this.imageFile) {
         let dl = document.createElement('a')
@@ -84,6 +108,9 @@ export default {
 
       this.$nextTick(() => this.hide())
     },
+    /**
+     * Shows the modal dialog and resets it to its initial state
+     */
     show: function () {
       this.imageFile = null
       this.imageData = null
@@ -91,6 +118,9 @@ export default {
       this.imageGps = null
       this.$nextTick(() => this.$refs.imageModal.show())
     },
+    /**
+     * Hides the modal dialog
+     */
     hide: function () {
       this.$nextTick(() => this.$refs.imageModal.hide())
     }

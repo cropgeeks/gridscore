@@ -9,10 +9,12 @@
       <b-form-group v-for="(trait, index) in dataset.traits"
                     :key="`trait-${index}`"
                     :label-for="`trait-${index}`">
+        <!-- Show the trait name along with the type and its color as the label -->
         <template v-slot:label>
           <span :style="{ color: colors[index % colors.length] }">⬤ {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
         </template>
 
+        <!-- For date types, show a datepicker -->
         <b-form-datepicker v-if="trait.type === 'date'"
                            :id="`trait-${index}`"
                            :ref="`trait-${index}`"
@@ -21,7 +23,8 @@
                            v-model="values[index]"
                            reset-button
                            :reset-value="null"
-                           @input="(event) => onDataChanged(event, index)"/>
+                           @input="(event) => onDateChanged(event, index)"/>
+        <!-- For int types, show a number input, apply restrictions -->
         <b-form-input      v-else-if="trait.type === 'int'"
                            :id="`trait-${index}`"
                            :ref="`trait-${index}`"
@@ -31,6 +34,7 @@
                            type="number"
                            :min="(trait.restrictions && trait.restrictions.min !== null && trait.restrictions.min !== undefined) ? trait.restrictions.min : null"
                            :max="(trait.restrictions && trait.restrictions.max !== null && trait.restrictions.max !== undefined) ? trait.restrictions.max : null" />
+        <!-- For float types, show a number input, apply restrictions -->
         <b-form-input      v-else-if="trait.type === 'float'"
                            :id="`trait-${index}`"
                            :ref="`trait-${index}`"
@@ -41,6 +45,7 @@
                            :min="(trait.restrictions && trait.restrictions.min !== null && trait.restrictions.min !== undefined) ? trait.restrictions.min : null"
                            :max="(trait.restrictions && trait.restrictions.max !== null && trait.restrictions.max !== undefined) ? trait.restrictions.max : null"
                            :step="0.02" />
+        <!-- For text types, show a simple input field -->
         <b-form-input      v-else-if="trait.type === 'text'"
                            :id="`trait-${index}`"
                            :ref="`trait-${index}`"
@@ -48,7 +53,9 @@
                            @keyup.enter="traverseForm(index + 1)"
                            v-model="values[index]"
                            type="text" />
+        <!-- For categorical traits -->
         <template v-if="trait.type === 'categorical' && trait.restrictions && trait.restrictions.categories">
+          <!-- If there are more than 3 options, show a dropdown select -->
           <b-form-select   v-if="trait.restrictions.categories.length > 3"
                            :id="`trait-${index}`"
                            :ref="`trait-${index}`"
@@ -56,6 +63,7 @@
                            @keyup.enter="traverseForm(index + 1)"
                            v-model="values[index]"
                            :options="[{ value: null, text: $t('formSelectCategory') }, ...trait.restrictions.categories]" />
+          <!-- Else show a button group for easier selection -->
           <b-form-radio-group v-else
                            :id="`trait-${index}`"
                            :ref="`trait-${index}`"
@@ -68,13 +76,14 @@
         </template>
       </b-form-group>
 
+      <!-- User comments -->
       <b-form-group :label="$t('formLabelComment')" label-for="comment">
         <b-form-input v-model="comment" id="comment" />
       </b-form-group>
     </b-form>
-    <template>
-      <b-button @click="$refs.imageModal.show()">&#128247; {{ $t('buttonTakePhoto') }}</b-button>
-    </template>
+    <!-- Show a button for image tagging -->
+    <b-button @click="$refs.imageModal.show()">&#128247; {{ $t('buttonTakePhoto') }}</b-button>
+    <!-- Image tagging modal -->
     <ImageModal :name="name" ref="imageModal" />
   </b-modal>
 </template>
@@ -82,16 +91,22 @@
 <script>
 import ImageModal from '@/components/modals/ImageModal'
 
+/**
+ * Shows a modal used to enter the data into GridScore. Each trait is shown and based on its type a different method for data input is show.
+ */
 export default {
   props: {
+    /** The row of the current data point */
     row: {
       type: Number,
       default: null
     },
+    /** The col of the current data point */
     col: {
       type: Number,
       default: null
     },
+    /** The geolocation of the user */
     geolocation: {
       type: Object,
       default: null
@@ -115,6 +130,10 @@ export default {
     ImageModal
   },
   methods: {
+    /**
+     * For the given trait, return the i18n text
+     * @param trait The trait for which to return the text
+     */
     getTraitTypeText: function (trait) {
       switch (trait.type) {
         case 'date':
@@ -131,6 +150,9 @@ export default {
           return null
       }
     },
+    /**
+     * Shows the modal and resets it to its initial state
+     */
     show: function () {
       this.formValidated = false
       this.formState = this.dataset.traits.map(t => null)
@@ -142,34 +164,45 @@ export default {
       this.comment = this.dataset.data[this.row][this.col].comment
       this.$nextTick(() => this.$refs.dataPointModal.show())
     },
+    /**
+     * Hides the modal
+     */
     hide: function () {
       this.$nextTick(() => this.$refs.dataPointModal.hide())
     },
+    /**
+     * Sets focus to the first trait input
+     */
     setFocus: function () {
-      // Focus the first non-empty trait input
-      // for (let i = 0; i < this.dataset.traits.length; i++) {
-      //   if (this.values[i] === undefined || this.values[i] === null || this.values[i] === '') {
-      //     this.$refs[`trait-${i}`][0].focus()
-      //     break
-      //   }
-      // }
-
-      // Focus the first trait input
       this.$refs['trait-0'][0].focus()
     },
+    /**
+     * Traverses the form and focusses the next input field in turn based on the given index
+     * @param newIndex The index of the next field (the method will internally modulo this to stay in range)
+     */
     traverseForm: function (newIndex) {
       let i = newIndex % this.values.length
 
+      // If the next ref exists and it has a focus method, call it
       if (this.$refs[`trait-${i}`][0] && this.$refs[`trait-${i}`][0].focus) {
         this.$refs[`trait-${i}`][0].focus()
       }
     },
-    onDataChanged: function (event, index) {
+    /**
+     * Handle date change events
+     * @param event The native event
+     * @param index The trait index
+     */
+    onDateChanged: function (event, index) {
+      // If the input is something that would be considered "empty", reset the value and date
       if (event === null || event === undefined || event === '') {
         this.values[index] = null
         this.dates[index] = null
       }
     },
+    /**
+     * Handle the submit event. Checks restrictions before accepting the data.
+     */
     onSubmit: function () {
       this.formState = this.dataset.traits.map((t, i) => {
         if (this.values[i] === '' || this.values[i] === null) {
@@ -186,8 +219,9 @@ export default {
           return true
         }
       })
-      this.formValidated = true
 
+      // If the form is invalid, return
+      this.formValidated = true
       for (let i = 0; i < this.formState.length; i++) {
         if (this.formState[i] === false) {
           return
@@ -214,13 +248,17 @@ export default {
         }
       })
 
+      // Only store the comment if it's not empty
+      const comment = (this.comment !== undefined && this.comment !== null && this.comment.length > 0) ? this.comment : null
+
+      // Update the store with the newly set data point
       this.$store.dispatch('setDataPoint', {
         row: this.row,
         col: this.col,
         values: this.values,
         dates: this.dates,
         geolocation: this.useGps ? this.geolocation : null,
-        comment: (this.comment !== undefined && this.comment !== null && this.comment.length > 0) ? this.comment : null
+        comment: comment
       })
       this.hide()
     }

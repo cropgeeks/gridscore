@@ -11,8 +11,8 @@
 
         <!-- Import and export buttons for json -->
         <b-button-group>
-          <b-button variant="light" size="sm" @click="showImportExportModal(true)">{{ $t('buttonImport') }}</b-button>
-          <b-button variant="light" size="sm" @click="showImportExportModal(false)">{{ $t('buttonExport') }}</b-button>
+          <b-button variant="light" size="sm" @click="$refs.importModal.show()">{{ $t('buttonImport') }}</b-button>
+          <b-button variant="light" size="sm" @click="$refs.exportModal.show()">{{ $t('buttonExport') }}</b-button>
         </b-button-group>
 
         <button class="close ml-0" @click="close()">×</button>
@@ -89,7 +89,8 @@
     </b-modal>
 
     <!-- Modal to show json import/export -->
-    <ImportExportModal :isImport="isImport" v-on:dataset-changed="hide" ref="importExportModal" />
+    <JsonExportModal ref="exportModal" />
+    <JsonImportModal v-on:dataset-changed="hide" ref="importModal" />
     <!-- Modal to show configuration options for a selected trait -->
     <TraitConfigurationModal :trait="traitToConfigure" v-on:config-changed="updateTraitConfig" ref="traitConfigModal" />
     <!-- Modal for trait import via BrAPI -->
@@ -100,9 +101,13 @@
 <script>
 import FieldMap from '@/components/FieldMap'
 import BrapiTraitImportModal from '@/components/modals/BrapiTraitImportModal'
-import ImportExportModal from '@/components/modals/ImportExportModal'
+import JsonImportModal from '@/components/modals/JsonImportModal'
+import JsonExportModal from '@/components/modals/JsonExportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
 
+/**
+ * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
+ */
 export default {
   props: {
     geolocation: {
@@ -114,7 +119,6 @@ export default {
     return {
       rows: 1,
       cols: 1,
-      isImport: true,
       newTraits: null,
       trait: null,
       traitToConfigure: null,
@@ -155,7 +159,8 @@ export default {
   components: {
     FieldMap,
     BrapiTraitImportModal,
-    ImportExportModal,
+    JsonImportModal,
+    JsonExportModal,
     TraitConfigurationModal
   },
   methods: {
@@ -245,14 +250,6 @@ export default {
           }
           break
       }
-    },
-    /**
-     * Opens the import/export modal and sets the field that indicates whether it's an import or export request.
-     * @param isImportNew `true` if import, `false` otherwise
-     */
-    showImportExportModal: function (isImportNew) {
-      this.isImport = isImportNew
-      this.$refs.importExportModal.show()
     },
     /**
      * Invalidates the map's size to make sure it's showing all its tiles properly

@@ -7,19 +7,27 @@
              class="grid-table mb-0 position-relative"
              @head-clicked="onHeadClicked"
              :items="dataset.data"
-             :fields="getFields"
+             :fields="fields"
              ref="table">
+      <!-- The first column shows the row number -->
       <template v-slot:cell(0)="data">
         {{ data.index + 1 }}
       </template>
+      <!-- The last column shows the row number -->
       <template v-slot:cell(last)="data">
         {{ data.index + 1 }}
       </template>
+      <!-- Cell content -->
       <template v-slot:cell()="data">
+        <!-- handle click events -->
         <div v-on:click="onClick(data, $event)" :class="`text-center ${getClass(data)}`">
+          <!-- Truncated version of the variety name -->
           <span class="d-block">{{ data.value.name ? data.value.name.substring(0, 4) : '' }}</span>
+          <!-- For each trait -->
           <template v-for="(trait, index) in dataset.traits">
+            <!-- Show a circle in the representative trait color if it's not hidden -->
             <span class="mx-1" :key="`trait-${index}`" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0">⬤</span>
+            <!-- Otherwise show a hidden circle -->
             <span class="mx-1" :key="`trait-${index}`" :style="{ opacity: 0 }" v-else>⬤</span>
           </template>
         </div>
@@ -33,10 +41,12 @@ import Vue from 'vue'
 
 export default {
   props: {
+    /** A Boolean array indicating which traits are currently visible */
     visibleTraits: {
       type: Array,
       default: null
     },
+    /** The current user position in the field, x and y are scaled to 0-100 */
     highlightPosition: {
       type: Object,
       default: () => null
@@ -48,9 +58,11 @@ export default {
     }
   },
   computed: {
+    /** The index of the last column. Used for the slot in the table */
     lastIndex: function () {
       return this.dataset.cols + 1
     },
+    /** The row the user is currently in */
     highlightRow: function () {
       if (this.highlightPosition) {
         return this.dataset.rows - Math.ceil(this.dataset.rows * this.highlightPosition.y / 100.0)
@@ -58,6 +70,7 @@ export default {
         return null
       }
     },
+    /** The column the user is currently in */
     highlightCol: function () {
       if (this.highlightPosition) {
         return Math.floor(this.dataset.cols * this.highlightPosition.x / 100.0)
@@ -65,7 +78,9 @@ export default {
         return null
       }
     },
-    getFields: function () {
+    /** The actual data columns */
+    fields: function () {
+      // The first column showing the row index
       let result = [{
         key: '0',
         label: '',
@@ -74,6 +89,7 @@ export default {
         isRowHeader: true
       }]
 
+      // The other columns
       for (let i = 0; i < this.dataset.cols; i++) {
         result.push({
           key: '' + (i + 1),
@@ -82,6 +98,7 @@ export default {
         })
       }
 
+      // The last column showing the row index
       result.push({
         key: 'last',
         label: '',
@@ -98,27 +115,39 @@ export default {
     }
   },
   methods: {
+    /**
+     * Returns the class to use for the give cell
+     * @param data The data object representing the cell
+     */
     getClass: function (data) {
+      // Get col and row index
       const rowIndex = data.index
       const colIndex = parseInt(data.field.key) - 1
 
+      // If the user position in the field is known
       if (this.highlightRow && this.highlightCol) {
         if ((rowIndex === this.highlightRow) && (colIndex === this.highlightCol)) {
+          // If this is the cell the user is located in, highlight it green
           return 'table-success'
         } else {
+          // Otherwise, compute the row and column the user is in (restricted to the field, so if the user is outside the field, this will compute the closest row and col)
           const rowWithinBounds = Math.max(0, Math.min(this.dataset.rows - 1, this.highlightRow))
           const colWithinBounds = Math.max(0, Math.min(this.dataset.cols - 1, this.highlightCol))
 
           let result = ''
+          // If we're the first row and the user is in the first row and the user is in the same column, indicate the user is above
           if (rowIndex === 0 && rowWithinBounds === 0 && colIndex === colWithinBounds) {
             result += ' gps-border-top'
           }
+          // If we're the last row and the user is in the last row and the user is in the same column, indicate the user is below
           if (rowIndex === this.dataset.rows - 1 && rowWithinBounds === this.dataset.rows - 1 && colIndex === colWithinBounds) {
             result += ' gps-border-bottom'
           }
+          // If we're the first column and the user is in the first column and the user is in the same row, indicate the user is to the left
           if (colIndex === 0 && colWithinBounds === 0 && rowIndex === rowWithinBounds) {
             result += ' gps-border-left'
           }
+          // If we're the last column and the user is in the last column and the user is in the same row, indicate the user is to the right
           if (colIndex === this.dataset.cols - 1 && colWithinBounds === this.dataset.cols - 1 && rowIndex === rowWithinBounds) {
             result += ' gps-border-right'
           }
@@ -132,10 +161,13 @@ export default {
       // Else, check if there's a comment, then show warning colour
       return (data.value.comment && data.value.comment.length > 0) ? 'table-warning' : null
     },
+    /** Mark the column on user click */
     onHeadClicked: function (key) {
       Vue.set(this.markedColumns, key - 1, !this.markedColumns[key - 1])
     },
+    /** Handle cell click events */
     onClick: function (cell, event) {
+      /** Emit an event to handle user selections */
       this.$emit('cell-clicked', {
         row: cell.index,
         col: parseInt(cell.field.key)

@@ -1,9 +1,11 @@
 <template>
   <div>
     <div v-if="dataset && dataset.data && dataset.data.length > 0 && dataset.traits && dataset.traits.length > 0">
+      <!-- Trait selection box -->
       <b-form-group :label="$t('formLabelHeatmapTrait')" label-for="trait">
         <b-form-select id="trait" :options="traits" v-model="trait" />
       </b-form-group>
+      <!-- Heatmap element -->
       <div id="heatmap-chart"/>
     </div>
     <h3 v-else>{{ $t('labelNoData') }}</h3>
@@ -11,6 +13,9 @@
 </template>
 
 <script>
+/**
+ * Component that shows a heatmap for the selected trait
+ */
 export default {
   data: function () {
     return {
@@ -37,6 +42,7 @@ export default {
       let data = null
 
       if (actualTrait.type === 'date' || actualTrait.type === 'text') {
+        // If we're dealing with dates or text, check if there is date data
         outer:
         for (let row = 1; row <= rows; row++) {
           for (let col = 1; col <= cols; col++) {
@@ -47,6 +53,7 @@ export default {
           }
         }
       } else {
+        // Else check if there is value data
         outer:
         for (let row = 1; row <= rows; row++) {
           for (let col = 1; col <= cols; col++) {
@@ -59,9 +66,12 @@ export default {
       }
 
       if (hasData === true) {
+        // If there is data, plot the data differently for dates and text
         if (actualTrait.type === 'date' || actualTrait.type === 'text') {
+          // Assume a maximum date
           let minDateString = '9999-12-31'
 
+          // Find the minimum in the data
           for (let row = 1; row <= rows; row++) {
             for (let col = 1; col <= cols; col++) {
               const date = this.dataset.data[row - 1][col].dates[this.trait]
@@ -72,27 +82,34 @@ export default {
             }
           }
 
+          // Parse it
           const minDate = Date.parse(minDateString)
 
           data = [{
+            // X values are the column indices
             x: Array.from({ length: cols }, (v, k) => k + 1),
+            // Y Values are the row indices
             y: Array.from({ length: rows }, (v, k) => k + 1),
             z: this.dataset.data.map((row, index) => {
               let result = []
               for (let col = 1; col <= cols; col++) {
+                // Get the cell date
                 const dateString = this.dataset.data[rows - index - 1][col].dates[this.trait]
 
                 if (dateString) {
+                  // If there is one, return the time difference to the minimum date in days
                   const date = Date.parse(dateString)
 
                   result.push((date - minDate) / (1000 * 60 * 60 * 24))
                 } else {
+                  // Else return NaN
                   result.push(NaN)
                 }
               }
               return result
             }),
             text: this.dataset.data.map((row, index) => {
+              // Return variety names
               let result = []
               for (let col = 1; col <= cols; col++) {
                 result.push(this.dataset.data[rows - index - 1][col].name)
@@ -104,9 +121,12 @@ export default {
             colorscale: [[0, '#dddddd'], [1, this.colors[this.trait % this.colors.length]]]
           }]
         } else {
+          // For all other data types use the actual data instead of the date for plotting
           const isCategorical = actualTrait.type === 'categorical' && actualTrait.restrictions && actualTrait.restrictions.categories
           data = [{
+            // X values are the column indices
             x: Array.from({ length: cols }, (v, k) => k + 1),
+            // Y Values are the row indices
             y: Array.from({ length: rows }, (v, k) => k + 1),
             z: this.dataset.data.map((row, index) => {
               let result = []
@@ -115,9 +135,10 @@ export default {
 
                 if (value) {
                   if (isCategorical) {
-                    // Use the index, because the heatmap doesn't support categorical data
+                    // For categorical traits use the index, because the heatmap doesn't support categorical data
                     result.push(actualTrait.restrictions.categories.indexOf(value))
                   } else {
+                    // Else just plot the value
                     result.push(value)
                   }
                 } else {

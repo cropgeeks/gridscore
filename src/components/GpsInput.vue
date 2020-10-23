@@ -12,12 +12,17 @@
 </template>
 
 <script>
+/**
+ * Component used to ask the user for a GPS location as decimal lat and lng. Current location can be used by pressing the button.
+ */
 export default {
   props: {
+    /** The previous selection */
     currentPosition: {
       type: Array,
       default: () => [null, null]
     },
+    /** The user's current geolocation */
     geolocation: {
       type: Object,
       default: () => null
@@ -31,6 +36,7 @@ export default {
   },
   watch: {
     currentPosition: function () {
+      // Update the current position
       this.updateCurrentPosition()
     },
     latitude: function () {
@@ -47,12 +53,14 @@ export default {
     }
   },
   methods: {
+    /** Set the current geolocation as the selected location */
     setGps: function () {
       if (this.geolocation) {
         this.latitude = this.geolocation.lat
         this.longitude = this.geolocation.lng
       }
     },
+    /** Updates the current position based on the previous selection */
     updateCurrentPosition: function () {
       if (this.currentPosition) {
         this.latitude = this.currentPosition[0]

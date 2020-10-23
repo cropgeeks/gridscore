@@ -2,17 +2,23 @@
   <b-container>
     <b-jumbotron :header="$t('pageUuidImportTitle')" :lead="$t('pageUuidImportText')" bg-variant="info" text-variant="white" border-variant="dark">
       <b-input-group>
+        <!-- A UUID input field -->
         <b-input v-model="uuid" v-if="uuid" />
         <b-input-group-append>
+          <!-- Button to load the config based on the UUID -->
           <b-btn @click="getConfig" variant="primary">{{ $t('buttonUuidImport') }}</b-btn>
         </b-input-group-append>
       </b-input-group>
     </b-jumbotron>
+    <!-- Error messages -->
     <h4 class="text-danger font-weight-bold mt-3" v-if="serverError">{{ serverError }}</h4>
   </b-container>
 </template>
 
 <script>
+/**
+ * Component that handles data configuration sharing via a UUID QR code
+ */
 export default {
   data: function () {
     return {
@@ -27,15 +33,19 @@ export default {
         title: this.$t('modalTitleSetupWarning')
       }).then(value => {
         if (value === true) {
+          // Get the config from the server
           this.getConfigFromSharing(this.uuid)
             .then(result => {
               if (result && result.data) {
+                // Set the config
                 const config = result.data
 
+                // Initialize the data if not present
                 if (config && !config.data) {
                   config.data = []
                 }
 
+                // Send to the store
                 this.$store.commit('ON_DATASET_CHANGED', config)
                 this.$router.push({ name: 'home' })
               }
@@ -62,7 +72,11 @@ export default {
     }
   },
   mounted: function () {
-    this.uuid = this.$route.params.uuid
+    // Get the UUID from the URL if available
+
+    if (this.$route.params) {
+      this.uuid = this.$route.params.uuid
+    }
   }
 }
 </script>

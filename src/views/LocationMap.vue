@@ -20,6 +20,7 @@ const fixPer = require('fix-perspective')
 
 export default {
   computed: {
+    /** The corner points of the field */
     corners: function () {
       if (this.dataset && this.dataset.cornerPoints && this.dataset.cornerPoints.length === 4) {
         // Convert locations to latLngs
@@ -28,6 +29,7 @@ export default {
         return null
       }
     },
+    // The data recordig locations
     locations: function () {
       let locs = []
 
@@ -45,6 +47,7 @@ export default {
 
       return locs
     },
+    /** The reversed perspective projection used to draw the lines */
     reverseProjection: function () {
       const to = this.dataset.cornerPoints.filter(l => l !== null).map(l => { return { x: l[0], y: l[1] } })
 
@@ -60,9 +63,11 @@ export default {
         return null
       }
     },
+    /** The grid lines to show on the map */
     gridLines: function () {
       let lines = []
       if (this.reverseProjection) {
+        // The vertical lines
         for (let x = 1; x < this.dataset.cols; x++) {
           const start = this.reverseProjection((100.0 / this.dataset.cols) * x, 0)
           const end = this.reverseProjection((100.0 / this.dataset.cols) * x, 100)
@@ -70,6 +75,7 @@ export default {
             lines.push([L.latLng(start.x, start.y), L.latLng(end.x, end.y)])
           }
         }
+        // The horizontal lines
         for (let y = 1; y < this.dataset.rows; y++) {
           const start = this.reverseProjection(0, (100.0 / this.dataset.rows) * y)
           const end = this.reverseProjection(100, (100.0 / this.dataset.rows) * y)
@@ -80,6 +86,7 @@ export default {
       }
       return lines
     },
+    /** The bounds of the map */
     bounds: function () {
       let b = L.latLngBounds()
 

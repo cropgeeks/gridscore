@@ -18,26 +18,34 @@ import 'leaflet/dist/leaflet.css'
 
 const fixPer = require('fix-perspective')
 
+/**
+ * Shows the user's position as well as the field layout on a map
+ */
 export default {
   props: {
+    /** Location markers to show on the map */
     locations: {
       type: Array,
       default: () => null
     },
+    /** The user position */
     position: {
       type: Object,
       default: () => null
     },
+    /** The number of rows */
     rows: {
       type: Number,
       default: 1
     },
+    /** The number of columns */
     cols: {
       type: Number,
       default: 1
     }
   },
   computed: {
+    /** The marker objects to show on the map */
     markers: function () {
       if (this.locations) {
         // Convert locations to latLngs
@@ -46,6 +54,7 @@ export default {
         return null
       }
     },
+    /** Compute the reverse perspective projection to be able to draw the lines */
     reverseProjection: function () {
       const to = this.locations.filter(l => l !== null).map(l => { return { x: l[0], y: l[1] } })
 
@@ -61,9 +70,11 @@ export default {
         return null
       }
     },
+    /** The grid lines to show on the map */
     gridLines: function () {
       let lines = []
       if (this.reverseProjection) {
+        // Add the vertical lines
         for (let x = 1; x < this.cols; x++) {
           const start = this.reverseProjection((100.0 / this.cols) * x, 0)
           const end = this.reverseProjection((100.0 / this.cols) * x, 100)
@@ -71,6 +82,7 @@ export default {
             lines.push([L.latLng(start.x, start.y), L.latLng(end.x, end.y)])
           }
         }
+        // Add the horizontal lines
         for (let y = 1; y < this.rows; y++) {
           const start = this.reverseProjection(0, (100.0 / this.rows) * y)
           const end = this.reverseProjection(100, (100.0 / this.rows) * y)
@@ -86,8 +98,8 @@ export default {
     locations: {
       deep: true,
       handler: function (newValue) {
+        // If the locations change, update the map
         if (newValue) {
-          this.updateMarkers()
           this.updateBounds()
         }
       }
@@ -100,8 +112,6 @@ export default {
     LPolyline
   },
   methods: {
-    updateMarkers: function () {
-    },
     updateBounds: function () {
       // Calculate bounds around all locations
       let bounds = L.latLngBounds()
@@ -117,7 +127,6 @@ export default {
       this.$nextTick(() => {
         // Invalidate the map and update markers and bounds
         this.$refs.fieldMap.mapObject.invalidateSize()
-        this.updateMarkers()
         this.updateBounds()
       })
     }

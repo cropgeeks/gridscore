@@ -6,6 +6,7 @@
            ref="traitConfigModal"
            v-if="trait">
     <b-form @submit.prevent="onSubmit" :validated="formValidated">
+      <!-- If it's an `int`, show two number inputs for min and max -->
       <template v-if="trait.type === 'int'">
         <b-form-group :label="$t('formLabelTraitConfigMin')"
                       label-for="min">
@@ -16,6 +17,7 @@
           <b-input type="number" v-model.number="max" :state="formState.max" required/>
         </b-form-group>
       </template>
+      <!-- If it's a `float`, show two number inputs for min and max -->
       <template v-else-if="trait.type === 'float'">
         <b-form-group :label="$t('formLabelTraitConfigMin')"
                       label-for="min">
@@ -26,6 +28,7 @@
           <b-input type="number" v-model.number="max" :step="0.02" :state="formState.max" required/>
         </b-form-group>
       </template>
+      <!-- If it's `categorical`, show a text area where categories are defined -->
       <template v-else-if="trait.type === 'categorical'">
         <b-form-group :label="$t('formLabelTraitCategories')"
                       label-for="categories">
@@ -37,8 +40,14 @@
 </template>
 
 <script>
+/**
+ * Trait configuration modal to define trait restrictions for a specified trait.
+ */
 export default {
   props: {
+    /**
+     * The trait in question
+     */
     trait: {
       type: Object,
       default: () => null
@@ -58,14 +67,19 @@ export default {
     }
   },
   methods: {
+    /**
+     * Handles the submit event. Checks if restrictions are valid and shows feedback in the form.
+     */
     onSubmit: function () {
       if (this.trait.type === 'int' || this.trait.type === 'float') {
+        // For numeric traits, check min and max fields
         this.formState = {
           min: this.min !== undefined && this.min !== null && this.min !== '',
           max: this.max !== undefined && this.max !== null && this.max !== '',
           categories: null
         }
       } else if (this.trait.type === 'categorical') {
+        // For categorical traits, check the categories field
         this.formState = {
           min: null,
           max: null,
@@ -74,10 +88,12 @@ export default {
       }
 
       this.formValidated = true
+      // Check if any field is invalid, if so, return
       if (this.formState.min === false || this.formState.max === false || this.formState.categories === false) {
         return
       }
 
+      // If the form is valid, emit an event with the restrictions as payload
       this.$emit('config-changed', {
         min: this.min,
         max: this.max,
@@ -86,6 +102,9 @@ export default {
 
       this.hide()
     },
+    /**
+     * Resets the modal to its initial state
+     */
     reset: function () {
       this.formValidated = false
       this.formState = {
@@ -97,9 +116,13 @@ export default {
       this.min = null
       this.max = null
     },
+    /**
+     * Shows the modal
+     */
     show: function () {
       this.reset()
 
+      // Read existing trait restrictions into the fields
       if (this.trait && this.trait.restrictions) {
         if (this.trait.restrictions.categories) {
           this.categories = this.trait.restrictions.categories.join('\n')

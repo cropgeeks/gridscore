@@ -34,6 +34,9 @@ import Vue from 'vue'
 import GpsInput from '@/components/GpsInput'
 import Map from '@/components/Map'
 
+/**
+ * Shows the field layout corner points selection components as well as the map
+ */
 export default {
   data: function () {
     return {
@@ -41,14 +44,17 @@ export default {
     }
   },
   props: {
+    /** The user's geolocation */
     geolocation: {
       type: Object,
       default: () => null
     },
+    /** The number of rows the field has */
     rows: {
       type: Number,
       default: 1
     },
+    /** The number of columns the field has */
     cols: {
       type: Number,
       default: 1
@@ -56,6 +62,7 @@ export default {
   },
   watch: {
     'dataset.cornerPoints': function (newValue) {
+      // Watch changes to the dataset's corner points
       this.refresh()
     }
   },
@@ -64,15 +71,29 @@ export default {
     Map
   },
   methods: {
+    /**
+     * Sets the new field corner location
+     * @param index The index of the field corner in the array
+     * @param location The new location
+     */
     updateLocation: function (index, location) {
       Vue.set(this.locations, index, location)
     },
+    /**
+     * Invalidates the map size on uncollapsing of the collapse element to fix display issues
+     */
     invalidateSize: function () {
       this.$nextTick(() => this.$refs.map.invalidateSize())
     },
+    /**
+     * Returns the selected corner points
+     */
     getCornerPoints: function () {
       return this.locations
     },
+    /**
+     * Refreshes the local variables based on the dataset corner points
+     */
     refresh: function () {
       if (this.dataset && this.dataset.cornerPoints && this.dataset.cornerPoints.length === 4) {
         this.locations = this.dataset.cornerPoints.map(l => [l[0], l[1]])

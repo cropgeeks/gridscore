@@ -3,11 +3,21 @@ const axios = require('axios').default
 export default {
   data: function () {
     return {
+      /** Store the `serverinfo` result for each BrAPI URL to know which calls are available */
       serverInfos: {
       }
     }
   },
   methods: {
+    /**
+     * Sends a BrAPI request to the server using the given parameter configuration
+     * @param {String} url The requested (relative) server URL
+     * @param {String} callName The BrAPI call name as returned from `serverinfo`
+     * @param {Object} params (Optional) The request payload in the form of a Javascript object
+     * @param {String} method (Optional) REST method (default: `'get'`)
+     * @param {Boolean} infoCheck (Optional) Indicator whether the BrAPI server should be checked for availability of the requested endpoint. (default: `true`)
+     * @returns Promise
+     */
     get: async function (url, callName, params = null, method = 'get', infoCheck = true) {
       const baseUrl = this.brapiConfig.url
 
@@ -32,9 +42,18 @@ export default {
         }
       })
     },
+    /**
+     * Retrieves the observation variables on the BrAPI server
+     * @param {Number} page (Optional) Page number (default: `0`)
+     * @param {Number} pageSize (Optional) Page size (default: `2147483647`)
+     * @returns Promise
+     */
     brapiGetVariables: function (page = 0, pageSize = 2147483647) {
       return this.get('variables', 'variables', { pageSize: pageSize, page: page })
     },
+    /**
+     * Retrieves the `serverinfo` from the BrAPI server to check availability of certain endpoints. Sets the field `serverInfo` for this BrAPI server
+     */
     brapiGetInfo: async function () {
       const url = '' + this.brapiConfig.url
       await this.get('serverinfo', 'serverinfo', 'get', null, false)

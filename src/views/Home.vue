@@ -42,6 +42,15 @@ export default {
       visibleTraits: null
     }
   },
+  watch: {
+    dataset: function (newValue) {
+      if (newValue && newValue.traits) {
+        this.visibleTraits = newValue.traits.map(t => true)
+      } else {
+        this.visibleTraits = null
+      }
+    }
+  },
   components: {
     GridTable,
     DataPointModal,

@@ -1,22 +1,26 @@
 <template>
   <BrapiModal ref="brapiTraitImportModal"
-              :title="$t('modalTitleBrapiTraitImport')"
-              :okTitle="$t('buttonOk')"
-              :cancelTitle="$t('buttonCancel')"
+              :title="'modalTitleBrapiTraitImport'"
+              :okTitle="'buttonOk'"
+              :cancelTitle="'buttonCancel'"
               @submit="onSubmit"
               @brapi-url-changed="getTraits">
+    <!-- Fill the slot with the content, assuming the loading state is set -->
     <template v-slot:content v-if="loading !== null">
-      <b-form @submit.prevent="onSubmit" v-if="loading === false">
+      <!-- If it is loading, show the indicator -->
+      <div class="text-center" v-if="loading === true">
+        <b-spinner type="grow" variant="primary" />
+      </div>
+      <!-- Else, show the selection -->
+      <b-form @submit.prevent="onSubmit" v-else>
         <p v-if="formState === false" class="text-danger">{{ $t('modalTextWarningBrapiTraitImport') }}</p>
+        <!-- Checkbox group representing the list of traits -->
         <b-form-checkbox-group v-model="selectedTraits"
                               :options="traitOptions"
                               required
                               stacked>
         </b-form-checkbox-group>
       </b-form>
-      <div class="text-center" v-else>
-        <b-spinner type="grow" variant="primary" />
-      </div>
     </template>
   </BrapiModal>
 </template>
@@ -26,6 +30,10 @@ import BrapiModal from '@/components/modals/BrapiModal'
 
 import brapi from '@/mixin/brapi'
 
+/**
+ * Modal used to import trait information from a BrAPI source.
+ * @emits `traits-selected` List of traits to add
+ */
 export default {
   data: function () {
     return {
@@ -36,9 +44,11 @@ export default {
     }
   },
   computed: {
+    /** The trait options for the checkbox component */
     traitOptions: function () {
       if (this.traits && this.traits.length > 0) {
         return this.traits.concat().sort((a, b) => {
+          // Sort by name
           if (a.observationVariableName < b.observationVariableName) {
             return -1
           }
@@ -47,22 +57,52 @@ export default {
           }
           return 0
         }).map(t => {
-          let html = `<span>${t.observationVariableName}</span>`
+          // Then map to HTML showing the name, type as well as the restrictions.
+          let name = t.observationVariableName
+          let type = ''
+          let restrictions = ''
 
-          if (t.scale && t.scale.validValues) {
-            if (t.scale.validValues.min !== undefined && t.scale.validValues.min !== null) {
-              html += `<span class="badge badge-secondary ml-2">&ge;${t.scale.validValues.min}</span>`
+          if (t.scale) {
+            switch (t.scale.dataType) {
+              case 'Date':
+                type = this.$t('traitTypeDate')
+                break
+              case 'Text':
+                type = this.$t('traitTypeText')
+                break
+              case 'Numeric':
+                type = this.$t('traitTypeFloat')
+                break
+              case 'Duration':
+                type = this.$t('traitTypeInt')
+                break
+              case 'Ordinal':
+                type = this.$t('traitTypeCategorical')
+                break
+              default:
+                type = ''
+                break
             }
-            if (t.scale.validValues.max !== undefined && t.scale.validValues.max !== null) {
-              html += `<span class="badge badge-secondary ml-2">&le;${t.scale.validValues.max}</span>`
+
+            if (type && type.length > 0) {
+              type = `<span class="badge badge-primary ml-2">${type}</span>`
             }
-            if (t.scale.validValues.categories) {
-              html += `<span class="badge badge-secondary ml-2">${t.scale.validValues.categories.map(tr => tr.value).join(', ')}</span>`
+
+            if (t.scale.validValues) {
+              if (t.scale.validValues.min !== undefined && t.scale.validValues.min !== null) {
+                restrictions = `<span class="badge badge-secondary ml-2">&ge;${t.scale.validValues.min}</span>`
+              }
+              if (t.scale.validValues.max !== undefined && t.scale.validValues.max !== null) {
+                restrictions = `<span class="badge badge-secondary ml-2">&le;${t.scale.validValues.max}</span>`
+              }
+              if (t.scale.validValues.categories) {
+                restrictions = `<span class="badge badge-secondary ml-2">${t.scale.validValues.categories.map(tr => tr.value).join(', ')}</span>`
+              }
             }
           }
 
           return {
-            html: html,
+            html: `<span>${name}</span>${type}${restrictions}`,
             value: t
           }
         })
@@ -76,6 +116,9 @@ export default {
   },
   mixins: [ brapi ],
   methods: {
+    /**
+     * Shows the modal and resets it to its default values
+     */
     show: function () {
       this.formState = true
       this.selectedTraits = []
@@ -83,9 +126,15 @@ export default {
 
       this.$nextTick(() => this.$refs.brapiTraitImportModal.show())
     },
+    /**
+     * Hides the modal
+     */
     hide: function () {
       this.$nextTick(() => this.$refs.brapiTraitImportModal.hide())
     },
+    /**
+     * Handles the submit button
+     */
     onSubmit: function () {
       this.formState = this.selectedTraits && this.selectedTraits.length > 0
 
@@ -97,6 +146,9 @@ export default {
 
       this.hide()
     },
+    /**
+     * Gets the traits from the BrAPI URL provided by the wrapped component
+     */
     getTraits: function () {
       this.loading = true
       this.brapiGetVariables()
