@@ -1,0 +1,5 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target" : { "namespace": "android_app", "package_name": "uk.ac.hutton.ics.gridscore",
+                   "sha256_cert_fingerprints": ["53:7D:AF:66:C1:8A:92:01:AA:29:76:D0:83:2B:E5:7B:58:DE:FD:B1:1B:72:7E:E0:DA:8E:39:65:29:A9:9B:31"] }
+    }]

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build && copyfiles .htaccess dist/",
+    "build": "vue-cli-service build && copyfiles .htaccess dist/ && copyfiles assetlinks.json dist/.well-known",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
