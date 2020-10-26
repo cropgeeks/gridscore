@@ -1,10 +1,29 @@
 <template>
   <div class="field-map">
-    <LMap :zoom="3" ref="fieldMap">
+    <LMap :zoom="3" ref="fieldMap" @ready="invalidateSize" @click="onMarkerSet">
       <!-- Draw a polygon connecting all markers -->
       <LPolygon :lat-lngs="markers" v-if="markers" :fillOpacity="0.1" />
       <!-- Show current position as a marker -->
       <LMarker v-if="position" :lat-lng="position" />
+      <LMarker v-if="clickedLocation" :lat-lng="clickedLocation" ref="clickedLocationMarker">
+        <LPopup :options="{ minWidth: 300 }" ref="popup">
+          <p>{{ $t('pageMapFieldCornerText') }}</p>
+          <b-row>
+            <b-col cols=6>
+              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 3, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: 1, col: 1 }) }}</b-button>
+            </b-col>
+            <b-col cols=6>
+              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 0, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: 1, col: cols }) }}</b-button>
+            </b-col>
+            <b-col cols=6>
+              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 2, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: rows, col: 1 }) }}</b-button>
+            </b-col>
+            <b-col cols=6>
+              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 1, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: rows, col: cols }) }}</b-button>
+            </b-col>
+          </b-row>
+        </LPopup>
+      </LMarker>
       <!-- Grid lines -->
       <LPolyline v-for="(line, index) in gridLines" :key="`grid-line-${index}`" :lat-lngs="line" :weight="1" />
     </LMap>
@@ -12,7 +31,7 @@
 </template>
 
 <script>
-import { LMap, LMarker, LPolygon, LPolyline } from 'vue2-leaflet'
+import { LMap, LMarker, LPolygon, LPolyline, LPopup } from 'vue2-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -42,6 +61,11 @@ export default {
     cols: {
       type: Number,
       default: 1
+    }
+  },
+  data: function () {
+    return {
+      clickedLocation: null
     }
   },
   computed: {
@@ -109,9 +133,14 @@ export default {
     LMap,
     LMarker,
     LPolygon,
-    LPolyline
+    LPolyline,
+    LPopup
   },
   methods: {
+    onMarkerSet: function (event) {
+      this.clickedLocation = event.latlng
+      this.$nextTick(() => this.$refs.clickedLocationMarker.mapObject.openPopup())
+    },
     updateBounds: function () {
       // Calculate bounds around all locations
       let bounds = L.latLngBounds()
@@ -153,6 +182,8 @@ export default {
       'Esri WorldImagery': satellite
     }
 
+    map.on('popupclose', () => { this.clickedLocation = null })
+
     L.control.layers(baseMaps).addTo(map)
   }
 }
@@ -160,6 +191,6 @@ export default {
 
 <style>
 .field-map {
-  height: 300px !important;
+  height: 400px !important;
 }
 </style>

@@ -24,7 +24,7 @@
       </b-col>
     </b-row>
     <!-- Map showing the corner points and user position -->
-    <Map :locations="locations" :rows="rows" :cols="cols" :position="geolocation" ref="map" />
+    <Map :locations="locations" :rows="rows" :cols="cols" :position="geolocation" @set-corner="updateLocationLatLng" ref="map" />
   </div>
 </template>
 
@@ -71,6 +71,14 @@ export default {
     Map
   },
   methods: {
+    /**
+     * Sets the new field corner location
+     * @param index The index of the field corner in the array
+     * @param location The new location as a leaflet LatLng
+     */
+    updateLocationLatLng: function (update) {
+      Vue.set(this.locations, update.corner, [update.location.lat, update.location.lng])
+    },
     /**
      * Sets the new field corner location
      * @param index The index of the field corner in the array

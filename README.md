@@ -1,12 +1,12 @@
 # GridScore
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/gridscore.svg?sanitize=true" width="200" alt="Logo">
+  <img src="https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/gridscore.svg?sanitize=true" width="200" alt="Logo">
 </p>
 
-![GitHub](https://img.shields.io/github/license/sebastian-raubach/gridscore)
-![GitHub package.json version](https://img.shields.io/github/package-json/v/sebastian-raubach/gridscore)
-![GitHub last commit](https://img.shields.io/github/last-commit/sebastian-raubach/gridscore)
+![GitHub](https://img.shields.io/github/license/cropgeeks/gridscore)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/cropgeeks/gridscore)
+![GitHub last commit](https://img.shields.io/github/last-commit/cropgeeks/gridscore)
 
 GridScore is a field trial phenotyping app for trait data. It lets you keep track of what's happening in the field on a plot-level basis. This could be anything from plant emergence, flowering date, plant height, flower colour, etc. You can define the layout of your field trial and the traits you want to score. GridScore then presents your data in a table format representing your field layout. Data is recorded by clicking on a specific plot in a field and then entering your data.
 
@@ -21,22 +21,22 @@ All your data is stored in the app and can be exported at any time. This, howeve
 ## Functionality
 
 ### Setup
-![](https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/screenshot-setup.png "Setup")
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-setup.png "Setup")
 The setup screen is used to define some basic characteristics of your field trial. Row and column counts as well as a list of germplasm/variety names is used to identify each plot uniquely. Traits are then defined along with their type which can be one of 'integer', 'floating point', 'date', 'text' or 'categorical' (pick from a list of options).
 
 Optionally, the corner points of the field can be configured. This can either be done my walking to the corners of the field and clicking the button to get your GPS position or by manually entering the location. Defining the corner points allows GridScore to show your recorded data in the context of the field plots as well as to highlight your location in the data recording table for easier navigation and orientation.
 
 
 ### Grid view
-![](https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/screenshot-grid.jpg "Grid view")
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-grid.jpg "Grid view")
 The main data table represents your field plan with rows and columns. Each cell is a plot and shows you a short version of the germplasm/variety name. Clicking on a cell opens the data entry dialog where you can enter the data values for each trait. The coloured dots in each cell represent whether the respective trait has already been scored. This is especially useful when scoring time-based traits like emergence, which allows you to only visit the cells without the corresponding data indicator.
 
 ### Timeline
-![](https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/screenshot-timeline.jpg "Timeline")
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-timeline.jpg "Timeline")
 The timeline shows how many plots have already been scored per trait. This represents the development over time, and can highlight differences in traits or time offsets between traits. The y axis ranges from 0 to 100 percent of scored plots.
 
 ### Field heatmap
-![](https://raw.githubusercontent.com/sebastian-raubach/gridscore/master/public/img/screenshot-heatmap.jpg "Heatmap")
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-heatmap.jpg "Heatmap")
 Sometimes there are factors that can affect certain parts of the field. The heatmap plot shows your data in a colour-coded way to highlight possible localised artifacts. For date and text traits, the heatmap shows the recording date in days after the first data value. For integer and floating point traits, the heatmap shows the actual data value.
 
 ### Image tagging

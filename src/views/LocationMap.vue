@@ -5,6 +5,9 @@
       <LPolygon :lat-lngs="corners" v-if="corners" :fillOpacity="0.1" />
       <!-- Grid lines -->
       <LPolyline v-for="(line, index) in gridLines" :key="`grid-line-${index}`" :lat-lngs="line" :weight="1" />
+      <LControl>
+        <b-button v-b-tooltip="$t('tooltipDefineFieldLayout')" variant="light" @click="$refs.fieldLayoutModal.show()">🌐</b-button>
+      </LControl>
     </LMap>
     <!-- Popup content -->
     <div v-if="selectedLocation" ref="popupContent">
@@ -19,11 +22,14 @@
         </dl>
       </div>
     </div>
+    <FieldLayoutModal ref="fieldLayoutModal" />
   </b-row>
 </template>
 
 <script>
-import { LMap, LPolygon, LPolyline } from 'vue2-leaflet'
+import FieldLayoutModal from '@/components/modals/FieldLayoutModal'
+
+import { LMap, LControl, LPolygon, LPolyline } from 'vue2-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -139,6 +145,8 @@ export default {
     }
   },
   components: {
+    FieldLayoutModal,
+    LControl,
     LMap,
     LPolygon,
     LPolyline
@@ -149,7 +157,9 @@ export default {
       const openstreetmap = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         id: 'OpenStreetMap',
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        subdomains: ['a', 'b', 'c']
+        subdomains: ['a', 'b', 'c'],
+        maxZoom: 21,
+        maxNativeZoom: 19
       })
 
       const map = this.$refs.locationMap.mapObject
@@ -158,7 +168,9 @@ export default {
       // Add an additional satellite layer
       const satellite = L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         id: 'Esri WorldImagery',
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxZoom: 21,
+        maxNativeZoom: 19
       })
 
       const baseMaps = {
