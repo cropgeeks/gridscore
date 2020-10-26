@@ -13,10 +13,10 @@
               <b-button block class="mb-2" @click="$emit('set-corner', { corner: 3, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: 1, col: 1 }) }}</b-button>
             </b-col>
             <b-col cols=6>
-              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 0, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: 1, col: cols }) }}</b-button>
+              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 2, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: 1, col: cols }) }}</b-button>
             </b-col>
             <b-col cols=6>
-              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 2, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: rows, col: 1 }) }}</b-button>
+              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 0, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: rows, col: 1 }) }}</b-button>
             </b-col>
             <b-col cols=6>
               <b-button block class="mb-2" @click="$emit('set-corner', { corner: 1, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: rows, col: cols }) }}</b-button>
