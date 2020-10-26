@@ -7,7 +7,7 @@
     <b-form @submit.prevent="exportData" id="import-export-form">
       <b-form-group :label="$t('formLabelImportExportData')"
                     label-for="data">
-        <b-form-textarea :rows="5" :readonly="true" id="data" v-model="config" />
+        <b-form-textarea :rows="5" :readonly="true" id="data" :value="config" />
       </b-form-group>
       <b-button @click="exportJson">{{ $t('buttonImportExportShare') }}</b-button>
 
@@ -32,13 +32,17 @@ const codeWriter = new BrowserQRCodeSvgWriter()
 export default {
   data: function () {
     return {
-      config: null,
       svg: null,
       serverUuid: null,
       serverError: null
     }
   },
   computed: {
+    config: function () {
+      const dataCopy = JSON.parse(JSON.stringify(this.dataset))
+      // delete dataCopy.data
+      return JSON.stringify(dataCopy, undefined, 2)
+    },
     shareUrl: function () {
       if (this.serverUuid) {
         const uuidPart = this.$router.resolve({ name: 'uuid-import', params: { uuid: this.serverUuid } }).resolved.path

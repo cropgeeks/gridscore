@@ -1,6 +1,6 @@
 <template>
   <b-row class="location-map">
-    <LMap :zoom="3" :bounds="bounds" ref="locationMap">
+    <LMap :zoom="3" :bounds="bounds" ref="locationMap" @ready="loadMap">
       <!-- Draw a polygon connecting all markers -->
       <LPolygon :lat-lngs="corners" v-if="corners" :fillOpacity="0.1" />
       <!-- Grid lines -->
@@ -79,16 +79,20 @@ export default {
     },
     /** The reversed perspective projection used to draw the lines */
     reverseProjection: function () {
-      const to = this.dataset.cornerPoints.filter(l => l !== null).map(l => { return { x: l[0], y: l[1] } })
+      if (this.dataset.cornerPoints) {
+        const to = this.dataset.cornerPoints.filter(l => l !== null).map(l => { return { x: l[0], y: l[1] } })
 
-      if (to.length === 4) {
-        const from = [
-          { x: 0, y: 0 },
-          { x: 100, y: 0 },
-          { x: 100, y: 100 },
-          { x: 0, y: 100 }
-        ]
-        return fixPer(from, to)
+        if (to.length === 4) {
+          const from = [
+            { x: 0, y: 0 },
+            { x: 100, y: 0 },
+            { x: 100, y: 100 },
+            { x: 0, y: 100 }
+          ]
+          return fixPer(from, to)
+        } else {
+          return null
+        }
       } else {
         return null
       }
@@ -140,6 +144,32 @@ export default {
     LPolyline
   },
   methods: {
+    loadMap: function () {
+      // Add OSM as the default
+      const openstreetmap = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        id: 'OpenStreetMap',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        subdomains: ['a', 'b', 'c']
+      })
+
+      const map = this.$refs.locationMap.mapObject
+      map.addLayer(openstreetmap)
+
+      // Add an additional satellite layer
+      const satellite = L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        id: 'Esri WorldImagery',
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+      })
+
+      const baseMaps = {
+        'OpenStreetMap': openstreetmap,
+        'Esri WorldImagery': satellite
+      }
+
+      L.control.layers(baseMaps).addTo(map)
+
+      this.updateMarkers()
+    },
     updateMarkers: function () {
       if (this.dataset && this.dataset.data) {
         const map = this.$refs.locationMap.mapObject
@@ -164,32 +194,6 @@ export default {
     onMarkerClicked: function (e) {
       console.log(e)
     }
-  },
-  mounted: function () {
-    // Add OSM as the default
-    const openstreetmap = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      id: 'OpenStreetMap',
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      subdomains: ['a', 'b', 'c']
-    })
-
-    const map = this.$refs.locationMap.mapObject
-    map.addLayer(openstreetmap)
-
-    // Add an additional satellite layer
-    const satellite = L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      id: 'Esri WorldImagery',
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    })
-
-    const baseMaps = {
-      'OpenStreetMap': openstreetmap,
-      'Esri WorldImagery': satellite
-    }
-
-    L.control.layers(baseMaps).addTo(map)
-
-    this.updateMarkers()
   }
 }
 </script>
