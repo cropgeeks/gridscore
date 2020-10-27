@@ -11,7 +11,7 @@
     <b-form-file v-model="imageFile" accept="image/*" capture class="form" />
 
     <!-- Show image date if available -->
-    <b-badge v-if="imageDate">📅 {{ imageDate.toLocaleString() }}</b-badge><br/>
+    <b-badge v-if="imageDate"><BIconCalendar3 /> {{ imageDate.toLocaleString() }}</b-badge><br/>
     <!-- Show geolocation if available -->
     <b-badge target="_blank" :href="`https://www.google.com/maps/place/${imageGps.latitude},${imageGps.longitude}/@${imageGps.latitude},${imageGps.longitude},9z`" v-if="imageGps && imageGps.latitude && imageGps.longitude">📍 {{ imageGps.latitude.toFixed(4) }}; {{ imageGps.longitude.toFixed(4) }}</b-badge>
   </b-modal>
@@ -19,8 +19,12 @@
 
 <script>
 import exifr from 'exifr/dist/lite.umd.js'
+import { BIconCalendar3 } from 'bootstrap-vue'
 
 export default {
+  components: {
+    BIconCalendar3
+  },
   data: function () {
     return {
       imageFile: null,

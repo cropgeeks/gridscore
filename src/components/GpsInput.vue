@@ -6,16 +6,21 @@
 
     <b-input-group-append>
       <!-- Button that sets user's current position -->
-      <b-button @click="setGps" v-b-tooltip="$t('tooltipSettingsGetLocation')">📍</b-button>
+      <b-button @click="setGps" v-b-tooltip="$t('tooltipSettingsGetLocation')"><BIconGeoAlt /></b-button>
     </b-input-group-append>
   </b-input-group>
 </template>
 
 <script>
+import { BIconGeoAlt } from 'bootstrap-vue'
+
 /**
  * Component used to ask the user for a GPS location as decimal lat and lng. Current location can be used by pressing the button.
  */
 export default {
+  components: {
+    BIconGeoAlt
+  },
   props: {
     /** The previous selection */
     currentPosition: {

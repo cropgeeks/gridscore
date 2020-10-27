@@ -7,7 +7,7 @@
 
       <b-button-group class="d-flex flex-row align-items-center flex-wrap">
         <b-button v-for="(trait, index) in dataset.traits" :key="`trait-${index}`" variant="light" @click="toggleVisibility(index)">
-          <span class="mx-1" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }">⬤ {{ trait.name }}</span>
+          <span class="mx-1" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }"><BIconCircleFill /> {{ trait.name }}</span>
         </b-button>
       </b-button-group>
 
@@ -15,7 +15,7 @@
     </div>
 
     <GridTable v-on:cell-clicked="onCellClicked" v-if="dataset && dataset.traits && dataset.traits.length > 0" :visibleTraits="visibleTraits" :highlightPosition="userPosition" />
-    <h3 class="ml-3 mt-3" v-else>🡅 {{ $t('labelHomeIntro') }}</h3>
+    <h3 class="ml-3 mt-3" v-else><BIconArrowUpSquareFill /> {{ $t('labelHomeIntro') }}</h3>
     <ExportModal ref="exportModal" />
     <SettingsModal ref="settingsModal" v-on:settings-changed="onSettingsChanged" :geolocation="geolocation" />
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" :geolocation="geolocation" />
@@ -27,6 +27,7 @@ import GridTable from '@/components/tables/GridTable'
 import DataPointModal from '@/components/modals/DataPointModal'
 import SettingsModal from '@/components/modals/SettingsModal'
 import ExportModal from '@/components/modals/ExportModal'
+import { BIconArrowUpSquareFill, BIconCircleFill } from 'bootstrap-vue'
 
 const fixPer = require('fix-perspective')
 
@@ -38,6 +39,7 @@ export default {
         col: null
       },
       geolocation: null,
+      geolocationHeading: null,
       geolocationWatchId: null,
       visibleTraits: null
     }
@@ -52,6 +54,8 @@ export default {
     }
   },
   components: {
+    BIconArrowUpSquareFill,
+    BIconCircleFill,
     GridTable,
     DataPointModal,
     SettingsModal,
@@ -71,7 +75,9 @@ export default {
           { x: 0, y: 100 }
         ]
         const perspT = fixPer(from, to)
-        return perspT(this.geolocation.lat, this.geolocation.lng)
+        let result = perspT(this.geolocation.lat, this.geolocation.lng)
+        result.heading = this.geolocationHeading
+        return result
       } else {
         return null
       }
@@ -128,6 +134,11 @@ export default {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude,
                 elv: position.coords.altitude
+              }
+
+              // Update the heading only if it's available. When stationaty, the heading is NaN, ignore it and keep the old heading
+              if (position.coords.heading !== undefined && position.coords.heading !== null && !isNaN(position.coords.heading)) {
+                this.geolocationHeading = position.coords.heading
               }
             }
           }, null, options)

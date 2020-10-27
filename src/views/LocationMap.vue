@@ -6,19 +6,19 @@
       <!-- Grid lines -->
       <LPolyline v-for="(line, index) in gridLines" :key="`grid-line-${index}`" :lat-lngs="line" :weight="1" />
       <LControl>
-        <b-button v-b-tooltip="$t('tooltipDefineFieldLayout')" variant="light" @click="$refs.fieldLayoutModal.show()">🌐</b-button>
+        <b-button v-b-tooltip="$t('tooltipDefineFieldLayout')" variant="light" @click="$refs.fieldLayoutModal.show()"><BIconBoundingBox /></b-button>
       </LControl>
     </LMap>
     <!-- Popup content -->
     <div v-if="selectedLocation" ref="popupContent">
       <h4>{{ selectedLocation.name }}</h4>
-      <b-badge class="text-white" target="_blank" :href="`https://www.google.com/maps/place/${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng}/@${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng},14z`" v-if="selectedLocation.geolocation">📍 {{ selectedLocation.geolocation.lat.toFixed(4) }}; {{ selectedLocation.geolocation.lng.toFixed(4) }}</b-badge>
+      <b-badge class="text-white" target="_blank" :href="`https://www.google.com/maps/place/${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng}/@${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng},14z`" v-if="selectedLocation.geolocation"><BIconGeoAlt /> {{ selectedLocation.geolocation.lat.toFixed(4) }}; {{ selectedLocation.geolocation.lng.toFixed(4) }}</b-badge>
       <hr />
       <div v-for="(trait, index) in Object.keys(selectedLocationData)" :key="`selected-location-trait-${index}`">
         <h5>{{ trait }}</h5>
         <dl class="row">
           <dt class="col-6 text-muted"><span>{{ selectedLocationData[trait].value }}</span></dt>
-          <dd class="col-6 text-right"><b-badge>📅 {{ selectedLocationData[trait].date }}</b-badge></dd>
+          <dd class="col-6 text-right"><b-badge><BIconCalendar3 /> {{ selectedLocationData[trait].date }}</b-badge></dd>
         </dl>
       </div>
     </div>
@@ -29,6 +29,7 @@
 <script>
 import FieldLayoutModal from '@/components/modals/FieldLayoutModal'
 
+import { BIconBoundingBox, BIconCalendar3, BIconGeoAlt } from 'bootstrap-vue'
 import { LMap, LControl, LPolygon, LPolyline } from 'vue2-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -145,6 +146,9 @@ export default {
     }
   },
   components: {
+    BIconBoundingBox,
+    BIconCalendar3,
+    BIconGeoAlt,
     FieldLayoutModal,
     LControl,
     LMap,

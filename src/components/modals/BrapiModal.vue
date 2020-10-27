@@ -11,7 +11,7 @@
         <b-form-input v-model="brapiUrl" id="brapiUrl" />
         <b-input-group-append>
           <!-- Button to update the BrAPI URL in the store -->
-          <b-button @click="updateBrapiUrl">&#x21bb;</b-button>
+          <b-button @click="updateBrapiUrl"><BIconArrowClockwise /></b-button>
         </b-input-group-append>
       </b-input-group>
     </b-form-group>
@@ -22,10 +22,15 @@
 </template>
 
 <script>
+import { BIconArrowClockwise } from 'bootstrap-vue'
+
 /**
  * Base modal used to show a BrAPI URL input field at the top. Wrapping components can use the `content` slot to add their own content.
  */
 export default {
+  components: {
+    BIconArrowClockwise
+  },
   data: function () {
     return {
       brapiUrl: null

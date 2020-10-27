@@ -58,9 +58,9 @@
                   <template v-slot:append>
                     <b-button-group>
                       <!-- Configuration button for numeric and categorical traits -->
-                      <b-button variant="info" :title="$t('buttonConfigure')" @click="configureTrait(index)" v-if="trait.type === 'int' || trait.type === 'float' || trait.type === 'categorical'">⚙</b-button>
+                      <b-button variant="info" :title="$t('buttonConfigure')" @click="configureTrait(index)" v-if="trait.type === 'int' || trait.type === 'float' || trait.type === 'categorical'"><BIconGear /></b-button>
                       <!-- Delete trait -->
-                      <b-button variant="danger" :title="$t('buttonDelete')" @click="newTraits.splice(index, 1)">×</b-button>
+                      <b-button variant="danger" :title="$t('buttonDelete')" @click="newTraits.splice(index, 1)"><BIconX /></b-button>
                     </b-button-group>
                   </template>
                 </b-input-group>
@@ -71,7 +71,7 @@
                 <!-- New trait name -->
                 <b-form-input id="trait" :state="state.traits" ref="traitName" required v-model="trait" v-on:keyup.enter="addTrait" />
                 <template v-slot:append>
-                  <b-button variant="success" :title="$t('buttonAdd')" @click="addTrait">＋</b-button>
+                  <b-button variant="success" :title="$t('buttonAdd')" @click="addTrait"><BIconPlus /></b-button>
                 </template>
               </b-input-group>
             </b-form-group>
@@ -104,6 +104,8 @@ import BrapiTraitImportModal from '@/components/modals/BrapiTraitImportModal'
 import JsonImportModal from '@/components/modals/JsonImportModal'
 import JsonExportModal from '@/components/modals/JsonExportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
+
+import { BIconGear, BIconPlus, BIconX } from 'bootstrap-vue'
 
 /**
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
@@ -157,6 +159,9 @@ export default {
     }
   },
   components: {
+    BIconGear,
+    BIconPlus,
+    BIconX,
     FieldMap,
     BrapiTraitImportModal,
     JsonImportModal,

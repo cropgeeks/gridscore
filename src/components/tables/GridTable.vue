@@ -1,14 +1,17 @@
 <template>
-  <div>
+  <div id="grid-table">
     <b-table responsive
              striped
              foot-clone
              sticky-header="100vh"
-             class="grid-table mb-0 position-relative"
+             class="grid-table mb-0"
+             table-class="position-relative"
              @head-clicked="onHeadClicked"
              :items="dataset.data"
-             :fields="fields"
-             ref="table">
+             :fields="fields">
+      <template #thead-top v-if="useGps === true">
+        <UserPositionIndicator :position="highlightPosition" tableId="grid-table" />
+      </template>
       <!-- The first column shows the row number -->
       <template v-slot:cell(0)="data">
         {{ data.index + 1 }}
@@ -26,9 +29,9 @@
           <!-- For each trait -->
           <template v-for="(trait, index) in dataset.traits">
             <!-- Show a circle in the representative trait color if it's not hidden -->
-            <span class="mx-1" :key="`trait-${index}`" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0">⬤</span>
+            <span class="mx-1" :key="`trait-${index}`" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0"><BIconCircleFill /></span>
             <!-- Otherwise show a hidden circle -->
-            <span class="mx-1" :key="`trait-${index}`" :style="{ opacity: 0 }" v-else>⬤</span>
+            <span class="mx-1" :key="`trait-${index}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
           </template>
         </div>
       </template>
@@ -37,6 +40,8 @@
 </template>
 
 <script>
+import UserPositionIndicator from '@/components/UserPositionIndicator'
+import { BIconCircleFill } from 'bootstrap-vue'
 import Vue from 'vue'
 
 export default {
@@ -64,7 +69,7 @@ export default {
     },
     /** The row the user is currently in */
     highlightRow: function () {
-      if (this.highlightPosition) {
+      if (this.useGps && this.highlightPosition) {
         return this.dataset.rows - Math.ceil(this.dataset.rows * this.highlightPosition.y / 100.0)
       } else {
         return null
@@ -72,7 +77,7 @@ export default {
     },
     /** The column the user is currently in */
     highlightCol: function () {
-      if (this.highlightPosition) {
+      if (this.useGps && this.highlightPosition) {
         return Math.floor(this.dataset.cols * this.highlightPosition.x / 100.0)
       } else {
         return null
@@ -114,6 +119,10 @@ export default {
       this.updateMarkedColumns()
     }
   },
+  components: {
+    BIconCircleFill,
+    UserPositionIndicator
+  },
   methods: {
     /**
      * Returns the class to use for the give cell
@@ -126,7 +135,7 @@ export default {
       let result = ''
 
       // If the user position in the field is known
-      if (this.highlightRow && this.highlightCol) {
+      if (this.useGps && this.highlightRow !== null && this.highlightCol !== null) {
         if ((rowIndex === this.highlightRow) && (colIndex === this.highlightCol)) {
           // If this is the cell the user is located in, highlight it green
           return 'table-success'
@@ -201,7 +210,8 @@ export default {
   border-top: 1px solid;
   border-top-color: var(--primary) !important;
 }
-.grid-table thead th div {
+.grid-table thead th div,
+.grid-table .no-user-select {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
      -khtml-user-select: none; /* Konqueror HTML */
@@ -210,11 +220,14 @@ export default {
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
+.grid-table .no-user-select {
+  pointer-events: none;
+}
 .grid-table thead th:first-child,
 .grid-table thead th:nth-child(5n+1),
 .grid-table tfoot th:first-child,
 .grid-table tfoot th:nth-child(5n+1),
-.grid-table tbody tr th,
+.grid-table tbody tr th:not(:last-child),
 .grid-table tr td:nth-child(5n+1) {
   border-right: 1px solid;
   border-right-color: var(--primary) !important;

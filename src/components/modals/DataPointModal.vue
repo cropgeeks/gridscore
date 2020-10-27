@@ -11,7 +11,7 @@
                     :label-for="`trait-${index}`">
         <!-- Show the trait name along with the type and its color as the label -->
         <template v-slot:label>
-          <span :style="{ color: colors[index % colors.length] }">⬤ {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
+          <span :style="{ color: colors[index % colors.length] }"><BIconCircleFill /> {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
         </template>
 
         <!-- For date types, show a datepicker -->
@@ -82,7 +82,7 @@
       </b-form-group>
     </b-form>
     <!-- Show a button for image tagging -->
-    <b-button @click="$refs.imageModal.show()">&#128247; {{ $t('buttonTakePhoto') }}</b-button>
+    <b-button @click="$refs.imageModal.show()"><BIconCamera/> {{ $t('buttonTakePhoto') }}</b-button>
     <!-- Image tagging modal -->
     <ImageModal :name="name" ref="imageModal" />
   </b-modal>
@@ -90,6 +90,7 @@
 
 <script>
 import ImageModal from '@/components/modals/ImageModal'
+import { BIconCamera, BIconCircleFill } from 'bootstrap-vue'
 
 /**
  * Shows a modal used to enter the data into GridScore. Each trait is shown and based on its type a different method for data input is show.
@@ -127,6 +128,8 @@ export default {
     }
   },
   components: {
+    BIconCamera,
+    BIconCircleFill,
     ImageModal
   },
   methods: {

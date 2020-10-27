@@ -18,7 +18,7 @@
         <!-- Toggle for showing dates -->
         <b-form-checkbox class="mb-2" switch v-model="showDates">{{ $t('labelCheckboxExportUseDates') }}</b-form-checkbox>
         <!-- Link to actually download the data -->
-        <a :href="getHrefData" :download="getFilenameData" v-if="text && (text !== $t('labelNoData'))">&#128190; {{ $t('linkExport') }}</a>
+        <BIconDownload /> <a :href="getHrefData" :download="getFilenameData" v-if="text && (text !== $t('labelNoData'))"> {{ $t('linkExport') }}</a>
       </b-tab>
       <!-- Tab for the trait definitions -->
       <b-tab :title="$t('tabTitleExportTraits')">
@@ -28,14 +28,19 @@
           <b-form-textarea rows="8" readonly :value="traits" id="exportTraits" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
         </b-form-group>
         <!-- Link to actually download the data -->
-        <a :href="getHrefTraits" :download="getFilenameTraits" v-if="traits && (traits !== $t('labelNoData'))">&#128190; {{ $t('linkExport') }}</a>
+        <BIconDownload /> <a :href="getHrefTraits" :download="getFilenameTraits" v-if="traits && (traits !== $t('labelNoData'))"> {{ $t('linkExport') }}</a>
       </b-tab>
     </b-tabs>
   </b-modal>
 </template>
 
 <script>
+import { BIconDownload } from 'bootstrap-vue'
+
 export default {
+  components: {
+    BIconDownload
+  },
   data: function () {
     return {
       showDates: 0
