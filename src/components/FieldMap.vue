@@ -5,26 +5,26 @@
       <b-col cols=6>
         <b-form-group :label="$t('formLabelFieldLayoutRowCol', { row: 1, col: 1 })" label-for="top-left">
           <!-- Top left corner -->
-          <GpsInput :currentPosition="locations[3]" :geolocation="geolocation" @location-changed="location => updateLocation(3, location)" id="top-left" />
+          <GpsInput :currentPosition="locations[3]" @location-changed="location => updateLocation(3, location)" id="top-left" />
         </b-form-group>
         <b-form-group :label="$t('formLabelFieldLayoutRowCol', { row: rows, col: 1 })" label-for="bottom-left">
           <!-- Bottom left corner -->
-          <GpsInput :currentPosition="locations[0]" :geolocation="geolocation" @location-changed="location => updateLocation(0, location)" id="bottom-left" />
+          <GpsInput :currentPosition="locations[0]" @location-changed="location => updateLocation(0, location)" id="bottom-left" />
         </b-form-group>
       </b-col>
       <b-col cols=6>
         <b-form-group :label="$t('formLabelFieldLayoutRowCol', { row: 1, col: cols })" label-for="top-right">
           <!-- Top right corner -->
-          <GpsInput :currentPosition="locations[2]" :geolocation="geolocation" @location-changed="location => updateLocation(2, location)" id="top-right" />
+          <GpsInput :currentPosition="locations[2]" @location-changed="location => updateLocation(2, location)" id="top-right" />
         </b-form-group>
         <b-form-group :label="$t('formLabelFieldLayoutRowCol', { row: rows, col: cols })" label-for="bottom-right">
           <!-- Bottom right corner -->
-          <GpsInput :currentPosition="locations[1]" :geolocation="geolocation" @location-changed="location => updateLocation(1, location)" id="bottom-right" />
+          <GpsInput :currentPosition="locations[1]" @location-changed="location => updateLocation(1, location)" id="bottom-right" />
         </b-form-group>
       </b-col>
     </b-row>
     <!-- Map showing the corner points and user position -->
-    <Map :locations="locations" :rows="rows" :cols="cols" :position="geolocation" @set-corner="updateLocationLatLng" ref="map" />
+    <Map :locations="locations" :rows="rows" :cols="cols" @set-corner="updateLocationLatLng" ref="map" />
   </div>
 </template>
 
@@ -44,11 +44,6 @@ export default {
     }
   },
   props: {
-    /** The user's geolocation */
-    geolocation: {
-      type: Object,
-      default: () => null
-    },
     /** The number of rows the field has */
     rows: {
       type: Number,

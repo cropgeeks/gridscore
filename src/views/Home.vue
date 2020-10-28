@@ -17,8 +17,8 @@
     <GridTable v-on:cell-clicked="onCellClicked" v-if="dataset && dataset.traits && dataset.traits.length > 0" :visibleTraits="visibleTraits" :highlightPosition="userPosition" />
     <h3 class="ml-3 mt-3" v-else><BIconArrowUpSquareFill /> {{ $t('labelHomeIntro') }}</h3>
     <ExportModal ref="exportModal" />
-    <SettingsModal ref="settingsModal" v-on:settings-changed="onSettingsChanged" :geolocation="geolocation" />
-    <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" :geolocation="geolocation" />
+    <SettingsModal ref="settingsModal" v-on:settings-changed="onSettingsChanged" />
+    <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
   </div>
 </template>
 
@@ -38,9 +38,6 @@ export default {
         row: null,
         col: null
       },
-      geolocation: null,
-      geolocationHeading: null,
-      geolocationWatchId: null,
       visibleTraits: null
     }
   },
@@ -76,7 +73,7 @@ export default {
         ]
         const perspT = fixPer(from, to)
         let result = perspT(this.geolocation.lat, this.geolocation.lng)
-        result.heading = this.geolocationHeading
+        result.heading = this.geolocation.heading
         return result
       } else {
         return null
@@ -91,7 +88,6 @@ export default {
       this.$store.dispatch('setRows', settings.rows)
       this.$store.dispatch('setCols', settings.cols)
       this.$store.dispatch('setTraits', settings.traits)
-      // TODO: Change this to acual values
       if (settings.cornerPoints && settings.cornerPoints.length === 4) {
         this.$store.dispatch('setCornerPoints', settings.cornerPoints)
       }
@@ -112,7 +108,6 @@ export default {
         data.push(rowData)
       }
       this.$store.dispatch('setData', data)
-      this.startGeoTracking()
     },
     onCellClicked: function (cell) {
       this.cell = cell
@@ -123,40 +118,13 @@ export default {
     },
     setUseGps: function (value) {
       this.$store.dispatch('setUseGps', value)
-    },
-    startGeoTracking: function () {
-      if (this.geolocationWatchId === null) {
-        if (navigator.geolocation) {
-          const options = { enableHighAccuracy: true, maximumAge: 100, timeout: 20000 }
-          this.geolocationWatchId = navigator.geolocation.watchPosition(position => {
-            if (position && position.coords) {
-              this.geolocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-                elv: position.coords.altitude
-              }
-
-              // Update the heading only if it's available. When stationaty, the heading is NaN, ignore it and keep the old heading
-              if (position.coords.heading !== undefined && position.coords.heading !== null && !isNaN(position.coords.heading)) {
-                this.geolocationHeading = position.coords.heading
-              }
-            }
-          }, null, options)
-        }
-      }
     }
   },
   mounted: function () {
-    this.startGeoTracking()
     if (this.dataset && this.dataset.traits) {
       this.visibleTraits = this.dataset.traits.map(t => true)
     } else {
       this.visibleTraits = null
-    }
-  },
-  destroyed: function () {
-    if (this.geolocationWatchId && navigator.geolocation) {
-      navigator.geolocation.clearWatch(this.geolocationWatchId)
     }
   }
 }

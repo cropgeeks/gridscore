@@ -26,7 +26,8 @@ const storeState = {
     datasetIndex: 0,
     datasets: [dataset],
     serverUrl: null,
-    useGps: true
+    useGps: true,
+    geolocation: null
   },
   getters: {
     brapiConfig: (state) => state.datasets[state.datasetIndex].brapiConfig,
@@ -37,7 +38,8 @@ const storeState = {
       return state.datasets.length < 2 && (ds === null || ds.data === null || ds.data.length < 1)
     },
     serverUrl: (state) => state.serverUrl,
-    locale: (state) => state.locale
+    locale: (state) => state.locale,
+    geolocation: (state) => state.geolocation
   },
   mutations: {
     ON_DATASET_INDEX_CHANGED_MUTATION: function (state, newDatasetIndex) {
@@ -87,6 +89,24 @@ const storeState = {
     },
     ON_LOCALE_CHANGED_MUTATION: function (state, newLocale) {
       state.locale = newLocale
+    },
+    ON_GEOLOCATION_CHANGED_MUTATION: function (state, newGeolocation) {
+      if (state.geolocation && newGeolocation) {
+        let newObject = {
+          lat: newGeolocation.lat,
+          lng: newGeolocation.lng,
+          elv: newGeolocation.elv
+        }
+
+        // Update the heading only if it's available. When stationaty, the heading is NaN, ignore it and keep the old heading
+        if (newGeolocation.heading !== undefined && newGeolocation.heading !== null && !isNaN(newGeolocation.heading)) {
+          newObject.heading = newGeolocation.heading
+        }
+
+        state.geolocation = newObject
+      } else {
+        state.geolocation = newGeolocation
+      }
     }
   },
   actions: {
@@ -125,6 +145,9 @@ const storeState = {
     },
     setLocale: function ({ commit }, locale) {
       commit('ON_LOCALE_CHANGED_MUTATION', locale)
+    },
+    setGeolocation: function ({ commit }, geolocation) {
+      commit('ON_GEOLOCATION_CHANGED_MUTATION', geolocation)
     }
   },
   plugins: [createPersistedState({

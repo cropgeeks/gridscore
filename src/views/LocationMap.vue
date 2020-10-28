@@ -8,6 +8,11 @@
       <LControl>
         <b-button v-b-tooltip="$t('tooltipDefineFieldLayout')" variant="light" @click="$refs.fieldLayoutModal.show()"><BIconBoundingBox /></b-button>
       </LControl>
+      <LMarker v-if="geolocation" :latLng="geolocation">
+        <LIcon :icon-anchor="[20, 40]">
+          <BIconGeoFill variant="danger" :style="{ width: '40px', height: '40px'}" />
+        </LIcon>
+      </LMarker>
     </LMap>
     <!-- Popup content -->
     <div v-if="selectedLocation" ref="popupContent">
@@ -29,14 +34,27 @@
 <script>
 import FieldLayoutModal from '@/components/modals/FieldLayoutModal'
 
-import { BIconBoundingBox, BIconCalendar3, BIconGeoAlt } from 'bootstrap-vue'
-import { LMap, LControl, LPolygon, LPolyline } from 'vue2-leaflet'
+import { BIconBoundingBox, BIconCalendar3, BIconGeoAlt, BIconGeoFill } from 'bootstrap-vue'
+import { LMap, LControl, LPolygon, LPolyline, LMarker, LIcon } from 'vue2-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 const fixPer = require('fix-perspective')
 
 export default {
+  components: {
+    BIconBoundingBox,
+    BIconCalendar3,
+    BIconGeoAlt,
+    BIconGeoFill,
+    FieldLayoutModal,
+    LControl,
+    LMap,
+    LMarker,
+    LPolygon,
+    LPolyline,
+    LIcon
+  },
   data: function () {
     return {
       selectedLocation: null
@@ -137,6 +155,9 @@ export default {
       if (this.dataset.cornerPoints) {
         this.dataset.cornerPoints.forEach(c => b.extend(L.latLng(c[0], c[1])))
       }
+      if (this.geolocation) {
+        b.extend(this.geolocation)
+      }
 
       if (b.isValid()) {
         return b.pad(0.1)
@@ -144,16 +165,6 @@ export default {
         return null
       }
     }
-  },
-  components: {
-    BIconBoundingBox,
-    BIconCalendar3,
-    BIconGeoAlt,
-    FieldLayoutModal,
-    LControl,
-    LMap,
-    LPolygon,
-    LPolyline
   },
   methods: {
     loadMap: function () {
@@ -206,9 +217,6 @@ export default {
           })
         })
       }
-    },
-    onMarkerClicked: function (e) {
-      console.log(e)
     }
   }
 }

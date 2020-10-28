@@ -6,7 +6,7 @@
            @shown="invalidateSize"
            @ok.prevent="onSubmit"
            ref="fieldLayoutModal">
-    <FieldMap :geolocation="geolocation" :rows="dataset.rows" :cols="dataset.cols" ref="map" />
+    <FieldMap :rows="dataset.rows" :cols="dataset.cols" ref="map" />
   </b-modal>
 </template>
 
@@ -14,12 +14,6 @@
 import FieldMap from '@/components/FieldMap'
 
 export default {
-  props: {
-    geolocation: {
-      type: Object,
-      default: null
-    }
-  },
   components: {
     FieldMap
   },

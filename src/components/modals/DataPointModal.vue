@@ -106,11 +106,6 @@ export default {
     col: {
       type: Number,
       default: null
-    },
-    /** The geolocation of the user */
-    geolocation: {
-      type: Object,
-      default: null
     }
   },
   data: function () {

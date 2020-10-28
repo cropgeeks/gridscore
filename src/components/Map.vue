@@ -4,7 +4,6 @@
       <!-- Draw a polygon connecting all markers -->
       <LPolygon :lat-lngs="markers" v-if="markers" :fillOpacity="0.1" />
       <!-- Show current position as a marker -->
-      <LMarker v-if="position" :lat-lng="position" />
       <LMarker v-if="clickedLocation" :lat-lng="clickedLocation" ref="clickedLocationMarker">
         <LPopup :options="{ minWidth: 300 }" ref="popup">
           <p>{{ $t('pageMapFieldCornerText') }}</p>
@@ -24,6 +23,11 @@
           </b-row>
         </LPopup>
       </LMarker>
+      <LMarker v-if="geolocation" :lat-lng="geolocation">
+        <LIcon :icon-anchor="[20, 40]">
+          <BIconGeoFill variant="danger" :style="{ width: '40px', height: '40px'}" />
+        </LIcon>
+      </LMarker>
       <!-- Grid lines -->
       <LPolyline v-for="(line, index) in gridLines" :key="`grid-line-${index}`" :lat-lngs="line" :weight="1" />
     </LMap>
@@ -31,9 +35,10 @@
 </template>
 
 <script>
-import { LMap, LMarker, LPolygon, LPolyline, LPopup } from 'vue2-leaflet'
+import { LMap, LMarker, LPolygon, LPolyline, LPopup, LIcon } from 'vue2-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { BIconGeoFill } from 'bootstrap-vue'
 
 const fixPer = require('fix-perspective')
 
@@ -41,15 +46,19 @@ const fixPer = require('fix-perspective')
  * Shows the user's position as well as the field layout on a map
  */
 export default {
+  components: {
+    LMap,
+    LMarker,
+    LPolygon,
+    LPolyline,
+    LPopup,
+    LIcon,
+    BIconGeoFill
+  },
   props: {
     /** Location markers to show on the map */
     locations: {
       type: Array,
-      default: () => null
-    },
-    /** The user position */
-    position: {
-      type: Object,
       default: () => null
     },
     /** The number of rows */
@@ -129,13 +138,6 @@ export default {
       }
     }
   },
-  components: {
-    LMap,
-    LMarker,
-    LPolygon,
-    LPolyline,
-    LPopup
-  },
   methods: {
     onMarkerSet: function (event) {
       this.clickedLocation = event.latlng
@@ -145,6 +147,9 @@ export default {
       // Calculate bounds around all locations
       let bounds = L.latLngBounds()
       this.locations.filter(l => l !== null).forEach(l => bounds.extend(l))
+      if (this.geolocation) {
+        bounds.extend(this.geolocation)
+      }
       // If the bounds are valid, move the map
       if (bounds.isValid()) {
         this.$refs.fieldMap.fitBounds(bounds.pad(0.1))

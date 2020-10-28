@@ -1,6 +1,6 @@
 <template>
   <h4 id="user-position" class="position-absolute no-user-select" :style="{ left: userLeft, top: userTop, transform: userRotate, opacity: 0.75, margin: 0, padding: 0 }">
-    <template v-if="position !== null && position.heading !== null"><BIconCursorFill /></template>
+    <template v-if="position !== null && position.heading !== undefined && position.heading !== null"><BIconCursorFill /></template>
     <template v-else><BIconXCircle /></template>
   </h4>
 </template>

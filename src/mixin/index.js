@@ -15,6 +15,7 @@ export default {
       'brapiConfig',
       'dataset',
       'firstRun',
+      'geolocation',
       'locale',
       'serverUrl',
       'useGps'

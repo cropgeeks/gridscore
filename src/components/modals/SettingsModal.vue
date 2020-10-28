@@ -83,7 +83,7 @@
         <!-- Map used for defining the field's corner points -->
         <b-button v-b-toggle.collapse-1 variant="primary">{{ $t('buttonShowFieldMap') }}</b-button>
         <b-collapse id="collapse-1" class="mt-2" @shown="invalidateMap">
-          <FieldMap :geolocation="geolocation" :rows="rows" :cols="cols" ref="map" />
+          <FieldMap :rows="rows" :cols="cols" ref="map" />
         </b-collapse>
       </b-form>
     </b-modal>
@@ -111,12 +111,6 @@ import { BIconGear, BIconPlus, BIconX } from 'bootstrap-vue'
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
  */
 export default {
-  props: {
-    geolocation: {
-      type: Object,
-      default: null
-    }
-  },
   data: function () {
     return {
       rows: 1,

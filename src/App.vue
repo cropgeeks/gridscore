@@ -50,7 +50,8 @@ export default {
         locale: 'de_DE',
         name: 'Deutsch - Deutschland',
         icon: '🇩🇪'
-      }]
+      }],
+      geolocationWatchId: null
     }
   },
   methods: {
@@ -63,10 +64,33 @@ export default {
         this.$i18n.locale = language.locale
         this.$store.dispatch('setLocale', language.locale)
       })
+    },
+    startGeoTracking: function () {
+      if (this.geolocationWatchId === null) {
+        if (navigator.geolocation) {
+          const options = { enableHighAccuracy: true, maximumAge: 100, timeout: 20000 }
+          this.geolocationWatchId = navigator.geolocation.watchPosition(position => {
+            if (position && position.coords) {
+              this.$store.dispatch('setGeolocation', {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                elv: position.coords.altitude,
+                heading: position.coords.heading
+              })
+            }
+          }, null, options)
+        }
+      }
     }
   },
   mounted: function () {
     loadLanguageAsync(this.locale)
+    this.startGeoTracking()
+  },
+  destroyed: function () {
+    if (this.geolocationWatchId && navigator.geolocation) {
+      navigator.geolocation.clearWatch(this.geolocationWatchId)
+    }
   }
 }
 </script>
