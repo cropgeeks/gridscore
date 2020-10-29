@@ -1,12 +1,13 @@
 <template>
   <div>
+    <p v-if="dataset && dataset.traits && dataset.traits.length > 0">{{ $t('pageHomeText') }}</p>
     <div class="d-flex flex-row align-items-end top-banner">
       <b-button @click="$refs.settingsModal.show()" id="setup-button">{{ $t('buttonSettingsModal') }}</b-button>
 
       <b-form-checkbox :checked="useGps" switch @change="setUseGps" class="mx-3 my-2">{{ $t('buttonToggleGps') }}</b-form-checkbox>
 
       <b-button-group class="d-flex flex-row align-items-center flex-wrap">
-        <b-button v-for="(trait, index) in dataset.traits" :key="`trait-${index}`" variant="light" @click="toggleVisibility(index)">
+        <b-button v-for="(trait, index) in dataset.traits" :key="`trait-${index}`" variant="light" @click="toggleVisibility(index)" v-b-tooltip="$t('tooltipTraitToggle')">
           <span class="mx-1" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }"><BIconCircleFill /> {{ trait.name }}</span>
         </b-button>
       </b-button-group>
@@ -15,7 +16,7 @@
     </div>
 
     <GridTable v-on:cell-clicked="onCellClicked" v-if="dataset && dataset.traits && dataset.traits.length > 0" :visibleTraits="visibleTraits" :highlightPosition="userPosition" />
-    <h3 class="ml-3 mt-3" v-else><BIconArrowUpSquareFill /> {{ $t('labelHomeIntro') }}</h3>
+    <h3 class="ml-3 mt-3" v-else><BIconArrowUpCircleFill /> {{ $t('labelHomeIntro') }}</h3>
     <ExportModal ref="exportModal" />
     <SettingsModal ref="settingsModal" v-on:settings-changed="onSettingsChanged" />
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
@@ -27,7 +28,7 @@ import GridTable from '@/components/tables/GridTable'
 import DataPointModal from '@/components/modals/DataPointModal'
 import SettingsModal from '@/components/modals/SettingsModal'
 import ExportModal from '@/components/modals/ExportModal'
-import { BIconArrowUpSquareFill, BIconCircleFill } from 'bootstrap-vue'
+import { BIconArrowUpCircleFill, BIconCircleFill } from 'bootstrap-vue'
 
 const fixPer = require('fix-perspective')
 
@@ -51,7 +52,7 @@ export default {
     }
   },
   components: {
-    BIconArrowUpSquareFill,
+    BIconArrowUpCircleFill,
     BIconCircleFill,
     GridTable,
     DataPointModal,

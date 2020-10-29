@@ -155,9 +155,9 @@ export default {
       if (this.dataset.cornerPoints) {
         this.dataset.cornerPoints.forEach(c => b.extend(L.latLng(c[0], c[1])))
       }
-      if (this.geolocation) {
-        b.extend(this.geolocation)
-      }
+      // if (this.geolocation) {
+      //   b.extend(this.geolocation)
+      // }
 
       if (b.isValid()) {
         return b.pad(0.1)

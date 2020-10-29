@@ -118,7 +118,13 @@ export default {
             }),
             type: 'heatmap',
             hoverongaps: false,
-            colorscale: [[0, '#dddddd'], [1, this.colors[this.trait % this.colors.length]]]
+            colorscale: [[0, '#dddddd'], [1, this.colors[this.trait % this.colors.length]]],
+            colorbar: {
+              title: {
+                text: this.$t('plotLegendDaysSinceFirstRecording'),
+                side: 'right'
+              }
+            }
           }]
         } else {
           // For all other data types use the actual data instead of the date for plotting
@@ -172,6 +178,8 @@ export default {
         }
 
         const layout = {
+          margin: { autoexpand: true },
+          autosize: true,
           height: (25 * rows) + 200,
           xaxis: {
             showgrid: false,

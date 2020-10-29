@@ -82,7 +82,7 @@
       </b-form-group>
     </b-form>
     <!-- Show a button for image tagging -->
-    <b-button @click="$refs.imageModal.show()"><BIconCamera/> {{ $t('buttonTakePhoto') }}</b-button>
+    <b-button @click="$refs.imageModal.show()"><BIconCameraFill/> {{ $t('buttonTakePhoto') }}</b-button>
     <!-- Image tagging modal -->
     <ImageModal :name="name" ref="imageModal" />
   </b-modal>
@@ -90,7 +90,7 @@
 
 <script>
 import ImageModal from '@/components/modals/ImageModal'
-import { BIconCamera, BIconCircleFill } from 'bootstrap-vue'
+import { BIconCameraFill, BIconCircleFill } from 'bootstrap-vue'
 
 /**
  * Shows a modal used to enter the data into GridScore. Each trait is shown and based on its type a different method for data input is show.
@@ -123,7 +123,7 @@ export default {
     }
   },
   components: {
-    BIconCamera,
+    BIconCameraFill,
     BIconCircleFill,
     ImageModal
   },

@@ -10,20 +10,24 @@
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item :to="{ name: 'timeline' }">{{ $t('menuTimeSeries') }}</b-nav-item>
-          <b-nav-item :to="{ name: 'heatmap' }">{{ $t('menuHeatmap') }}</b-nav-item>
-          <b-nav-item :to="{ name: 'location-map' }">{{ $t('menuLocationMap') }}</b-nav-item>
+          <b-nav-item :to="{ name: 'home' }"><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
+          <b-nav-item :to="{ name: 'timeline' }"><BIconGraphUp /> {{ $t('menuTimeSeries') }}</b-nav-item>
+          <b-nav-item :to="{ name: 'heatmap' }"><BIconGridFill /> {{ $t('menuHeatmap') }}</b-nav-item>
+          <b-nav-item :to="{ name: 'location-map' }"><BIconMap /> {{ $t('menuLocationMap') }}</b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
-          <b-nav-item-dropdown :text="$t('menuLocale')" right>
+          <b-nav-item-dropdown right>
+            <template #button-content>
+              <BIconFlag /><span> {{ $t('menuLocale') }}</span>
+            </template>
             <b-dropdown-item v-for="language in languages" :key="`locale-${language.locale}`" @click="onLocaleChanged(language)">
               <span class="mr-2">{{ language.icon }}</span>
               <span>{{ language.name }}</span>
             </b-dropdown-item>
           </b-nav-item-dropdown>
-          <b-nav-item :to="{ name: 'about' }">About</b-nav-item>
+          <b-nav-item :to="{ name: 'about' }"><BIconInfoCircle /> About</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
@@ -38,8 +42,18 @@
 <script>
 import { loadLanguageAsync } from '@/plugins/i18n'
 
+import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconGridFill, BIconInfoCircle, BIconFlag } from 'bootstrap-vue'
+
 export default {
   name: 'App',
+  components: {
+    BIconMap,
+    BIconUiChecksGrid,
+    BIconGraphUp,
+    BIconGridFill,
+    BIconInfoCircle,
+    BIconFlag
+  },
   data: function () {
     return {
       languages: [{
@@ -109,5 +123,8 @@ html {
 
 .tooltip {
   text-transform: initial !important;
+}
+.input-group .btn {
+  line-height: 21px;
 }
 </style>

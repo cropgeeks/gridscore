@@ -2,6 +2,7 @@
   <div>
     <b-modal :ok-title="$t('buttonOk')"
             :cancel-title="$t('buttonCancel')"
+            scrollable
             size="xl"
             @ok.prevent="onSubmit"
             ref="settingsModal">
@@ -11,8 +12,9 @@
 
         <!-- Import and export buttons for json -->
         <b-button-group>
-          <b-button variant="light" size="sm" @click="$refs.importModal.show()">{{ $t('buttonImport') }}</b-button>
-          <b-button variant="light" size="sm" @click="$refs.exportModal.show()">{{ $t('buttonExport') }}</b-button>
+          <b-button variant="outline-secondary" size="sm" @click="loadExampleData">{{ $t('buttonLoadExample') }}</b-button>
+          <b-button variant="outline-secondary" size="sm" @click="$refs.importModal.show()">{{ $t('buttonImport') }}</b-button>
+          <b-button variant="outline-secondary" size="sm" @click="$refs.exportModal.show()">{{ $t('buttonExport') }}</b-button>
         </b-button-group>
 
         <button class="close ml-0" @click="close()">×</button>
@@ -21,18 +23,24 @@
         <b-row>
           <b-col cols=12 lg=6>
             <!-- Field layout rows -->
-            <b-form-group :label="$t('formLabelSettingsRows')" label-for="rows">
+            <b-form-group label-for="rows" :description="$t('formDescriptionSettingsRow')" >
+              <template v-slot:label>
+                <BIconLayoutThreeColumns rotate="90" /><span> {{ $t('formLabelSettingsRows') }}</span>
+              </template>
               <b-form-input id="rows" :state="state.rows" number type="number" :min="1" required autofocus v-model.number="rows" />
             </b-form-group>
             <!-- Field layout cols -->
-            <b-form-group :label="$t('formLabelSettingsCols')" label-for="cols">
+            <b-form-group label-for="cols" :description="$t('formDescriptionSettingsCol')">
+              <template v-slot:label>
+                <BIconLayoutThreeColumns /><span> {{ $t('formLabelSettingsCols') }}</span>
+              </template>
               <b-form-input id="cols" :state="state.cols" number type="number" :min="1" required v-model.number="cols" />
             </b-form-group>
             <!-- Field layout varieties -->
             <b-form-group label-for="varieties">
               <!-- Variety label -->
               <template v-slot:label>
-                <span>{{ $t('formLabelSettingsVarieties') }}</span><span id="variety-label"> 🛈</span>
+                <BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }}</span><span id="variety-label"> 🛈</span>
                 <!-- Tooltip for the variety label info icon -->
                 <b-tooltip target="variety-label">
                   <div>{{ $t('tooltipSettingsVarieties') }}</div>
@@ -66,7 +74,10 @@
                 </b-input-group>
               </b-list-group-item>
             </b-list-group>
-            <b-form-group :label="$t('formLabelSettingsTraits')" label-for="trait">
+            <b-form-group label-for="trait" :description="$t('formDescriptionSettingsTraits')">
+              <template v-slot:label>
+                <BIconTags /><span> {{ $t('formLabelSettingsTraits') }}</span>
+              </template>
               <b-input-group>
                 <!-- New trait name -->
                 <b-form-input id="trait" :state="state.traits" ref="traitName" required v-model="trait" v-on:keyup.enter="addTrait" />
@@ -77,12 +88,12 @@
             </b-form-group>
 
             <!-- Trait BrAPI import -->
-            <b-button @click="$refs.brapiTraitImportModal.show()">{{ $t('buttonBrapiTraitImport') }}</b-button>
+            <b-button @click="$refs.brapiTraitImportModal.show()"><BIconCloudDownload /> {{ $t('buttonBrapiTraitImport') }}</b-button>
           </b-col>
         </b-row>
         <!-- Map used for defining the field's corner points -->
-        <b-button v-b-toggle.collapse-1 variant="primary">{{ $t('buttonShowFieldMap') }}</b-button>
-        <b-collapse id="collapse-1" class="mt-2" @shown="invalidateMap">
+        <b-button v-b-toggle.collapse-1 variant="primary"><BIconBoundingBox /> {{ $t('buttonShowFieldMap') }}</b-button>
+        <b-collapse id="collapse-1" class="mt-2" v-model="mapVisible" @shown="invalidateMap">
           <FieldMap :rows="rows" :cols="cols" ref="map" />
         </b-collapse>
       </b-form>
@@ -105,7 +116,9 @@ import JsonImportModal from '@/components/modals/JsonImportModal'
 import JsonExportModal from '@/components/modals/JsonExportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
 
-import { BIconGear, BIconPlus, BIconX } from 'bootstrap-vue'
+import { BIconGear, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconTags, BIconBoundingBox, BIconCloudDownload } from 'bootstrap-vue'
+
+import exampleData from '@/example-data.json'
 
 /**
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
@@ -120,6 +133,7 @@ export default {
       traitToConfigure: null,
       varieties: null,
       formValidated: false,
+      mapVisible: false,
       traitTypes: [{
         value: 'date',
         text: this.$t('traitTypeDate')
@@ -156,6 +170,11 @@ export default {
     BIconGear,
     BIconPlus,
     BIconX,
+    BIconLayoutThreeColumns,
+    BIconTextLeft,
+    BIconBoundingBox,
+    BIconCloudDownload,
+    BIconTags,
     FieldMap,
     BrapiTraitImportModal,
     JsonImportModal,
@@ -313,6 +332,26 @@ export default {
       }
       this.trait = null
       this.varietiesFile = null
+      this.mapVisible = false
+    },
+    loadExampleData: function () {
+      // this.reset()
+
+      // this.rows = exampleData.rows
+      // this.cols = exampleData.cols
+      // this.newTraits = JSON.parse(JSON.stringify(exampleData.traits))
+      // let varieties = []
+      // exampleData.data.forEach(r => {
+      //   for (let c = 1; c <= this.cols; c++) {
+      //     varieties.push(r[c].name)
+      //   }
+      // })
+      // this.varieties = varieties.join('\n')
+      // this.$refs.map.setCornerPoints(exampleData.cornerPoints)
+      // this.mapVisible = true
+
+      this.$store.commit('ON_DATASET_CHANGED', exampleData)
+      this.hide()
     },
     /**
      * Shows the resets modal dialog

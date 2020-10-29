@@ -3,10 +3,12 @@
               :title="'modalTitleBrapiTraitImport'"
               :okTitle="'buttonOk'"
               :cancelTitle="'buttonCancel'"
+              :okDisabled="!selectedTraits || selectedTraits.length < 1"
               @submit="onSubmit"
               @brapi-url-changed="getTraits">
     <!-- Fill the slot with the content, assuming the loading state is set -->
     <template v-slot:content v-if="loading !== null">
+      <p class="text-danger" v-if="errorMessage">{{ errorMessage }}</p>
       <!-- If it is loading, show the indicator -->
       <div class="text-center" v-if="loading === true">
         <b-spinner type="grow" variant="primary" />
@@ -39,6 +41,7 @@ export default {
     return {
       traits: null,
       selectedTraits: [],
+      errorMessage: null,
       formState: true,
       loading: null
     }
@@ -123,6 +126,7 @@ export default {
       this.formState = true
       this.selectedTraits = []
       this.traits = []
+      this.errorMessage = null
 
       this.$nextTick(() => this.$refs.brapiTraitImportModal.show())
     },
@@ -159,8 +163,10 @@ export default {
             this.traits = []
           }
           this.loading = false
+          this.errorMessage = null
         })
-        .catch(() => {
+        .catch(error => {
+          this.errorMessage = error
           this.traits = []
           this.loading = false
         })

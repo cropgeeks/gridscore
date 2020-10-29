@@ -94,6 +94,9 @@ export default {
     getCornerPoints: function () {
       return this.locations
     },
+    setCornerPoints: function (cornerPoints) {
+      this.locations = cornerPoints
+    },
     /**
      * Refreshes the local variables based on the dataset corner points
      */

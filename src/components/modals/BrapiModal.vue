@@ -2,6 +2,7 @@
   <b-modal :title="$t(title)"
            :ok-title="$t(okTitle)"
            :cancel-title="$t(cancelTitle)"
+           :ok-disabled="okDisabled"
            @ok.prevent="$emit('submit')"
            scrollable
            ref="brapiModal">
@@ -51,6 +52,10 @@ export default {
     cancelTitle: {
       type: String,
       default: 'buttonCancel'
+    },
+    okDisabled: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
