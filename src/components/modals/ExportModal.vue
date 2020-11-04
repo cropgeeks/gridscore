@@ -10,6 +10,7 @@
     <b-tabs content-class="mt-3" v-else>
       <!-- Tab for the data -->
       <b-tab :title="$t('tabTitleExportData')" active>
+        <p>{{ $t('modalTextExportData') }}</p>
         <b-form-group :label="$t('formLabelExportText')"
                         label-for="exportText">
           <!-- The data is shown here, non-wrapped. On focus, select everything -->
@@ -22,6 +23,7 @@
       </b-tab>
       <!-- Tab for the trait definitions -->
       <b-tab :title="$t('tabTitleExportTraits')">
+        <p v-html="$t('modalTextExportTraits')" />
         <b-form-group :label="$t('formLabelExportTraits')"
                         label-for="exportTraits">
           <!-- The data is shown here, non-wrapped. On focus, select everything -->

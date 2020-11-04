@@ -1,5 +1,7 @@
 <template>
   <div>
+    <h1>{{ $t('pageTimelineTitle') }}</h1>
+    <p>{{ $t('pageTimelineText') }}</p>
     <div id="timeseries-chart" class="time-chart" v-if="dataset && dataset.data && dataset.data.length > 0 && dataset.traits && dataset.traits.length > 0"/>
     <h3 v-else>{{ $t('labelNoData') }}</h3>
   </div>
@@ -101,7 +103,8 @@ export default {
           showline: true,
           rangemode: 'tozero',
           title: this.$t('chartLabelTimeseriesPlotsScores')
-        }
+        },
+        legend: { orientation: 'h' }
       }
 
       this.$plotly.newPlot('timeseries-chart', traces, layout, { responsive: true })

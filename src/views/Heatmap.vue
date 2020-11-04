@@ -1,5 +1,7 @@
 <template>
   <div>
+    <h1>{{ $t('pageHeatmapTitle') }}</h1>
+    <p>{{ $t('pageHeatmapText') }}</p>
     <div v-if="dataset && dataset.data && dataset.data.length > 0 && dataset.traits && dataset.traits.length > 0">
       <!-- Trait selection box -->
       <b-form-group :label="$t('formLabelHeatmapTrait')" label-for="trait">

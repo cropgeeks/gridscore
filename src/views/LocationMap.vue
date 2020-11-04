@@ -1,34 +1,38 @@
 <template>
-  <b-row class="location-map">
-    <LMap :zoom="3" :bounds="bounds" ref="locationMap" @ready="loadMap">
-      <!-- Draw a polygon connecting all markers -->
-      <LPolygon :lat-lngs="corners" v-if="corners" :fillOpacity="0.1" />
-      <!-- Grid lines -->
-      <LPolyline v-for="(line, index) in gridLines" :key="`grid-line-${index}`" :lat-lngs="line" :weight="1" />
-      <LControl>
-        <b-button v-b-tooltip="$t('tooltipDefineFieldLayout')" variant="light" @click="$refs.fieldLayoutModal.show()"><BIconBoundingBox /></b-button>
-      </LControl>
-      <LMarker v-if="geolocation" :latLng="geolocation">
-        <LIcon :icon-anchor="[20, 40]">
-          <BIconGeoFill variant="danger" :style="{ width: '40px', height: '40px'}" />
-        </LIcon>
-      </LMarker>
-    </LMap>
-    <!-- Popup content -->
-    <div v-if="selectedLocation" ref="popupContent">
-      <h4>{{ selectedLocation.name }}</h4>
-      <b-badge class="text-white" target="_blank" :href="`https://www.google.com/maps/place/${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng}/@${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng},14z`" v-if="selectedLocation.geolocation"><BIconGeoAlt /> {{ selectedLocation.geolocation.lat.toFixed(4) }}; {{ selectedLocation.geolocation.lng.toFixed(4) }}</b-badge>
-      <hr />
-      <div v-for="(trait, index) in Object.keys(selectedLocationData)" :key="`selected-location-trait-${index}`">
-        <h5>{{ trait }}</h5>
-        <dl class="row">
-          <dt class="col-6 text-muted"><span>{{ selectedLocationData[trait].value }}</span></dt>
-          <dd class="col-6 text-right"><b-badge><BIconCalendar3 /> {{ selectedLocationData[trait].date }}</b-badge></dd>
-        </dl>
+  <div>
+    <h1>{{ $t('pageLocationsTitle') }}</h1>
+    <p>{{ $t('pageLocationsText') }}</p>
+    <b-row class="location-map">
+      <LMap :zoom="3" :bounds="bounds" ref="locationMap" @ready="loadMap">
+        <!-- Draw a polygon connecting all markers -->
+        <LPolygon :lat-lngs="corners" v-if="corners" :fillOpacity="0.1" />
+        <!-- Grid lines -->
+        <LPolyline v-for="(line, index) in gridLines" :key="`grid-line-${index}`" :lat-lngs="line" :weight="1" />
+        <LControl>
+          <b-button v-b-tooltip="$t('tooltipDefineFieldLayout')" variant="light" @click="$refs.fieldLayoutModal.show()"><BIconBoundingBox /></b-button>
+        </LControl>
+        <LMarker v-if="geolocation" :latLng="geolocation">
+          <LIcon :icon-anchor="[20, 40]">
+            <BIconGeoFill variant="danger" :style="{ width: '40px', height: '40px'}" />
+          </LIcon>
+        </LMarker>
+      </LMap>
+      <!-- Popup content -->
+      <div v-if="selectedLocation" ref="popupContent">
+        <h4>{{ selectedLocation.name }}</h4>
+        <b-badge class="text-white" target="_blank" :href="`https://www.google.com/maps/place/${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng}/@${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng},14z`" v-if="selectedLocation.geolocation"><BIconGeoAlt /> {{ selectedLocation.geolocation.lat.toFixed(4) }}; {{ selectedLocation.geolocation.lng.toFixed(4) }}</b-badge>
+        <hr />
+        <div v-for="(trait, index) in Object.keys(selectedLocationData)" :key="`selected-location-trait-${index}`">
+          <h5>{{ trait }}</h5>
+          <dl class="row">
+            <dt class="col-6 text-muted"><span>{{ selectedLocationData[trait].value }}</span></dt>
+            <dd class="col-6 text-right"><b-badge><BIconCalendar3 /> {{ selectedLocationData[trait].date }}</b-badge></dd>
+          </dl>
+        </div>
       </div>
-    </div>
-    <FieldLayoutModal ref="fieldLayoutModal" />
-  </b-row>
+      <FieldLayoutModal ref="fieldLayoutModal" />
+    </b-row>
+  </div>
 </template>
 
 <script>

@@ -6,7 +6,10 @@
            @ok.prevent="$emit('submit')"
            scrollable
            ref="brapiModal">
-    <b-form-group :label="$t('formLabelBrapiUrl')" label-for="brapiUrl">
+    <b-form-group label-for="brapiUrl">
+      <template v-slot:label>
+        <span v-html="$t('formLabelBrapiUrl')" />
+      </template>
       <b-input-group>
         <!-- BrAPI URL input field -->
         <b-form-input v-model="brapiUrl" id="brapiUrl" />

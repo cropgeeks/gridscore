@@ -40,7 +40,7 @@
             <b-form-group label-for="varieties">
               <!-- Variety label -->
               <template v-slot:label>
-                <BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }}</span><span id="variety-label"> 🛈</span>
+                <BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span>
                 <!-- Tooltip for the variety label info icon -->
                 <b-tooltip target="variety-label">
                   <div>{{ $t('tooltipSettingsVarieties') }}</div>
@@ -88,7 +88,7 @@
             </b-form-group>
 
             <!-- Trait BrAPI import -->
-            <b-button @click="$refs.brapiTraitImportModal.show()"><BIconCloudDownload /> {{ $t('buttonBrapiTraitImport') }}</b-button>
+            <b-button @click="$refs.brapiTraitImportModal.show()"><IconBrapi /> {{ $t('buttonBrapiTraitImport') }}</b-button>
           </b-col>
         </b-row>
         <!-- Map used for defining the field's corner points -->
@@ -115,8 +115,9 @@ import BrapiTraitImportModal from '@/components/modals/BrapiTraitImportModal'
 import JsonImportModal from '@/components/modals/JsonImportModal'
 import JsonExportModal from '@/components/modals/JsonExportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
+import IconBrapi from '@/components/IconBrapi'
 
-import { BIconGear, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconTags, BIconBoundingBox, BIconCloudDownload } from 'bootstrap-vue'
+import { BIconGear, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconTags, BIconBoundingBox, BIconInfoCircle } from 'bootstrap-vue'
 
 import exampleData from '@/example-data.json'
 
@@ -173,8 +174,9 @@ export default {
     BIconLayoutThreeColumns,
     BIconTextLeft,
     BIconBoundingBox,
-    BIconCloudDownload,
     BIconTags,
+    BIconInfoCircle,
+    IconBrapi,
     FieldMap,
     BrapiTraitImportModal,
     JsonImportModal,
@@ -350,8 +352,17 @@ export default {
       // this.$refs.map.setCornerPoints(exampleData.cornerPoints)
       // this.mapVisible = true
 
-      this.$store.commit('ON_DATASET_CHANGED', exampleData)
-      this.hide()
+      // Ask for confirmation
+      this.$bvModal.msgBoxConfirm(this.$t('modalTextSetupWarning'), {
+        title: this.$t('modalTitleSetupWarning'),
+        okTitle: this.$t('buttonOk'),
+        cancelTitle: this.$t('buttonCancel')
+      }).then(value => {
+        if (value === true) {
+          this.$store.commit('ON_DATASET_CHANGED', exampleData)
+          this.hide()
+        }
+      })
     },
     /**
      * Shows the resets modal dialog
@@ -388,7 +399,9 @@ export default {
       if (this.state.rows && this.state.cols && this.state.traits && this.state.varieties) {
         // Ask for confirmation
         this.$bvModal.msgBoxConfirm(this.$t('modalTextSetupWarning'), {
-          title: this.$t('modalTitleSetupWarning')
+          title: this.$t('modalTitleSetupWarning'),
+          okTitle: this.$t('buttonOk'),
+          cancelTitle: this.$t('buttonCancel')
         }).then(value => {
           if (value === true) {
             // If confirmed, emit an event with the new configuration

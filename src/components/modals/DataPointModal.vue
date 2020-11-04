@@ -5,6 +5,7 @@
            @ok.prevent="onSubmit"
            @shown="setFocus"
            ref="dataPointModal">
+    <p>{{ $t('modalTextDataEntry') }}</p>
     <b-form @submit.prevent="onSubmit" :validated="formValidated">
       <b-form-group v-for="(trait, index) in dataset.traits"
                     :key="`trait-${index}`"

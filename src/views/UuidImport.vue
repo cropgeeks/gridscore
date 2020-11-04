@@ -30,7 +30,9 @@ export default {
     getConfig: function () {
       // Ask for confirmation
       this.$bvModal.msgBoxConfirm(this.$t('modalTextSetupWarning'), {
-        title: this.$t('modalTitleSetupWarning')
+        title: this.$t('modalTitleSetupWarning'),
+        okTitle: this.$t('buttonOk'),
+        cancelTitle: this.$t('buttonCancel')
       }).then(value => {
         if (value === true) {
           // Get the config from the server
