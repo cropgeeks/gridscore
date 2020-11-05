@@ -15,6 +15,7 @@ if (!name) {
 const dataset = {
   cols: 1,
   rows: 1,
+  truncateNames: 6,
   traits: [],
   data: [],
   brapiConfig: null
@@ -39,7 +40,8 @@ const storeState = {
     },
     serverUrl: (state) => state.serverUrl,
     locale: (state) => state.locale,
-    geolocation: (state) => state.geolocation
+    geolocation: (state) => state.geolocation,
+    truncateNames: (state) => state.datasets[state.datasetIndex].truncateNames
   },
   mutations: {
     ON_DATASET_INDEX_CHANGED_MUTATION: function (state, newDatasetIndex) {
@@ -72,6 +74,9 @@ const storeState = {
     },
     ON_DATA_CHANGED_MUTATION: function (state, newData) {
       state.datasets[state.datasetIndex].data = newData
+    },
+    ON_TRUNCATE_NAMES_CHANGED_MUTATION: function (state, newTruncateNames) {
+      state.datasets[state.datasetIndex].truncateNames = newTruncateNames
     },
     ON_DATA_POINT_CHANGED_MUTATION: function (state, dataPoint) {
       state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col].dates = dataPoint.dates
@@ -148,6 +153,9 @@ const storeState = {
     },
     setGeolocation: function ({ commit }, geolocation) {
       commit('ON_GEOLOCATION_CHANGED_MUTATION', geolocation)
+    },
+    setTruncateNames: function ({ commit }, truncateNames) {
+      commit('ON_TRUNCATE_NAMES_CHANGED_MUTATION', truncateNames)
     }
   },
   plugins: [createPersistedState({
@@ -178,6 +186,10 @@ const storeState = {
                   }
                 })
               })
+            }
+
+            if (d.truncateNames === undefined || d.truncatENames === null) {
+              d.truncateNames = 6
             }
           })
         }

@@ -92,12 +92,14 @@ export default {
 
       const layout = {
         xaxis: {
+          automargin: true,
           showgrid: true,
           zeroline: true,
           showline: true,
           title: this.$t('chartLabelTimeseriesTime')
         },
         yaxis: {
+          automargin: true,
           showgrid: true,
           zeroline: true,
           showline: true,

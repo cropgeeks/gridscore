@@ -22,10 +22,13 @@
       </template>
       <!-- Cell content -->
       <template v-slot:cell()="data">
-        <!-- handle click events -->
+        <!-- Handle click events -->
         <div v-on:click="onClick(data, $event)" :class="`text-center ${getClass(data)}`">
           <!-- Truncated version of the variety name -->
-          <span class="d-block">{{ data.value.name ? data.value.name.substring(0, 4) : '' }}</span>
+          <span class="d-block" v-if="data.value.name">
+            <span v-if="data.value.name.length > dataset.truncateNames">{{ data.value.name.substring(0, dataset.truncateNames) }}…</span>
+            <span v-else>{{ data.value.name }}</span>
+          </span>
           <!-- For each trait -->
           <template v-for="(trait, index) in dataset.traits">
             <!-- Show a circle in the representative trait color if it's not hidden -->
