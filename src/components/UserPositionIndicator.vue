@@ -1,17 +1,17 @@
 <template>
   <h4 id="user-position" class="position-absolute no-user-select" :style="{ left: userLeft, top: userTop, transform: userRotate, opacity: 0.75, margin: 0, padding: 0 }">
     <template v-if="position !== null && position.heading !== undefined && position.heading !== null"><BIconCursorFill /></template>
-    <template v-else><BIconXCircle /></template>
+    <template v-else><BIconBullseye /></template>
   </h4>
 </template>
 
 <script>
-import { BIconCursorFill, BIconXCircle } from 'bootstrap-vue'
+import { BIconCursorFill, BIconBullseye } from 'bootstrap-vue'
 
 export default {
   components: {
     BIconCursorFill,
-    BIconXCircle
+    BIconBullseye
   },
   data: function () {
     return {

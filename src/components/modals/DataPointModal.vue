@@ -4,6 +4,7 @@
            :cancel-title="$t('buttonCancel')"
            @ok.prevent="onSubmit"
            @shown="setFocus"
+           size="lg"
            ref="dataPointModal">
     <p>{{ $t('modalTextDataEntry') }}</p>
     <b-form @submit.prevent="onSubmit" :validated="formValidated">
@@ -15,16 +16,22 @@
           <span :style="{ color: colors[index % colors.length] }"><BIconCircleFill /> {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
         </template>
 
-        <!-- For date types, show a datepicker -->
-        <b-form-datepicker v-if="trait.type === 'date'"
-                           :id="`trait-${index}`"
-                           :ref="`trait-${index}`"
-                           :state="formState[index]"
-                           @keyup.enter="traverseForm(index + 1)"
-                           v-model="values[index]"
-                           reset-button
-                           :reset-value="null"
-                           @input="(event) => onDateChanged(event, index)"/>
+        <b-input-group v-if="trait.type === 'date'">
+          <!-- For date types, show a datepicker -->
+          <b-form-datepicker :id="`trait-${index}`"
+                            :ref="`trait-${index}`"
+                            :state="formState[index]"
+                            @keyup.enter="traverseForm(index + 1)"
+                            v-model="values[index]"
+                            reset-button
+                            :reset-value="null"
+                            @input="(event) => onDateChanged(event, index)"/>
+          <b-input-group-append>
+            <b-button v-b-tooltip="$t('tooltipDataEntryDateMinusOne')" @click="setDateMinusOne(index)"><BIconCaretLeftFill /></b-button>
+            <b-button v-b-tooltip="$t('tooltipDataEntryDateToday')" @click="setDateToday(index)"><BIconCalendar3 /></b-button>
+            <b-button v-b-tooltip="$t('tooltipDataEntryDatePlusOne')" @click="setDatePlusOne(index)"><BIconCaretRightFill /></b-button>
+          </b-input-group-append>
+        </b-input-group>
         <!-- For int types, show a number input, apply restrictions -->
         <b-form-input      v-else-if="trait.type === 'int'"
                            :id="`trait-${index}`"
@@ -90,8 +97,9 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import ImageModal from '@/components/modals/ImageModal'
-import { BIconCameraFill, BIconCircleFill } from 'bootstrap-vue'
+import { BIconCameraFill, BIconCircleFill, BIconCaretLeftFill, BIconCaretRightFill, BIconCalendar3 } from 'bootstrap-vue'
 
 /**
  * Shows a modal used to enter the data into GridScore. Each trait is shown and based on its type a different method for data input is show.
@@ -126,9 +134,49 @@ export default {
   components: {
     BIconCameraFill,
     BIconCircleFill,
+    BIconCaretLeftFill,
+    BIconCaretRightFill,
+    BIconCalendar3,
     ImageModal
   },
   methods: {
+    setDateMinusOne: function (index) {
+      let current = this.values[index]
+
+      if (current === undefined || current === null) {
+        current = this.getToday()
+      } else {
+        current = new Date(current)
+      }
+
+      current.setDate(current.getDate() - 1)
+
+      Vue.set(this.values, index, current.toISOString().split('T')[0])
+    },
+    setDatePlusOne: function (index) {
+      let current = this.values[index]
+
+      if (current === undefined || current === null) {
+        current = this.getToday()
+      } else {
+        current = new Date(current)
+      }
+
+      current.setDate(current.getDate() + 1)
+
+      Vue.set(this.values, index, current.toISOString().split('T')[0])
+    },
+    setDateToday: function (index) {
+      Vue.set(this.values, index, this.getTodayString())
+    },
+    getToday: function () {
+      let today = new Date()
+      const offset = today.getTimezoneOffset()
+      return new Date(today.getTime() + (offset * 60 * 1000))
+    },
+    getTodayString: function () {
+      return this.getToday().toISOString().split('T')[0]
+    },
     /**
      * For the given trait, return the i18n text
      * @param trait The trait for which to return the text
@@ -240,10 +288,7 @@ export default {
           this.dates[i] = this.values[i]
         } else if (this.values[i] !== null && this.dates[i] === null) {
           // Else, if there is a value and no date, set the date as now
-          let today = new Date()
-          const offset = today.getTimezoneOffset()
-          today = new Date(today.getTime() + (offset * 60 * 1000))
-          this.dates[i] = today.toISOString().split('T')[0]
+          this.dates[i] = this.getTodayString()
         }
       })
 

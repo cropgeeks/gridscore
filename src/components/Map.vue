@@ -9,16 +9,16 @@
           <p>{{ $t('pageMapFieldCornerText') }}</p>
           <b-row>
             <b-col cols=6>
-              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 3, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: 1, col: 1 }) }}</b-button>
+              <b-button block class="mb-2" @click="setCorner(3)">{{ $t('formLabelFieldLayoutRowCol', { row: 1, col: 1 }) }}</b-button>
             </b-col>
             <b-col cols=6>
-              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 2, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: 1, col: cols }) }}</b-button>
+              <b-button block class="mb-2" @click="setCorner(2)">{{ $t('formLabelFieldLayoutRowCol', { row: 1, col: cols }) }}</b-button>
             </b-col>
             <b-col cols=6>
-              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 0, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: rows, col: 1 }) }}</b-button>
+              <b-button block class="mb-2" @click="setCorner(0)">{{ $t('formLabelFieldLayoutRowCol', { row: rows, col: 1 }) }}</b-button>
             </b-col>
             <b-col cols=6>
-              <b-button block class="mb-2" @click="$emit('set-corner', { corner: 1, location: clickedLocation })">{{ $t('formLabelFieldLayoutRowCol', { row: rows, col: cols }) }}</b-button>
+              <b-button block class="mb-2" @click="setCorner(1)">{{ $t('formLabelFieldLayoutRowCol', { row: rows, col: cols }) }}</b-button>
             </b-col>
           </b-row>
         </LPopup>
@@ -139,6 +139,10 @@ export default {
     }
   },
   methods: {
+    setCorner: function (index) {
+      this.$emit('set-corner', { corner: index, location: this.clickedLocation })
+      this.clickedLocation = null
+    },
     onMarkerSet: function (event) {
       this.clickedLocation = event.latlng
       this.$nextTick(() => this.$refs.clickedLocationMarker.mapObject.openPopup())
@@ -147,9 +151,9 @@ export default {
       // Calculate bounds around all locations
       let bounds = L.latLngBounds()
       this.locations.filter(l => l !== null).forEach(l => bounds.extend(l))
-      if (this.geolocation) {
-        bounds.extend(this.geolocation)
-      }
+      // if (this.geolocation) {
+      //   bounds.extend(this.geolocation)
+      // }
       // If the bounds are valid, move the map
       if (bounds.isValid()) {
         this.$refs.fieldMap.fitBounds(bounds.pad(0.1))
