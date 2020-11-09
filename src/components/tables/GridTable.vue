@@ -24,10 +24,9 @@
       <template v-slot:cell()="data">
         <!-- Handle click events -->
         <div v-on:click="onClick(data, $event)" :class="`text-center ${getClass(data)}`">
-          <!-- Truncated version of the variety name -->
-          <span class="d-block" v-if="data.value.name">
-            <span v-if="data.value.name.length > dataset.truncateNames">{{ data.value.name.substring(0, dataset.truncateNames) }}…</span>
-            <span v-else>{{ data.value.name }}</span>
+          <!-- Variety name -->
+          <span class="d-block grid-cell-name" v-if="data.value.name">
+            <span>{{ data.value.name }}</span>
           </span>
           <!-- For each trait -->
           <template v-for="(trait, index) in dataset.traits">
@@ -274,5 +273,10 @@ export default {
 }
 .grid-table .gps-border-bottom {
   border-bottom: 5px solid var(--success);
+}
+.grid-table .grid-cell-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

@@ -6,12 +6,7 @@
             scrollable
             @ok.prevent="onSubmit"
             ref="settingsModal">
-      <b-form @submit.prevent="onSubmit" :validated="formValidated">
-        <b-form-group :label="$t('formLabelSettingsTruncate')" label-for="truncate">
-          <!-- Input for truncation length value -->
-          <b-form-input :min="1" type="number" v-model.number="truncate" :state="formState.truncate" required />
-        </b-form-group>
-
+      <b-form @submit.prevent="onSubmit">
         <b-form-checkbox v-model="shouldUseGps" switch>{{ $t('buttonToggleGps') }}</b-form-checkbox>
       </b-form>
     </b-modal>
@@ -25,11 +20,6 @@
 export default {
   data: function () {
     return {
-      formValidated: false,
-      formState: {
-        truncate: null
-      },
-      truncate: 4,
       shouldUseGps: true
     }
   },
@@ -51,27 +41,10 @@ export default {
      * Resets the dialog to its initial state
      */
     reset: function () {
-      this.formValidated = false
-      this.formState = {
-        truncate: null
-      }
-
-      this.truncate = this.dataset.truncateNames
       this.shouldUseGps = this.useGps
     },
     onSubmit: function () {
-      // Set the form to validated
-      this.formValidated = true
-      // Check all fields
-      this.formState.truncate = this.truncate !== undefined && this.truncate !== null && this.truncate !== '' && this.truncate > 0
-
-      // If a field is not valid, return
-      if (this.formState.truncate === false) {
-        return
-      }
-
-      // Otherwise, dispatch to the store
-      this.$store.dispatch('setTruncateNames', this.truncate)
+      // Dispatch to the store
       this.$store.dispatch('setUseGps', this.shouldUseGps)
       this.hide()
     }
