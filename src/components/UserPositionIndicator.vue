@@ -58,34 +58,29 @@ export default {
      * Updates the location of the user position indicator.
      */
     updateUserPosition: function () {
-      if (this.useGps && this.position && this.position.x >= 0 && this.position.x <= 100) {
+      if (this.useGps && this.position && this.position.x >= 0 && this.position.x <= 100 && this.position.y >= 0 && this.position.y <= 100) {
         if (!document.querySelector(`#${this.tableId} .table`)) {
           return null
         }
         // Get the widths of the table, the top left cell and the bottom right cell
-        const table = document.querySelector(`#${this.tableId} .table`).offsetWidth
-        const topLeft = document.querySelector(`#${this.tableId} .table thead tr th:first-child`).offsetWidth
-        const bottomRight = document.querySelector(`#${this.tableId} .table tfoot tr th:last-child`).offsetWidth
-        const icon = document.querySelector(`#${this.tableId} #user-position`).offsetWidth
+        const tableWidth = document.querySelector(`#${this.tableId} .table`).offsetWidth
+        const topLeftWidth = document.querySelector(`#${this.tableId} .table thead tr th:first-child`).offsetWidth
+        const bottomRightWidth = document.querySelector(`#${this.tableId} .table tfoot tr th:last-child`).offsetWidth
+        const iconWidth = document.querySelector(`#${this.tableId} #user-position`).offsetWidth
 
         // Calculate the percentage position within just the body of the table (without first and last column), then add the first column width and subtract half the height of the icon to center it
-        this.userLeft = `${topLeft + (table - topLeft - bottomRight) * this.position.x / 100 - icon / 2}px`
-      } else {
-        this.userLeft = null
-      }
-      if (this.useGps && this.position && this.position.y >= 0 && this.position.y <= 100) {
-        if (!document.querySelector(`#${this.tableId} .table`)) {
-          return null
-        }
+        this.userLeft = `${topLeftWidth + (tableWidth - topLeftWidth - bottomRightWidth) * this.position.x / 100 - iconWidth / 2}px`
+
         // Get the heights of the table, the top left cell and the bottom right cell
-        const table = document.querySelector(`#${this.tableId} .table`).offsetHeight
-        const topLeft = document.querySelector(`#${this.tableId} .table thead tr th:first-child`).offsetHeight
-        const bottomRight = document.querySelector(`#${this.tableId} .table tfoot tr th:last-child`).offsetHeight
-        const icon = document.querySelector(`#${this.tableId} #user-position`).offsetHeight
+        const tableHeight = document.querySelector(`#${this.tableId} .table`).offsetHeight
+        const topLeftHeight = document.querySelector(`#${this.tableId} .table thead tr th:first-child`).offsetHeight
+        const bottomRightHeight = document.querySelector(`#${this.tableId} .table tfoot tr th:last-child`).offsetHeight
+        const iconHeight = document.querySelector(`#${this.tableId} #user-position`).offsetHeight
 
         // Calculate the percentage position within just the body of the table (without first and last row), then add the first row height and substract half the width of the icon to center it
-        this.userTop = `${topLeft + (table - topLeft - bottomRight) * (100 - this.position.y) / 100 - icon / 2}px`
+        this.userTop = `${topLeftHeight + (tableHeight - topLeftHeight - bottomRightHeight) * (100 - this.position.y) / 100 - iconHeight / 2}px`
       } else {
+        this.userLeft = null
         this.userTop = null
       }
     }
@@ -102,5 +97,7 @@ export default {
 </script>
 
 <style>
-
+#user-position {
+  transition: top .1s ease-in-out, left .1s ease-in-out;
+}
 </style>

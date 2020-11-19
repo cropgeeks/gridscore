@@ -1,7 +1,7 @@
 # GridScore
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/gridscore.svg?sanitize=true" width="200" alt="Logo">
+  <img src="https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/gridscore2.svg?sanitize=true" width="200" alt="Logo">
 </p>
 
 ![GitHub](https://img.shields.io/github/license/cropgeeks/gridscore)

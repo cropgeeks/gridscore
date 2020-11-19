@@ -2,7 +2,7 @@
   <div>
     <b-navbar toggleable="lg" type="dark" variant="primary">
       <b-navbar-brand :to="{ name: 'home' }" class="d-flex align-items-center">
-        <img src="img/gridscore.svg" height="40px" class="d-inline-block align-top mr-3" alt="GridScore">
+        <img src="img/gridscore2.svg" height="40px" class="d-inline-block align-top mr-3" alt="GridScore">
         GridScore
       </b-navbar-brand>
 
