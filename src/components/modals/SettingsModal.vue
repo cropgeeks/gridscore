@@ -7,7 +7,12 @@
             @ok.prevent="onSubmit"
             ref="settingsModal">
       <b-form @submit.prevent="onSubmit">
-        <b-form-checkbox v-model="shouldUseGps" switch>{{ $t('buttonToggleGps') }}</b-form-checkbox>
+        <b-form-group :label="$t('formLabelSettingsGps')" label-for="use-gps">
+          <b-form-checkbox v-model="tempUseGps" switch id="use-gps">{{ $t('buttonToggleGps') }}</b-form-checkbox>
+        </b-form-group>
+        <b-form-group :label="$t('formLabelSettingsGridLinesEvery')" label-for="grid-lines-every">
+          <b-form-select :options="validGridLines" v-model="tempGridLinesEvery" id="grid-lines-every" />
+        </b-form-group>
       </b-form>
     </b-modal>
   </div>
@@ -20,7 +25,9 @@
 export default {
   data: function () {
     return {
-      shouldUseGps: true
+      tempUseGps: true,
+      tempGridLinesEvery: 5,
+      validGridLines: [2, 3, 4, 5]
     }
   },
   methods: {
@@ -41,11 +48,17 @@ export default {
      * Resets the dialog to its initial state
      */
     reset: function () {
-      this.shouldUseGps = this.useGps
+      this.tempUseGps = this.useGps
+      this.tempGridLinesEvery = this.gridLinesEvery
     },
     onSubmit: function () {
       // Dispatch to the store
-      this.$store.dispatch('setUseGps', this.shouldUseGps)
+      if (this.tempUseGps !== this.useGps) {
+        this.$store.dispatch('setUseGps', this.tempUseGps)
+      }
+      if (this.tempGridLinesEvery !== this.gridLinesEvery) {
+        this.$store.dispatch('setGridLinesEvery', this.tempGridLinesEvery)
+      }
       this.hide()
     }
   },

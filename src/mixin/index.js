@@ -16,6 +16,7 @@ export default {
       'dataset',
       'firstRun',
       'geolocation',
+      'gridLinesEvery',
       'locale',
       'serverUrl',
       'useGps'

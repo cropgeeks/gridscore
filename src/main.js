@@ -7,7 +7,8 @@ import {
   DropdownPlugin,
   BVModalPlugin,
   NavbarPlugin,
-  TablePlugin,
+  TableLitePlugin,
+  TableSimplePlugin,
   CollapsePlugin,
   ImagePlugin,
   ButtonPlugin,
@@ -57,7 +58,8 @@ Vue.use(DropdownPlugin)
 Vue.use(BVModalPlugin)
 Vue.use(CollapsePlugin)
 Vue.use(NavbarPlugin)
-Vue.use(TablePlugin)
+Vue.use(TableLitePlugin)
+Vue.use(TableSimplePlugin)
 Vue.use(ButtonPlugin)
 Vue.use(ButtonGroupPlugin)
 Vue.use(FormPlugin)

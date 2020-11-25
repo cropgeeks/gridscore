@@ -1,6 +1,6 @@
 <template>
   <div id="grid-table">
-    <b-table responsive
+    <b-table-lite responsive
              striped
              foot-clone
              sticky-header="100vh"
@@ -37,7 +37,7 @@
           </template>
         </div>
       </template>
-    </b-table>
+    </b-table-lite>
   </div>
 </template>
 

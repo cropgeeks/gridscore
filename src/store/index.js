@@ -27,6 +27,7 @@ const storeState = {
     datasets: [dataset],
     serverUrl: null,
     useGps: true,
+    gridLinesEvery: 5,
     geolocation: null
   },
   getters: {
@@ -39,6 +40,7 @@ const storeState = {
     },
     serverUrl: (state) => state.serverUrl,
     locale: (state) => state.locale,
+    gridLinesEvery: (state) => state.gridLinesEvery,
     geolocation: (state) => state.geolocation
   },
   mutations: {
@@ -89,6 +91,9 @@ const storeState = {
     },
     ON_LOCALE_CHANGED_MUTATION: function (state, newLocale) {
       state.locale = newLocale
+    },
+    ON_GRID_LINES_EVERY_CHANGED_MUTATION: function (state, newGridLinesEvery) {
+      state.gridLinesEvery = newGridLinesEvery
     },
     ON_GEOLOCATION_CHANGED_MUTATION: function (state, newGeolocation) {
       if (state.geolocation && newGeolocation) {
@@ -145,6 +150,9 @@ const storeState = {
     },
     setLocale: function ({ commit }, locale) {
       commit('ON_LOCALE_CHANGED_MUTATION', locale)
+    },
+    setGridLinesEvery: function ({ commit }, gridLinesEvery) {
+      commit('ON_GRID_LINES_EVERY_CHANGED_MUTATION', gridLinesEvery)
     },
     setGeolocation: function ({ commit }, geolocation) {
       commit('ON_GEOLOCATION_CHANGED_MUTATION', geolocation)

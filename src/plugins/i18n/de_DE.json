@@ -38,6 +38,8 @@
   "formDescriptionSettingsRow": "Anzahl an Reihen im Feld-Layout.",
   "formDescriptionSettingsTraits": "Kennung/Namen des Merkmals eingeben.",
   "formLabelSettingsCols": "Spalten",
+  "formLabelSettingsGps": "GPS",
+  "formLabelSettingsGridLinesEvery": "Gitter alle x Spalten/Zeilen anzeigen",
   "formLabelSettingsRows": "Zeilen",
   "formLabelSettingsTraits": "Merkmal hinzufügen",
   "formLabelSettingsVarieties": "Sortennamen",

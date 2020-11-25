@@ -38,6 +38,8 @@
   "formDescriptionSettingsRow": "The number of rows in the field layout.",
   "formDescriptionSettingsTraits": "Enter the trait identifier/name.",
   "formLabelSettingsCols": "Columns",
+  "formLabelSettingsGps": "GPS",
+  "formLabelSettingsGridLinesEvery": "Show grid lines every x columns/rows",
   "formLabelSettingsRows": "Rows",
   "formLabelSettingsTraits": "Add trait",
   "formLabelSettingsVarieties": "Variety names",

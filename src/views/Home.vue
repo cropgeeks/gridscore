@@ -14,8 +14,12 @@
       <b-button @click="onExportClicked" class="ml-auto">{{ $t('buttonExport') }}</b-button>
     </div>
 
-    <GridTable v-on:cell-clicked="onCellClicked" v-if="dataset && dataset.traits && dataset.traits.length > 0" :visibleTraits="visibleTraits" :highlightPosition="userPosition" />
+    <GridTableLite v-on:cell-clicked="onCellClicked" :visibleTraits="visibleTraits" :highlightPosition="userPosition" v-if="dataset && dataset.traits && dataset.traits.length > 0" />
     <h3 class="ml-3 mt-3" v-else><BIconArrowUpCircleFill /> {{ $t('labelHomeIntro') }}</h3>
+
+    <!-- <GridTable v-on:cell-clicked="onCellClicked" v-if="dataset && dataset.traits && dataset.traits.length > 0" :visibleTraits="visibleTraits" :highlightPosition="userPosition" />
+    <h3 class="ml-3 mt-3" v-else><BIconArrowUpCircleFill /> {{ $t('labelHomeIntro') }}</h3> -->
+
     <ExportModal ref="exportModal" />
     <SetupModal ref="setupModal" v-on:settings-changed="onSettingsChanged" />
     <SettingsModal ref="settingsModal" />
@@ -25,7 +29,8 @@
 </template>
 
 <script>
-import GridTable from '@/components/tables/GridTable'
+// import GridTable from '@/components/tables/GridTable'
+import GridTableLite from '@/components/tables/GridTableLite'
 import DataPointModal from '@/components/modals/DataPointModal'
 import SetupModal from '@/components/modals/SetupModal'
 import SettingsModal from '@/components/modals/SettingsModal'
@@ -57,7 +62,8 @@ export default {
     BIconArrowUpCircleFill,
     BIconCircleFill,
     BIconGearFill,
-    GridTable,
+    // GridTable,
+    GridTableLite,
     DataPointModal,
     SetupModal,
     SettingsModal,
