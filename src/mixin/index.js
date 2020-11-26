@@ -13,6 +13,7 @@ export default {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
       'brapiConfig',
+      'continuousInput',
       'dataset',
       'firstRun',
       'geolocation',

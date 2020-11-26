@@ -46,9 +46,9 @@ export default {
       if (actualTrait.type === 'date' || actualTrait.type === 'text') {
         // If we're dealing with dates or text, check if there is date data
         outer:
-        for (let row = 1; row <= rows; row++) {
-          for (let col = 1; col <= cols; col++) {
-            if (this.dataset.data[row - 1][col].dates[this.trait] !== null) {
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            if (this.dataset.data[row][col].dates[this.trait] !== null) {
               hasData = true
               break outer
             }
@@ -57,9 +57,9 @@ export default {
       } else {
         // Else check if there is value data
         outer:
-        for (let row = 1; row <= rows; row++) {
-          for (let col = 1; col <= cols; col++) {
-            if (this.dataset.data[row - 1][col].values[this.trait] !== null) {
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            if (this.dataset.data[row][col].values[this.trait] !== null) {
               hasData = true
               break outer
             }
@@ -74,9 +74,9 @@ export default {
           let minDateString = '9999-12-31'
 
           // Find the minimum in the data
-          for (let row = 1; row <= rows; row++) {
-            for (let col = 1; col <= cols; col++) {
-              const date = this.dataset.data[row - 1][col].dates[this.trait]
+          for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+              const date = this.dataset.data[row][col].dates[this.trait]
 
               if (date) {
                 minDateString = date < minDateString ? date : minDateString
@@ -94,7 +94,7 @@ export default {
             y: Array.from({ length: rows }, (v, k) => k + 1),
             z: this.dataset.data.map((row, index) => {
               let result = []
-              for (let col = 1; col <= cols; col++) {
+              for (let col = 0; col < cols; col++) {
                 // Get the cell date
                 const dateString = this.dataset.data[rows - index - 1][col].dates[this.trait]
 
@@ -113,7 +113,7 @@ export default {
             text: this.dataset.data.map((row, index) => {
               // Return variety names
               let result = []
-              for (let col = 1; col <= cols; col++) {
+              for (let col = 0; col < cols; col++) {
                 result.push(this.dataset.data[rows - index - 1][col].name)
               }
               return result
@@ -138,7 +138,7 @@ export default {
             y: Array.from({ length: rows }, (v, k) => k + 1),
             z: this.dataset.data.map((row, index) => {
               let result = []
-              for (let col = 1; col <= cols; col++) {
+              for (let col = 0; col < cols; col++) {
                 const value = this.dataset.data[rows - index - 1][col].values[this.trait]
 
                 if (value) {
@@ -157,7 +157,7 @@ export default {
             }),
             text: this.dataset.data.map((row, index) => {
               let result = []
-              for (let col = 1; col <= cols; col++) {
+              for (let col = 0; col < cols; col++) {
                 if (isCategorical) {
                   // Plot the actual category rather than just its index
                   result.push(`x: ${col}<br>y: ${rows - index - 1}<br>z: ${this.dataset.data[rows - index - 1][col].values[this.trait]}<br>${this.dataset.data[rows - index - 1][col].name}`)

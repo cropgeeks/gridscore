@@ -27,6 +27,7 @@ const storeState = {
     datasets: [dataset],
     serverUrl: null,
     useGps: true,
+    continuousInput: false,
     gridLinesEvery: 5,
     geolocation: null
   },
@@ -34,6 +35,7 @@ const storeState = {
     brapiConfig: (state) => state.datasets[state.datasetIndex].brapiConfig,
     dataset: (state) => state.datasets[state.datasetIndex],
     useGps: (state) => state.useGps,
+    continuousInput: (state) => state.continuousInput,
     firstRun: (state) => {
       const ds = state.datasets[state.datasetIndex]
       return state.datasets.length < 2 && (ds === null || ds.data === null || ds.data.length < 1)
@@ -94,6 +96,9 @@ const storeState = {
     },
     ON_GRID_LINES_EVERY_CHANGED_MUTATION: function (state, newGridLinesEvery) {
       state.gridLinesEvery = newGridLinesEvery
+    },
+    ON_CONTINUOUS_INPUT_CHANGED_MUTATION: function (state, newContinuousInput) {
+      state.continuousInput = newContinuousInput
     },
     ON_GEOLOCATION_CHANGED_MUTATION: function (state, newGeolocation) {
       if (state.geolocation && newGeolocation) {
@@ -156,6 +161,9 @@ const storeState = {
     },
     setGeolocation: function ({ commit }, geolocation) {
       commit('ON_GEOLOCATION_CHANGED_MUTATION', geolocation)
+    },
+    setContinuousInput: function ({ commit }, continuousInput) {
+      commit('ON_CONTINUOUS_INPUT_CHANGED_MUTATION', continuousInput)
     }
   },
   plugins: [createPersistedState({
@@ -179,10 +187,24 @@ const storeState = {
             }
 
             if (d.data && d.data.length > 0) {
+              // Fix the old object based format to a 2d array format
+              if (!Array.isArray(d.data[0])) {
+                d.data = d.data.map(r => {
+                  let rowData = []
+
+                  for (let col = 0; col < d.cols; col++) {
+                    rowData.push(r[col + 1])
+                  }
+
+                  return rowData
+                })
+              }
+
+              // Fix missing date arrays
               d.data.forEach(r => {
-                Object.keys(r).forEach(c => {
-                  if (!r[c].values) {
-                    r[c].values = JSON.parse(JSON.stringify(r[c].dates))
+                r.forEach(c => {
+                  if (!c.values) {
+                    c.values = JSON.parse(JSON.stringify(c.dates))
                   }
                 })
               })

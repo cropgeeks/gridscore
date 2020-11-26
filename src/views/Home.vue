@@ -1,6 +1,16 @@
 <template>
   <div>
-    <p v-if="dataset && dataset.traits && dataset.traits.length > 0">{{ $t('pageHomeText') }}</p>
+    <div class="d-flex justify-content-between mb-3" v-if="dataset && dataset.traits && dataset.traits.length > 0">
+      <p>{{ $t('pageHomeText') }}</p>
+      <b-form inline @submit.prevent="openDataInput">
+        <b-input-group>
+          <b-input v-model="searchTerm" ref="searchInput" autofocus />
+          <b-input-group-append>
+            <b-button @click="openDataInput"><BIconSearch /></b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form>
+    </div>
     <div class="d-flex flex-row align-items-end top-banner">
       <b-button @click="$refs.setupModal.show()" id="setup-button">{{ $t('buttonSettingsModal') }}</b-button>
       <b-button class="mx-1" @click="$refs.settingsModal.show()" v-if="dataset && dataset.traits && dataset.traits.length > 0"><BIconGearFill /></b-button>
@@ -35,13 +45,15 @@ import DataPointModal from '@/components/modals/DataPointModal'
 import SetupModal from '@/components/modals/SetupModal'
 import SettingsModal from '@/components/modals/SettingsModal'
 import ExportModal from '@/components/modals/ExportModal'
-import { BIconArrowUpCircleFill, BIconCircleFill, BIconGearFill } from 'bootstrap-vue'
+import { BIconArrowUpCircleFill, BIconCircleFill, BIconGearFill, BIconSearch } from 'bootstrap-vue'
 
 const fixPer = require('fix-perspective')
 
 export default {
   data: function () {
     return {
+      searchTerm: null,
+      focusInterval: null,
       cell: {
         row: null,
         col: null
@@ -56,12 +68,24 @@ export default {
       } else {
         this.visibleTraits = null
       }
+    },
+    continuousInput: function (newValue) {
+      if (newValue === true) {
+        if (this.focusInterval === null) {
+          this.focusInterval = setInterval(this.forceFocus, 1000)
+        }
+      } else {
+        if (this.focusInterval !== null) {
+          clearInterval(this.focusInterval)
+        }
+      }
     }
   },
   components: {
     BIconArrowUpCircleFill,
     BIconCircleFill,
     BIconGearFill,
+    BIconSearch,
     // GridTable,
     GridTableLite,
     DataPointModal,
@@ -70,6 +94,13 @@ export default {
     ExportModal
   },
   computed: {
+    searchTermLowerCase: function () {
+      if (this.searchTerm) {
+        return this.searchTerm.toLowerCase()
+      } else {
+        return null
+      }
+    },
     userPosition: function () {
       if (this.dataset.cornerPoints && (this.dataset.cornerPoints.length === 4) && this.geolocation) {
         const from = this.dataset.cornerPoints.filter(c => c !== null).map(c => { return { x: c[0], y: c[1] } })
@@ -92,6 +123,22 @@ export default {
     }
   },
   methods: {
+    openDataInput: function () {
+      if (this.searchTermLowerCase === null) {
+        return
+      }
+      this.dataset.data.forEach((r, rowIndex) => {
+        r.forEach((c, columnIndex) => {
+          if (c.name !== undefined && c.name !== null && c.name.toLowerCase() === this.searchTermLowerCase) {
+            this.onCellClicked({
+              row: rowIndex,
+              col: columnIndex
+            })
+            this.searchTerm = null
+          }
+        })
+      })
+    },
     toggleVisibility: function (index) {
       this.visibleTraits.splice(index, 1, !this.visibleTraits[index])
     },
@@ -106,15 +153,15 @@ export default {
       let data = []
       let counter = 0
       for (let y = 0; y < settings.rows; y++) {
-        let rowData = {}
+        let rowData = []
         for (let x = 0; x < settings.cols; x++) {
-          rowData[x + 1] = {
+          rowData.push({
             name: settings.varieties.length > counter ? settings.varieties[counter++] : null,
             dates: new Array(settings.traits.length).fill(null),
             values: new Array(settings.traits.length).fill(null),
             geolocation: null,
             comment: null
-          }
+          })
         }
         data.push(rowData)
       }
@@ -126,6 +173,16 @@ export default {
     },
     onExportClicked: function () {
       this.$refs.exportModal.show()
+    },
+    forceFocus: function () {
+      if (this.$refs.searchInput && !document.body.classList.contains('modal-open')) {
+        const x = window.scrollX
+        const y = window.scrollY
+        this.$refs.searchInput.focus({
+          preventScroll: true
+        })
+        window.scrollTo(x, y)
+      }
     }
   },
   mounted: function () {
@@ -133,6 +190,15 @@ export default {
       this.visibleTraits = this.dataset.traits.map(t => true)
     } else {
       this.visibleTraits = null
+    }
+
+    if (this.continuousInput === true) {
+      this.focusInterval = setInterval(this.forceFocus, 1000)
+    }
+  },
+  beforeDestroy: function () {
+    if (this.focusInterval) {
+      clearInterval(this.focusInterval)
     }
   }
 }

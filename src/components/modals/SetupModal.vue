@@ -320,7 +320,7 @@ export default {
       this.newTraits = JSON.parse(JSON.stringify(this.dataset.traits))
       let varieties = []
       this.dataset.data.forEach(r => {
-        for (let c = 1; c <= this.cols; c++) {
+        for (let c = 0; c < this.cols; c++) {
           varieties.push(r[c].name)
         }
       })

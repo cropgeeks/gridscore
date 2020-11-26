@@ -38,9 +38,8 @@ export default {
       // For each field row
       this.dataset.data.forEach(r => {
         // For each column
-        Object.keys(r).forEach(k => {
-          // For each date
-          r[k].dates.forEach((d, i) => {
+        r.forEach(c => {
+          c.dates.forEach((d, i) => {
             // If it exists
             if (d) {
               // Get the current count for that trait and date

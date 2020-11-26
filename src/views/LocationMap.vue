@@ -83,7 +83,7 @@ export default {
     corners: function () {
       if (this.dataset && this.dataset.cornerPoints && this.dataset.cornerPoints.length === 4) {
         // Convert locations to latLngs
-        return this.dataset.cornerPoints.map(l => L.latLng(l[0], l[1]))
+        return this.dataset.cornerPoints.filter(l => l !== null).map(l => L.latLng(l[0], l[1]))
       } else {
         return null
       }
@@ -94,11 +94,9 @@ export default {
 
       if (this.dataset && this.dataset.data) {
         this.dataset.data.forEach(row => {
-          Object.keys(row).forEach(key => {
-            const col = row[key]
-
-            if (col.geolocation) {
-              locs.push(L.latLng(col.geolocation.lat, col.geolocation.lng))
+          row.forEach(c => {
+            if (c.geolocation) {
+              locs.push(L.latLng(c.geolocation.lat, c.geolocation.lng))
             }
           })
         })
@@ -157,7 +155,7 @@ export default {
         this.locations.forEach(l => b.extend(l))
       }
       if (this.dataset.cornerPoints) {
-        this.dataset.cornerPoints.forEach(c => b.extend(L.latLng(c[0], c[1])))
+        this.dataset.cornerPoints.filter(l => l !== null).forEach(c => b.extend(L.latLng(c[0], c[1])))
       }
       // if (this.geolocation) {
       //   b.extend(this.geolocation)
@@ -205,14 +203,12 @@ export default {
       if (this.dataset && this.dataset.data) {
         const map = this.$refs.locationMap.mapObject
         this.dataset.data.forEach(row => {
-          Object.keys(row).forEach(key => {
-            const col = row[key]
-
-            if (col.geolocation) {
-              let marker = L.marker(L.latLng(col.geolocation.lat, col.geolocation.lng)).bindPopup('')
+          row.forEach(c => {
+            if (c.geolocation) {
+              let marker = L.marker(L.latLng(c.geolocation.lat, c.geolocation.lng)).bindPopup('')
               marker.on('click', e => {
                 let popup = e.target.getPopup()
-                this.selectedLocation = col
+                this.selectedLocation = c
                 // Set the popup content on click
                 this.$nextTick(() => popup.setContent(this.$refs.popupContent))
               })

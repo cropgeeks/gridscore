@@ -7,36 +7,36 @@
         </template>
         <b-tr>
           <b-th></b-th>
-          <th role="columnheader" scope="col" :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column)">{{ column }}</th>
+          <th role="columnheader" scope="col" :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">{{ column }}</th>
           <b-th></b-th>
         </b-tr>
       </b-thead>
       <b-tbody>
-        <b-tr v-for="(datum, row) in dataset.data" :key="`table-row-${row}`">
-          <b-th class="text-right">{{ row + 1 }}</b-th>
-          <b-td :class="`text-center ${cellClasses[row][column - 1]}`" v-for="column in dataset.cols" :key="`table-cell-${row}-${column}`">
+        <b-tr v-for="(row, rowIndex) in dataset.data" :key="`table-row-${rowIndex}`">
+          <b-th class="text-right">{{ rowIndex + 1 }}</b-th>
+          <b-td :class="`text-center ${cellClasses[rowIndex][columnIndex]}`" v-for="(cell, columnIndex) in row" :key="`table-cell-${rowIndex}-${columnIndex}`">
             <!-- Handle click events -->
-            <div v-on:click="onClick(row, column)" :class="borderStyles[row][column - 1]">
+            <div v-on:click="onClick(rowIndex, columnIndex)" :class="borderStyles[rowIndex][columnIndex]">
               <!-- Variety name -->
-              <span class="d-block grid-cell-name" v-if="datum[column].name">
-                <span>{{ datum[column].name }}</span>
+              <span class="d-block grid-cell-name" v-if="cell.name">
+                <span>{{cell.name }}</span>
               </span>
               <!-- For each trait -->
               <template v-for="(trait, traitIndex) in dataset.traits">
                 <!-- Show a circle in the representative trait color if it's not hidden -->
-                <span class="mx-1" :key="`table-cell-${row}-${column}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="datum[column].dates[traitIndex] !== null && datum[column].dates[traitIndex].length > 0"><BIconCircleFill /></span>
+                <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="row[columnIndex].dates[traitIndex] !== null &&cell.dates[traitIndex].length > 0"><BIconCircleFill /></span>
                 <!-- Otherwise show a hidden circle -->
-                <span class="mx-1" :key="`table-cell-${row}-${column}-${traitIndex}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
+                <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
               </template>
             </div>
           </b-td>
-          <b-th class="text-left">{{ row + 1 }}</b-th>
+          <b-th class="text-left">{{ rowIndex + 1 }}</b-th>
         </b-tr>
       </b-tbody>
       <b-tfoot>
         <b-tr>
           <b-th></b-th>
-          <b-th :class="`text-center ${column % 2 === 1 ? '' : 'table-active'}`" v-for="column in dataset.cols" :key="`table-column-${column}`">{{ column }}</b-th>
+          <b-th :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">{{ column }}</b-th>
           <b-th></b-th>
         </b-tr>
       </b-tfoot>
@@ -170,7 +170,7 @@ export default {
           }
 
           // Else, check if there's a comment, then show warning colour
-          if ((this.dataset.data && this.dataset.data[row] && this.dataset.data[row][col + 1]) && this.dataset.data[row][col + 1].comment && this.dataset.data[row][col + 1].comment.length > 0) {
+          if ((this.dataset.data && this.dataset.data[row] && this.dataset.data[row][col]) && this.dataset.data[row][col].comment && this.dataset.data[row][col].comment.length > 0) {
             theClasses += ' table-warning'
           }
 
@@ -186,7 +186,7 @@ export default {
   methods: {
     /** Mark the column on user click */
     onHeadClicked: function (column) {
-      Vue.set(this.markedColumns, column - 1, !this.markedColumns[column - 1])
+      Vue.set(this.markedColumns, column, !this.markedColumns[column])
     },
     /** Handle cell click events */
     onClick: function (row, col) {

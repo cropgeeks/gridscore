@@ -112,7 +112,7 @@ export default {
         // And each field column
         for (let x = 0; x < this.dataset.cols; x++) {
           // Get the data cell
-          const cell = this.dataset.data[y][x + 1]
+          const cell = this.dataset.data[y][x]
           // If there is data
           if (cell) {
             // Get it (either actual data or date)

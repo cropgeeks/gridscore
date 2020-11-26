@@ -10,6 +10,9 @@
         <b-form-group :label="$t('formLabelSettingsGps')" label-for="use-gps">
           <b-form-checkbox v-model="tempUseGps" switch id="use-gps">{{ $t('buttonToggleGps') }}</b-form-checkbox>
         </b-form-group>
+        <b-form-group :label="$t('formLabelSettingsContinuousInput')" label-for="continuous-input">
+          <b-form-checkbox v-model="tempContinuousInput" switch id="continuous-input">{{ $t('buttonToggleContinuousInput') }}</b-form-checkbox>
+        </b-form-group>
         <b-form-group :label="$t('formLabelSettingsGridLinesEvery')" label-for="grid-lines-every">
           <b-form-select :options="validGridLines" v-model="tempGridLinesEvery" id="grid-lines-every" />
         </b-form-group>
@@ -26,6 +29,7 @@ export default {
   data: function () {
     return {
       tempUseGps: true,
+      tempContinuousInput: false,
       tempGridLinesEvery: 5,
       validGridLines: [2, 3, 4, 5]
     }
@@ -49,12 +53,16 @@ export default {
      */
     reset: function () {
       this.tempUseGps = this.useGps
+      this.tempContinuousInput = this.continuousInput
       this.tempGridLinesEvery = this.gridLinesEvery
     },
     onSubmit: function () {
       // Dispatch to the store
       if (this.tempUseGps !== this.useGps) {
         this.$store.dispatch('setUseGps', this.tempUseGps)
+      }
+      if (this.tempContinuousInput !== this.continuousInput) {
+        this.$store.dispatch('setContinuousInput', this.tempContinuousInput)
       }
       if (this.tempGridLinesEvery !== this.gridLinesEvery) {
         this.$store.dispatch('setGridLinesEvery', this.tempGridLinesEvery)
