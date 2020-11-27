@@ -31,7 +31,7 @@
           <!-- For each trait -->
           <template v-for="(trait, index) in dataset.traits">
             <!-- Show a circle in the representative trait color if it's not hidden -->
-            <span class="mx-1" :key="`trait-${index}`" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0"><BIconCircleFill /></span>
+            <span class="mx-1" :key="`trait-${index}`" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? traitColors[index % traitColors.length] : 'lightgray' }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0"><BIconCircleFill /></span>
             <!-- Otherwise show a hidden circle -->
             <span class="mx-1" :key="`trait-${index}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
           </template>

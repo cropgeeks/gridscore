@@ -3,12 +3,6 @@ import { mapGetters } from 'vuex'
 const axios = require('axios').default
 
 export default {
-  data: function () {
-    return {
-      /** Default set of colors for charts */
-      colors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
-    }
-  },
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
@@ -18,8 +12,10 @@ export default {
       'firstRun',
       'geolocation',
       'gridLinesEvery',
+      'invertView',
       'locale',
       'serverUrl',
+      'traitColors',
       'useGps'
     ])
   },

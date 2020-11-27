@@ -29,7 +29,9 @@ const storeState = {
     useGps: true,
     continuousInput: false,
     gridLinesEvery: 5,
-    geolocation: null
+    geolocation: null,
+    invertView: false,
+    traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
   },
   getters: {
     brapiConfig: (state) => state.datasets[state.datasetIndex].brapiConfig,
@@ -43,7 +45,9 @@ const storeState = {
     serverUrl: (state) => state.serverUrl,
     locale: (state) => state.locale,
     gridLinesEvery: (state) => state.gridLinesEvery,
-    geolocation: (state) => state.geolocation
+    geolocation: (state) => state.geolocation,
+    invertView: (state) => state.invertView,
+    traitColors: (state) => state.traitColors
   },
   mutations: {
     ON_DATASET_INDEX_CHANGED_MUTATION: function (state, newDatasetIndex) {
@@ -117,6 +121,12 @@ const storeState = {
       } else {
         state.geolocation = newGeolocation
       }
+    },
+    ON_TRAIT_COLORS_CHANGED_MUTATION: function (state, newTraitColors) {
+      state.traitColors = newTraitColors
+    },
+    ON_INVERT_VIEW_CHANGED_MUTATION: function (state, newInvertView) {
+      state.invertView = newInvertView
     }
   },
   actions: {
@@ -164,6 +174,12 @@ const storeState = {
     },
     setContinuousInput: function ({ commit }, continuousInput) {
       commit('ON_CONTINUOUS_INPUT_CHANGED_MUTATION', continuousInput)
+    },
+    setTraitColors: function ({ commit }, traitColors) {
+      commit('ON_TRAIT_COLORS_CHANGED_MUTATION', traitColors)
+    },
+    setInvertView: function ({ commit }, invertView) {
+      commit('ON_INVERT_VIEW_CHANGED_MUTATION', invertView)
     }
   },
   plugins: [createPersistedState({

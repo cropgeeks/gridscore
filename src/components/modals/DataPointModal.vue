@@ -13,7 +13,7 @@
                     :label-for="`trait-${index}`">
         <!-- Show the trait name along with the type and its color as the label -->
         <template v-slot:label>
-          <span :style="{ color: colors[index % colors.length] }"><BIconCircleFill /> {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
+          <span :style="{ color: traitColors[index % traitColors.length] }"><BIconCircleFill /> {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
         </template>
 
         <b-input-group v-if="trait.type === 'date'">

@@ -12,7 +12,7 @@
 
         <!-- Import and export buttons for json -->
         <b-button-group>
-          <b-button variant="outline-secondary" size="sm" @click="loadExampleData">{{ $t('buttonLoadExample') }}</b-button>
+          <b-button variant="outline-dark" size="sm" @click="loadExampleData">{{ $t('buttonLoadExample') }}</b-button>
           <b-button variant="outline-secondary" size="sm" @click="$refs.importModal.show()">{{ $t('buttonImport') }}</b-button>
           <b-button variant="outline-secondary" size="sm" @click="$refs.exportModal.show()">{{ $t('buttonExport') }}</b-button>
         </b-button-group>

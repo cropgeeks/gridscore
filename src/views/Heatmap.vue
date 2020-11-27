@@ -120,7 +120,7 @@ export default {
             }),
             type: 'heatmap',
             hoverongaps: false,
-            colorscale: [[0, '#dddddd'], [1, this.colors[this.trait % this.colors.length]]],
+            colorscale: [[0, '#dddddd'], [1, this.traitColors[this.trait % this.traitColors.length]]],
             colorbar: {
               title: {
                 text: this.$t('plotLegendDaysSinceFirstRecording'),
@@ -169,7 +169,7 @@ export default {
             }),
             type: 'heatmap',
             hoverongaps: false,
-            colorscale: [[0, '#dddddd'], [1, this.colors[this.trait % this.colors.length]]],
+            colorscale: [[0, '#dddddd'], [1, this.traitColors[this.trait % this.traitColors.length]]],
             hoverinfo: isCategorical ? 'text' : 'all',
             colorbar: isCategorical ? {
               tickmode: 'array',

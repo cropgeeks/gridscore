@@ -23,10 +23,18 @@
               </span>
               <!-- For each trait -->
               <template v-for="(trait, traitIndex) in dataset.traits">
-                <!-- Show a circle in the representative trait color if it's not hidden -->
-                <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="row[columnIndex].dates[traitIndex] !== null &&cell.dates[traitIndex].length > 0"><BIconCircleFill /></span>
-                <!-- Otherwise show a hidden circle -->
-                <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
+                <template v-if="invertView === true">
+                  <!-- Show a circle in the representative trait color if it's not hidden -->
+                  <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="row[columnIndex].dates[traitIndex] === null || cell.dates[traitIndex].length < 1"><BIconCircleFill /></span>
+                  <!-- Otherwise show a hidden circle -->
+                  <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
+                </template>
+                <template v-else>
+                  <!-- Show a circle in the representative trait color if it's not hidden -->
+                  <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="row[columnIndex].dates[traitIndex] !== null && cell.dates[traitIndex].length > 0"><BIconCircleFill /></span>
+                  <!-- Otherwise show a hidden circle -->
+                  <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
+                </template>
               </template>
             </div>
           </b-td>
@@ -111,7 +119,7 @@ export default {
     cellStyles: function () {
       return this.dataset.traits.map((t, index) => {
         return {
-          color: (this.visibleTraits && this.visibleTraits[index] === true) ? this.colors[index % this.colors.length] : 'lightgray'
+          color: (this.visibleTraits && this.visibleTraits[index] === true) ? this.traitColors[index % this.traitColors.length] : 'lightgray'
         }
       })
     },

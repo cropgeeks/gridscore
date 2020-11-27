@@ -17,7 +17,7 @@
 
       <b-button-group class="d-flex flex-row align-items-center flex-wrap">
         <b-button v-for="(trait, index) in dataset.traits" :key="`trait-${index}`" variant="light" @click="toggleVisibility(index)" v-b-tooltip="$t('tooltipTraitToggle')">
-          <span class="mx-1" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? colors[index % colors.length] : 'lightgray' }"><BIconCircleFill /> {{ trait.name }}</span>
+          <span class="mx-1" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? traitColors[index % traitColors.length] : 'lightgray' }"><BIconCircleFill /> {{ trait.name }}</span>
         </b-button>
       </b-button-group>
 
@@ -62,9 +62,9 @@ export default {
     }
   },
   watch: {
-    dataset: function (newValue) {
-      if (newValue && newValue.traits) {
-        this.visibleTraits = newValue.traits.map(t => true)
+    'dataset.traits': function (newValue) {
+      if (newValue) {
+        this.visibleTraits = newValue.map(t => true)
       } else {
         this.visibleTraits = null
       }

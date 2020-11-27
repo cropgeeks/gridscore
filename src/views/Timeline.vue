@@ -68,7 +68,7 @@ export default {
           mode: 'lines+markers',
           name: this.dataset.traits[index].name,
           line: {
-            color: this.colors[index % this.colors.length]
+            color: this.traitColors[index % this.traitColors.length]
           },
           // X values are the dates
           x: dates,
