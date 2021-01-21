@@ -27,6 +27,7 @@ const storeState = {
     datasets: [dataset],
     serverUrl: null,
     useGps: true,
+    useSpeech: false,
     continuousInput: false,
     gridLinesEvery: 5,
     geolocation: null,
@@ -37,6 +38,7 @@ const storeState = {
     brapiConfig: (state) => state.datasets[state.datasetIndex].brapiConfig,
     dataset: (state) => state.datasets[state.datasetIndex],
     useGps: (state) => state.useGps,
+    useSpeech: (state) => state.useSpeech,
     continuousInput: (state) => state.continuousInput,
     firstRun: (state) => {
       const ds = state.datasets[state.datasetIndex]
@@ -94,6 +96,9 @@ const storeState = {
     },
     ON_USE_GPS_CHANGED_MUTATION: function (state, newUseGps) {
       state.useGps = newUseGps
+    },
+    ON_USE_SPEECH_CHANGED_MUTATION: function (state, newUseSpeech) {
+      state.useSpeech = newUseSpeech
     },
     ON_LOCALE_CHANGED_MUTATION: function (state, newLocale) {
       state.locale = newLocale
@@ -162,6 +167,9 @@ const storeState = {
     },
     setUseGps: function ({ commit }, useGps) {
       commit('ON_USE_GPS_CHANGED_MUTATION', useGps)
+    },
+    setUseSpeech: function ({ commit }, useSpeech) {
+      commit('ON_USE_SPEECH_CHANGED_MUTATION', useSpeech)
     },
     setLocale: function ({ commit }, locale) {
       commit('ON_LOCALE_CHANGED_MUTATION', locale)

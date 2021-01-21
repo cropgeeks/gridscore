@@ -198,6 +198,8 @@ export default {
       L.control.layers(baseMaps).addTo(map)
 
       this.updateMarkers()
+
+      this.$nextTick(() => window.scrollTo(0, document.body.scrollHeight))
     },
     updateMarkers: function () {
       if (this.dataset && this.dataset.data) {

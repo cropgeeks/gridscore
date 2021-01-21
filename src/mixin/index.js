@@ -16,7 +16,8 @@ export default {
       'locale',
       'serverUrl',
       'traitColors',
-      'useGps'
+      'useGps',
+      'useSpeech'
     ])
   },
   methods: {

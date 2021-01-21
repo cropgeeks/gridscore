@@ -1,20 +1,20 @@
 <template>
   <div id="grid-table">
     <b-table-simple :class="`grid-table grid${gridLinesEvery} mb-0`" table-class="position-relative" responsive striped sticky-header="100vh">
-      <b-thead>
+      <thead role="rowgroup">
         <template v-if="useGps === true">
           <UserPositionIndicator :position="highlightPosition" tableId="grid-table" />
         </template>
-        <b-tr>
-          <b-th></b-th>
+        <tr>
+          <th></th>
           <th role="columnheader" scope="col" :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">{{ column }}</th>
-          <b-th></b-th>
-        </b-tr>
-      </b-thead>
-      <b-tbody>
-        <b-tr v-for="(row, rowIndex) in dataset.data" :key="`table-row-${rowIndex}`">
-          <b-th class="text-right">{{ rowIndex + 1 }}</b-th>
-          <b-td :class="`text-center ${cellClasses[rowIndex][columnIndex]}`" v-for="(cell, columnIndex) in row" :key="`table-cell-${rowIndex}-${columnIndex}`">
+          <th></th>
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+        <tr role="row" v-for="(row, rowIndex) in dataset.data" :key="`table-row-${rowIndex}`">
+          <th role="rowheader" class="text-right">{{ rowIndex + 1 }}</th>
+          <td role="cell" :class="`text-center ${cellClasses[rowIndex][columnIndex]}`" v-for="(cell, columnIndex) in row" :key="`table-cell-${rowIndex}-${columnIndex}`">
             <!-- Handle click events -->
             <div v-on:click="onClick(rowIndex, columnIndex)" :class="borderStyles[rowIndex][columnIndex]">
               <!-- Variety name -->
@@ -22,32 +22,24 @@
                 <span>{{cell.name }}</span>
               </span>
               <!-- For each trait -->
-              <template v-for="(trait, traitIndex) in dataset.traits">
-                <template v-if="invertView === true">
-                  <!-- Show a circle in the representative trait color if it's not hidden -->
-                  <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="row[columnIndex].dates[traitIndex] === null || cell.dates[traitIndex].length < 1"><BIconCircleFill /></span>
-                  <!-- Otherwise show a hidden circle -->
-                  <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
-                </template>
-                <template v-else>
-                  <!-- Show a circle in the representative trait color if it's not hidden -->
-                  <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="row[columnIndex].dates[traitIndex] !== null && cell.dates[traitIndex].length > 0"><BIconCircleFill /></span>
-                  <!-- Otherwise show a hidden circle -->
-                  <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
-                </template>
+              <template v-for="(date, traitIndex) in cell.dates">
+                <!-- Show a circle in the representative trait color if it's not hidden -->
+                <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="invertView ? (date === null || date.length < 1) : (date !== null && date.length > 0)"><BIconCircleFill /></span>
+                <!-- Otherwise show a hidden circle -->
+                <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
               </template>
             </div>
-          </b-td>
-          <b-th class="text-left">{{ rowIndex + 1 }}</b-th>
-        </b-tr>
-      </b-tbody>
-      <b-tfoot>
-        <b-tr>
-          <b-th></b-th>
-          <b-th :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">{{ column }}</b-th>
-          <b-th></b-th>
-        </b-tr>
-      </b-tfoot>
+          </td>
+          <th role="rowheader" class="text-left">{{ rowIndex + 1 }}</th>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th></th>
+          <th :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">{{ column }}</th>
+          <th></th>
+        </tr>
+      </tfoot>
     </b-table-simple>
   </div>
 </template>

@@ -128,7 +128,17 @@ export default {
       imageFile: null,
       imageData: null,
       formValidated: false,
-      formState: []
+      formState: [],
+      textSynth: null
+    }
+  },
+  watch: {
+    useSpeech: function (newValue) {
+      if (newValue) {
+        this.textSynth = window.speechSynthesis
+      } else {
+        this.textSynth = null
+      }
     }
   },
   components: {
@@ -210,6 +220,10 @@ export default {
       this.name = this.dataset.data[this.row][this.col].name
       this.comment = this.dataset.data[this.row][this.col].comment
       this.$nextTick(() => this.$refs.dataPointModal.show())
+
+      if (this.textSynth) {
+        this.textSynth.speak(new SpeechSynthesisUtterance(this.name))
+      }
     },
     /**
      * Hides the modal
@@ -228,7 +242,13 @@ export default {
      * @param newIndex The index of the next field (the method will internally modulo this to stay in range)
      */
     traverseForm: function (newIndex) {
-      let i = newIndex % this.values.length
+      const oldIndex = newIndex - 1
+
+      if (this.textSynth) {
+        this.textSynth.speak(new SpeechSynthesisUtterance(this.values[oldIndex]))
+      }
+
+      const i = newIndex % this.values.length
 
       // If the next ref exists and it has a focus method, call it
       if (this.$refs[`trait-${i}`][0] && this.$refs[`trait-${i}`][0].focus) {
@@ -245,6 +265,10 @@ export default {
       if (event === null || event === undefined || event === '') {
         this.values[index] = null
         this.dates[index] = null
+      } else {
+        if (this.textSynth) {
+          this.textSynth.speak(new SpeechSynthesisUtterance(this.values[index]))
+        }
       }
     },
     /**
@@ -305,6 +329,11 @@ export default {
         comment: comment
       })
       this.hide()
+    }
+  },
+  created: function () {
+    if (this.useSpeech) {
+      this.textSynth = window.speechSynthesis
     }
   }
 }

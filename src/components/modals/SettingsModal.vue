@@ -11,6 +11,9 @@
         <b-form-group :label="$t('formLabelSettingsGps')" label-for="use-gps">
           <b-form-checkbox v-model="tempUseGps" switch id="use-gps">{{ $t('buttonToggleGps') }}</b-form-checkbox>
         </b-form-group>
+        <b-form-group :label="$t('formLabelSettingsSpeech')" label-for="use-speech">
+          <b-form-checkbox v-model="tempUseSpeech" switch id="use-speech">{{ $t('buttonToggleSpeech') }}</b-form-checkbox>
+        </b-form-group>
         <b-form-group :label="$t('formLabelSettingsContinuousInput')" label-for="continuous-input">
           <b-form-checkbox v-model="tempContinuousInput" switch id="continuous-input">{{ $t('buttonToggleContinuousInput') }}</b-form-checkbox>
         </b-form-group>
@@ -58,6 +61,7 @@ export default {
   data: function () {
     return {
       tempUseGps: true,
+      tempUseSpeech: false,
       tempContinuousInput: false,
       tempInvertView: false,
       tempGridLinesEvery: 5,
@@ -85,6 +89,7 @@ export default {
      */
     reset: function () {
       this.tempUseGps = this.useGps
+      this.tempUseSpeech = this.useSpeech
       this.tempContinuousInput = this.continuousInput
       this.tempGridLinesEvery = this.gridLinesEvery
       this.tempInvertView = this.invertView
@@ -94,6 +99,9 @@ export default {
       // Dispatch to the store
       if (this.tempUseGps !== this.useGps) {
         this.$store.dispatch('setUseGps', this.tempUseGps)
+      }
+      if (this.tempUseSpeech !== this.useSpeech) {
+        this.$store.dispatch('setUseSpeech', this.tempUseSpeech)
       }
       if (this.tempContinuousInput !== this.continuousInput) {
         this.$store.dispatch('setContinuousInput', this.tempContinuousInput)
