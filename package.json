@@ -8,8 +8,8 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@zxing/library": "~0.18.0",
-    "axios": "^0.21.1",
+    "@zxing/browser": "~0.0.7",
+    "axios": "~0.21.1",
     "bootstrap": "~4.5.3",
     "bootstrap-vue": "~2.18.1",
     "bootswatch": "~4.5.0",

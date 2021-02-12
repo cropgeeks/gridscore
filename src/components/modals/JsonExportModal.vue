@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { BrowserQRCodeSvgWriter } from '@zxing/library'
+import { BrowserQRCodeSvgWriter } from '@zxing/browser'
 
 const codeWriter = new BrowserQRCodeSvgWriter()
 
@@ -60,7 +60,15 @@ export default {
   watch: {
     shareUrl: function (newValue) {
       if (newValue) {
-        this.$nextTick(() => codeWriter.writeToDom(this.$refs.svg, newValue, 300, 300))
+        const ref = this.$refs.svg
+
+        // Remove all previous codes
+        while (ref.firstChild) {
+          ref.removeChild(ref.firstChild)
+        }
+
+        // Generate the new one
+        this.$nextTick(() => codeWriter.writeToDom(ref, newValue, 300, 300))
       } else {
         // TODO
       }
