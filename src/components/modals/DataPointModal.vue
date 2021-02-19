@@ -3,6 +3,7 @@
            :ok-title="$t('buttonOk')"
            :cancel-title="$t('buttonCancel')"
            @ok.prevent="onSubmit"
+           @hide="disableSpeechRecognition"
            @shown="setFocus"
            size="lg"
            ref="dataPointModal">
@@ -18,18 +19,20 @@
 
         <b-input-group v-if="trait.type === 'date'">
           <!-- For date types, show a datepicker -->
-          <b-form-datepicker :id="`trait-${index}`"
+          <b-form-input :id="`trait-${index}`"
                             :ref="`trait-${index}`"
                             :state="formState[index]"
-                            @keyup.enter="traverseForm(index + 1)"
-                            v-model="values[index]"
-                            reset-button
-                            :reset-value="null"
-                            @input="(event) => onDateChanged(event, index)"/>
+                            @keyup.enter="handleDateInput(index)"
+                            :value="values[index]"
+                            type="date"
+                            :key="values[index]"
+                            @keyup.exact="(event) => handleDateInputChar(index, event)"
+                            @change="(event) => onDateChanged(event, index)" />
           <b-input-group-append>
             <b-button v-b-tooltip="$t('tooltipDataEntryDateMinusOne')" @click="setDateMinusOne(index)"><BIconCaretLeftFill /></b-button>
             <b-button v-b-tooltip="$t('tooltipDataEntryDateToday')" @click="setDateToday(index)"><BIconCalendar3 /></b-button>
             <b-button v-b-tooltip="$t('tooltipDataEntryDatePlusOne')" @click="setDatePlusOne(index)"><BIconCaretRightFill /></b-button>
+            <b-button v-b-tooltip="$t('tooltipDataEntryDateReset')" variant="danger" @click="resetDate(index)"><BIconSlashCircle /></b-button>
           </b-input-group-append>
         </b-input-group>
         <!-- For int types, show a number input, apply restrictions -->
@@ -86,7 +89,12 @@
 
       <!-- User comments -->
       <b-form-group :label="$t('formLabelComment')" label-for="comment">
-        <b-form-input v-model="comment" id="comment" />
+        <b-input-group>
+          <b-form-input v-model="comment" id="comment" />
+          <b-input-group-addon append v-if="supportsSpeechRecognition">
+            <b-button @click="toggleRecording" :variant="speechRecognition ? 'danger' : null" v-b-tooltip="$t('tooltipDataEntryCommentMicrophone')"><BIconMic /></b-button>
+          </b-input-group-addon>
+        </b-input-group>
       </b-form-group>
     </b-form>
     <!-- Show a button for image tagging -->
@@ -99,7 +107,7 @@
 <script>
 import Vue from 'vue'
 import ImageModal from '@/components/modals/ImageModal'
-import { BIconCameraFill, BIconCircleFill, BIconCaretLeftFill, BIconCaretRightFill, BIconCalendar3 } from 'bootstrap-vue'
+import { BIconCameraFill, BIconCircleFill, BIconMic, BIconCaretLeftFill, BIconCaretRightFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
 
 /**
  * Shows a modal used to enter the data into GridScore. Each trait is shown and based on its type a different method for data input is show.
@@ -129,7 +137,15 @@ export default {
       imageData: null,
       formValidated: false,
       formState: [],
-      textSynth: null
+      textSynth: null,
+      speechRecognition: null,
+      dateInput: '',
+      dateInputIndex: null
+    }
+  },
+  computed: {
+    supportsSpeechRecognition: function () {
+      return ('webkitSpeechRecognition' in window)
     }
   },
   watch: {
@@ -147,13 +163,69 @@ export default {
     BIconCaretLeftFill,
     BIconCaretRightFill,
     BIconCalendar3,
-    ImageModal
+    BIconMic,
+    ImageModal,
+    BIconSlashCircle
   },
   methods: {
+    toggleRecording: function () {
+      if (this.supportsSpeechRecognition) {
+        if (this.speechRecognition) {
+          this.disableSpeechRecognition()
+        } else {
+          // eslint-disable-next-line new-cap
+          this.speechRecognition = new window.webkitSpeechRecognition()
+          this.speechRecognition.continuous = true
+          this.speechRecognition.interimResults = true
+
+          this.speechRecognition.start()
+          this.speechRecognition.onresult = event => {
+            let result = ''
+
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+              result += event.results[i][0].transcript
+            }
+            this.comment = result
+          }
+        }
+      }
+    },
+    handleDateInput: function (index) {
+      if (this.dateInput.length > 0 && !isNaN(this.dateInput)) {
+        const number = +this.dateInput
+
+        const current = this.getToday()
+        current.setDate(current.getDate() + number)
+
+        Vue.set(this.values, index, current.toISOString().split('T')[0])
+
+        this.dateInput = ''
+        this.dateInputIndex = null
+      }
+
+      this.traverseForm(index + 1)
+    },
+    handleDateInputChar: function (index, event) {
+      if (this.dateInputIndex !== index) {
+        this.dateInputIndex = index
+        this.dateInput = ''
+      }
+
+      // If this could be part of a number
+      if (event.key === '-' || event.key === '+' || !isNaN(event.key)) {
+        this.dateInput += event.key
+      }
+    },
+    disableSpeechRecognition: function () {
+      if (this.speechRecognition) {
+        this.speechRecognition.stop()
+        this.speechRecognition = null
+      }
+    },
     setDateMinusOne: function (index) {
       let current = this.values[index]
 
-      if (current === undefined || current === null) {
+      if (current === undefined || current === null || current === '') {
         current = this.getToday()
       } else {
         current = new Date(current)
@@ -166,7 +238,7 @@ export default {
     setDatePlusOne: function (index) {
       let current = this.values[index]
 
-      if (current === undefined || current === null) {
+      if (current === undefined || current === null || current === '') {
         current = this.getToday()
       } else {
         current = new Date(current)
@@ -175,6 +247,9 @@ export default {
       current.setDate(current.getDate() + 1)
 
       Vue.set(this.values, index, current.toISOString().split('T')[0])
+    },
+    resetDate: function (index) {
+      Vue.set(this.values, index, null)
     },
     setDateToday: function (index) {
       Vue.set(this.values, index, this.getTodayString())
@@ -221,9 +296,8 @@ export default {
       this.comment = this.dataset.data[this.row][this.col].comment
       this.$nextTick(() => this.$refs.dataPointModal.show())
 
-      if (this.textSynth) {
-        this.textSynth.speak(new SpeechSynthesisUtterance(this.name))
-      }
+      this.speak(this.name)
+      this.speak(this.dataset.traits[0].name)
     },
     /**
      * Hides the modal
@@ -231,11 +305,23 @@ export default {
     hide: function () {
       this.$nextTick(() => this.$refs.dataPointModal.hide())
     },
+    speak: function (text) {
+      if (this.textSynth) {
+        const utterance = new SpeechSynthesisUtterance(text)
+        utterance.rate = 1.5
+        this.textSynth.speak(utterance)
+      }
+    },
     /**
      * Sets focus to the first trait input
      */
     setFocus: function () {
-      this.$refs['trait-0'][0].focus()
+      if (this.$refs['trait-0'][0].focus) {
+        this.$refs['trait-0'][0].focus()
+      }
+      if (this.$refs['trait-0'][0].select) {
+        this.$refs['trait-0'][0].select()
+      }
     },
     /**
      * Traverses the form and focusses the next input field in turn based on the given index
@@ -244,15 +330,22 @@ export default {
     traverseForm: function (newIndex) {
       const oldIndex = newIndex - 1
 
-      if (this.textSynth) {
-        this.textSynth.speak(new SpeechSynthesisUtterance(this.values[oldIndex]))
-      }
-
-      const i = newIndex % this.values.length
+      this.speak(this.values[oldIndex])
 
       // If the next ref exists and it has a focus method, call it
-      if (this.$refs[`trait-${i}`][0] && this.$refs[`trait-${i}`][0].focus) {
-        this.$refs[`trait-${i}`][0].focus()
+      if (newIndex < this.values.length) {
+        if (this.$refs[`trait-${newIndex}`][0]) {
+          if (this.$refs[`trait-${newIndex}`][0].focus) {
+            this.$refs[`trait-${newIndex}`][0].focus()
+          }
+          if (this.$refs[`trait-${newIndex}`][0].select) {
+            this.$refs[`trait-${newIndex}`][0].select()
+          }
+
+          this.speak(this.dataset.traits[newIndex].name)
+        }
+      } else {
+        this.onSubmit()
       }
     },
     /**
@@ -266,9 +359,8 @@ export default {
         this.values[index] = null
         this.dates[index] = null
       } else {
-        if (this.textSynth) {
-          this.textSynth.speak(new SpeechSynthesisUtterance(this.values[index]))
-        }
+        Vue.set(this.values, index, event)
+        this.traverseForm(index + 1)
       }
     },
     /**
@@ -332,7 +424,7 @@ export default {
     }
   },
   created: function () {
-    if (this.useSpeech) {
+    if (this.useSpeech && window.speechSynthesis) {
       this.textSynth = window.speechSynthesis
     }
   }
