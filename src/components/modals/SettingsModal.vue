@@ -20,6 +20,12 @@
         <b-form-group :label="$t('formLabelSettingsInvertView')" label-for="invert-view" :description="$t('formDescriptionSettingsInvertView')">
           <b-form-checkbox v-model="tempInvertView" switch id="invert-view">{{ $t('buttonToggleInvertView') }}</b-form-checkbox>
         </b-form-group>
+        <b-form-group :label="$t('formLabelSettingsInvertNumberingX')" label-for="invert-numbering-x" :description="$t('formDescriptionSettingsInvertNumberingX')">
+          <b-form-checkbox v-model="tempInvertNumberingX" switch id="invert-numbering-x">{{ $t('buttonToggleInvertNumberingX') }}</b-form-checkbox>
+        </b-form-group>
+        <b-form-group :label="$t('formLabelSettingsInvertNumberingY')" label-for="invert-numbering-y" :description="$t('formDescriptionSettingsInvertNumberingY')">
+          <b-form-checkbox v-model="tempInvertNumberingY" switch id="invert-numbering-y">{{ $t('buttonToggleInvertNumberingY') }}</b-form-checkbox>
+        </b-form-group>
         <b-form-group :label="$t('formLabelSettingsGridLinesEvery')" label-for="grid-lines-every">
           <b-form-select :options="validGridLines" v-model="tempGridLinesEvery" id="grid-lines-every" />
         </b-form-group>
@@ -64,6 +70,8 @@ export default {
       tempUseSpeech: false,
       tempContinuousInput: false,
       tempInvertView: false,
+      tempInvertNumberingX: false,
+      tempInvertNumberingY: false,
       tempGridLinesEvery: 5,
       tempColors: [],
       newColor: 'black',
@@ -93,6 +101,8 @@ export default {
       this.tempContinuousInput = this.continuousInput
       this.tempGridLinesEvery = this.gridLinesEvery
       this.tempInvertView = this.invertView
+      this.tempInvertNumberingX = this.invertNumberingX
+      this.tempInvertNumberingY = this.invertNumberingY
       this.tempColors = JSON.parse(JSON.stringify(this.traitColors))
     },
     onSubmit: function () {
@@ -111,6 +121,12 @@ export default {
       }
       if (this.tempInvertView !== this.invertView) {
         this.$store.dispatch('setInvertView', this.tempInvertView)
+      }
+      if (this.tempInvertNumberingX !== this.invertNumberingX) {
+        this.$store.dispatch('setInvertNumberingX', this.tempInvertNumberingX)
+      }
+      if (this.tempInvertNumberingY !== this.invertNumberingY) {
+        this.$store.dispatch('setInvertNumberingY', this.tempInvertNumberingY)
       }
 
       if (this.tempColors.length !== this.traitColors.length || !this.tempColors.every((value, index) => value === this.traitColors[index])) {

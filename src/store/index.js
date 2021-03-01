@@ -32,6 +32,8 @@ const storeState = {
     gridLinesEvery: 5,
     geolocation: null,
     invertView: false,
+    invertNumberingX: false,
+    invertNumberingY: false,
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
   },
   getters: {
@@ -49,6 +51,8 @@ const storeState = {
     gridLinesEvery: (state) => state.gridLinesEvery,
     geolocation: (state) => state.geolocation,
     invertView: (state) => state.invertView,
+    invertNumberingX: (state) => state.invertNumberingX,
+    invertNumberingY: (state) => state.invertNumberingY,
     traitColors: (state) => state.traitColors
   },
   mutations: {
@@ -132,6 +136,12 @@ const storeState = {
     },
     ON_INVERT_VIEW_CHANGED_MUTATION: function (state, newInvertView) {
       state.invertView = newInvertView
+    },
+    ON_INVERT_NUMBERING_X_CHANGED_MUTATION: function (state, newInvertNumberingX) {
+      state.invertNumberingX = newInvertNumberingX
+    },
+    ON_INVERT_NUMBERING_Y_CHANGED_MUTATION: function (state, newInvertNumberingY) {
+      state.invertNumberingY = newInvertNumberingY
     }
   },
   actions: {
@@ -188,6 +198,12 @@ const storeState = {
     },
     setInvertView: function ({ commit }, invertView) {
       commit('ON_INVERT_VIEW_CHANGED_MUTATION', invertView)
+    },
+    setInvertNumberingX: function ({ commit }, invertNumberingX) {
+      commit('ON_INVERT_NUMBERING_X_CHANGED_MUTATION', invertNumberingX)
+    },
+    setInvertNumberingY: function ({ commit }, invertNumberingY) {
+      commit('ON_INVERT_NUMBERING_Y_CHANGED_MUTATION', invertNumberingY)
     }
   },
   plugins: [createPersistedState({

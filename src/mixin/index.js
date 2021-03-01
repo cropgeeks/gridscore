@@ -13,6 +13,8 @@ export default {
       'geolocation',
       'gridLinesEvery',
       'invertView',
+      'invertNumberingX',
+      'invertNumberingY',
       'locale',
       'serverUrl',
       'traitColors',

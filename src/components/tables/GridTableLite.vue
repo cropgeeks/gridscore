@@ -7,13 +7,17 @@
         </template>
         <tr>
           <th></th>
-          <th role="columnheader" scope="col" :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">{{ column }}</th>
+          <th role="columnheader" scope="col" :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">
+            <span v-if="invertNumberingX">{{ dataset.cols - column + 1 }}</span>
+            <span v-else>{{ column }}</span>
+          </th>
           <th></th>
         </tr>
       </thead>
       <tbody role="rowgroup">
         <tr role="row" v-for="(row, rowIndex) in dataset.data" :key="`table-row-${rowIndex}`">
-          <th role="rowheader" class="text-right">{{ rowIndex + 1 }}</th>
+          <th role="rowheader" class="text-right" v-if="invertNumberingY">{{ dataset.rows - rowIndex }}</th>
+          <th role="rowheader" class="text-right" v-else>{{ rowIndex + 1 }}</th>
           <td role="cell" :class="`text-center ${cellClasses[rowIndex][columnIndex]}`" v-for="(cell, columnIndex) in row" :key="`table-cell-${rowIndex}-${columnIndex}`">
             <!-- Handle click events -->
             <div v-on:click="onClick(rowIndex, columnIndex)" :class="borderStyles[rowIndex][columnIndex]">
@@ -30,13 +34,17 @@
               </template>
             </div>
           </td>
-          <th role="rowheader" class="text-left">{{ rowIndex + 1 }}</th>
+          <th role="rowheader" class="text-left" v-if="invertNumberingY">{{ dataset.rows - rowIndex }}</th>
+          <th role="rowheader" class="text-left" v-else>{{ rowIndex + 1 }}</th>
         </tr>
       </tbody>
       <tfoot>
         <tr>
           <th></th>
-          <th :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">{{ column }}</th>
+          <th :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">
+            <span v-if="invertNumberingX">{{ dataset.cols - column + 1 }}</span>
+            <span v-else>{{ column }}</span>
+          </th>
           <th></th>
         </tr>
       </tfoot>
