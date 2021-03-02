@@ -2,9 +2,9 @@
   <b-modal :title="$t('modalTitleImportConfig')"
            :ok-title="$t('buttonImport')"
            :cancel-title="$t('buttonCancel')"
-           @ok.prevent="importData"
+           @ok.prevent="importExport"
            ref="importModal">
-    <b-form @submit.prevent="importData" id="import-export-form">
+    <b-form @submit.prevent="importExport" id="import-export-form">
       <b-form-group :label="$t('formLabelImportExportData')"
                     label-for="data">
         <b-form-textarea :rows="5" :readonly="false" id="data" v-model="config" />
@@ -96,7 +96,7 @@ export default {
         this.config = event.target.result.replace(/\r/g, '')
         this.dataFile = null
       }
-      reader.readAsText(this.varietiesFile)
+      reader.readAsText(this.dataFile)
     },
     show: function () {
       this.dataFile = null
