@@ -4,6 +4,7 @@
            :cancel-title="$t('buttonCancel')"
            @ok.prevent="onSubmit"
            ref="traitConfigModal"
+           no-fade
            v-if="trait">
     <b-form @submit.prevent="onSubmit" :validated="formValidated">
       <!-- If it's an `int`, show two number inputs for min and max -->

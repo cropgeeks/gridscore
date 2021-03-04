@@ -3,6 +3,7 @@
            :ok-title="$t('buttonClose')"
            content-class="export-modal"
            size="lg"
+           no-fade
            ok-only
            ref="exportModal">
     <!-- Show a loading indicator while the export is generated -->

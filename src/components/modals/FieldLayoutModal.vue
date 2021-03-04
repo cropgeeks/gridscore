@@ -3,6 +3,7 @@
            :ok-title="$t('buttonOk')"
            :cancel-title="$t('buttonCancel')"
            size="xl"
+           no-fade
            @shown="invalidateSize"
            @ok.prevent="onSubmit"
            ref="fieldLayoutModal">

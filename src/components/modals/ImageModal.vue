@@ -3,6 +3,7 @@
            :ok-title="$t('buttonSave')"
            :cancel-title="$t('buttonCancel')"
            @ok.prevent="downloadImage"
+           no-fade
            ref="imageModal"
            content-class="image-modal">
     <!-- Preview the image -->

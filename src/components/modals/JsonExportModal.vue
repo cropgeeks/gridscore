@@ -3,6 +3,7 @@
            :ok-title="$t('buttonClose')"
            :cancel-title="$t('buttonCancel')"
            @ok.prevent="exportData"
+           no-fade
            ref="exportModal">
     <b-form @submit.prevent="exportData" id="import-export-form">
       <b-form-group :label="$t('formLabelImportExportData')"

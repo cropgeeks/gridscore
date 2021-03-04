@@ -5,6 +5,7 @@
            :ok-disabled="okDisabled"
            @ok.prevent="$emit('submit')"
            scrollable
+           no-fade
            ref="brapiModal">
     <b-form-group label-for="brapiUrl">
       <template v-slot:label>

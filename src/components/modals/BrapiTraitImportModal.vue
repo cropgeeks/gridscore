@@ -5,6 +5,7 @@
               :cancelTitle="'buttonCancel'"
               :okDisabled="!selectedTraits || selectedTraits.length < 1"
               @submit="onSubmit"
+              no-fade
               @brapi-url-changed="getTraits">
     <!-- Fill the slot with the content, assuming the loading state is set -->
     <template v-slot:content v-if="loading !== null">

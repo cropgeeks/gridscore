@@ -4,6 +4,7 @@
             :cancel-title="$t('buttonCancel')"
             scrollable
             size="xl"
+            no-fade
             @ok.prevent="onSubmit"
             ref="setupModal">
       <!-- Custom modal header -->

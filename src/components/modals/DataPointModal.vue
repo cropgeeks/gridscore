@@ -6,6 +6,7 @@
            @hide="disableSpeechRecognition"
            @shown="setFocus"
            size="lg"
+           no-fade
            ref="dataPointModal">
     <p>{{ $t('modalTextDataEntry') }}</p>
     <b-form @submit.prevent="onSubmit" :validated="formValidated">

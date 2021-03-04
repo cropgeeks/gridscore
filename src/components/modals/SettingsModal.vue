@@ -4,6 +4,7 @@
             :cancel-title="$t('buttonCancel')"
             :title="$t('modalTitleSettings')"
             scrollable
+            no-fade
             @ok.prevent="onSubmit"
             ref="settingsModal">
       <b-form @submit.prevent="onSubmit" class="settings-form">

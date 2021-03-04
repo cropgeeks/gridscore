@@ -28,9 +28,9 @@
               <!-- For each trait -->
               <template v-for="(date, traitIndex) in cell.dates">
                 <!-- Show a circle in the representative trait color if it's not hidden -->
-                <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="invertView ? (date === null || date.length < 1) : (date !== null && date.length > 0)"><BIconCircleFill /></span>
+                <span class="mx-1 circle-icon" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="invertView ? (date === null || date.length < 1) : (date !== null && date.length > 0)">⬤</span>
                 <!-- Otherwise show a hidden circle -->
-                <span class="mx-1" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
+                <span class="mx-1 circle-icon" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="{ opacity: 0 }" v-else>⬤</span>
               </template>
             </div>
           </td>
@@ -57,11 +57,8 @@ import Vue from 'vue'
 
 import UserPositionIndicator from '@/components/UserPositionIndicator'
 
-import { BIconCircleFill } from 'bootstrap-vue'
-
 export default {
   components: {
-    BIconCircleFill,
     UserPositionIndicator
   },
   props: {
@@ -78,7 +75,8 @@ export default {
   },
   data: function () {
     return {
-      markedColumns: []
+      markedColumns: [],
+      dataCopy: null
     }
   },
   watch: {
@@ -215,6 +213,9 @@ export default {
     }
   },
   mounted: function () {
+    const tempCopy = JSON.parse(JSON.stringify(this.dataset.data))
+    Object.freeze(tempCopy)
+    this.dataCopy = tempCopy
     this.updateMarkedColumns()
   }
 }
@@ -223,6 +224,9 @@ export default {
 <style>
 .grid-table {
   table-layout: fixed;
+}
+.grid-table .circle-icon {
+  font-size: 18px;
 }
 .grid-table thead th {
   border-bottom: 1px solid;
