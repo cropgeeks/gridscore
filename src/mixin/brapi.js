@@ -19,7 +19,7 @@ export default {
      * @returns Promise
      */
     get: async function (url, callName, params = null, method = 'get', infoCheck = true) {
-      const baseUrl = this.brapiConfig.url
+      const baseUrl = this.storeBrapiConfig.url
 
       if (infoCheck && !this.serverInfos[baseUrl]) {
         await this.brapiGetInfo()
@@ -32,7 +32,7 @@ export default {
       }
 
       return axios({
-        baseURL: this.brapiConfig ? this.brapiConfig.url : null,
+        baseURL: this.storeBrapiConfig ? this.storeBrapiConfig.url : null,
         url: url,
         params: params,
         method: method,
@@ -55,8 +55,8 @@ export default {
      * Retrieves the `serverinfo` from the BrAPI server to check availability of certain endpoints. Sets the field `serverInfo` for this BrAPI server
      */
     brapiGetInfo: async function () {
-      const url = '' + this.brapiConfig.url
-      await this.get('serverinfo', 'serverinfo', 'get', null, false)
+      const url = '' + this.storeBrapiConfig.url
+      await this.get('serverinfo', 'serverinfo', null, 'get', false)
         .then(result => {
           if (result && result.data && result.data.result) {
             this.serverInfos[url] = result.data.result.calls

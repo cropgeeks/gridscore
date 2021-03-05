@@ -10,12 +10,12 @@
            ref="dataPointModal">
     <p>{{ $t('modalTextDataEntry') }}</p>
     <b-form @submit.prevent="onSubmit" :validated="formValidated">
-      <b-form-group v-for="(trait, index) in dataset.traits"
+      <b-form-group v-for="(trait, index) in storeTraits"
                     :key="`trait-${index}`"
                     :label-for="`trait-${index}`">
         <!-- Show the trait name along with the type and its color as the label -->
         <template v-slot:label>
-          <span :style="{ color: traitColors[index % traitColors.length] }"><BIconCircleFill /> {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
+          <span :style="{ color: storeTraitColors[index % storeTraitColors.length] }"><BIconCircleFill /> {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
         </template>
 
         <b-input-group v-if="trait.type === 'date'">
@@ -110,6 +110,8 @@ import Vue from 'vue'
 import ImageModal from '@/components/modals/ImageModal'
 import { BIconCameraFill, BIconCircleFill, BIconMic, BIconCaretLeftFill, BIconCaretRightFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
 
+import { mapGetters } from 'vuex'
+
 /**
  * Shows a modal used to enter the data into GridScore. Each trait is shown and based on its type a different method for data input is show.
  */
@@ -145,12 +147,16 @@ export default {
     }
   },
   computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeData'
+    ]),
     supportsSpeechRecognition: function () {
       return ('webkitSpeechRecognition' in window)
     }
   },
   watch: {
-    useSpeech: function (newValue) {
+    storeUseSpeech: function (newValue) {
       if (newValue) {
         this.textSynth = window.speechSynthesis
       } else {
@@ -288,17 +294,17 @@ export default {
      */
     show: function () {
       this.formValidated = false
-      this.formState = this.dataset.traits.map(t => null)
+      this.formState = this.storeTraits.map(t => null)
       this.imageFile = null
       this.imageData = null
-      this.values = JSON.parse(JSON.stringify(this.dataset.data[this.row][this.col].values))
-      this.dates = JSON.parse(JSON.stringify(this.dataset.data[this.row][this.col].dates))
-      this.name = this.dataset.data[this.row][this.col].name
-      this.comment = this.dataset.data[this.row][this.col].comment
+      this.values = JSON.parse(JSON.stringify(this.storeData[this.row][this.col].values))
+      this.dates = JSON.parse(JSON.stringify(this.storeData[this.row][this.col].dates))
+      this.name = this.storeData[this.row][this.col].name
+      this.comment = this.storeData[this.row][this.col].comment
       this.$nextTick(() => this.$refs.dataPointModal.show())
 
       this.speak(this.name)
-      this.speak(this.dataset.traits[0].name)
+      this.speak(this.storeTraits[0].name)
     },
     /**
      * Hides the modal
@@ -343,7 +349,7 @@ export default {
             this.$refs[`trait-${newIndex}`][0].select()
           }
 
-          this.speak(this.dataset.traits[newIndex].name)
+          this.speak(this.storeTraits[newIndex].name)
         }
       } else {
         this.onSubmit()
@@ -368,7 +374,7 @@ export default {
      * Handle the submit event. Checks restrictions before accepting the data.
      */
     onSubmit: function () {
-      this.formState = this.dataset.traits.map((t, i) => {
+      this.formState = this.storeTraits.map((t, i) => {
         if (this.values[i] === '' || this.values[i] === null) {
           return true
         } else if (t.restrictions) {
@@ -400,7 +406,7 @@ export default {
           return
         }
 
-        if (this.dataset.traits[i].type === 'date') {
+        if (this.storeTraits[i].type === 'date') {
           // If the trait a date, simply set the date to the value
           this.dates[i] = this.values[i]
         } else if (this.values[i] !== null && this.dates[i] === null) {
@@ -418,14 +424,14 @@ export default {
         col: this.col,
         values: this.values,
         dates: this.dates,
-        geolocation: this.useGps ? this.geolocation : null,
+        geolocation: this.storeUseGps ? this.storeGeolocation : null,
         comment: comment
       })
       this.hide()
     }
   },
   created: function () {
-    if (this.useSpeech && window.speechSynthesis) {
+    if (this.storeUseSpeech && window.speechSynthesis) {
       this.textSynth = window.speechSynthesis
     }
   }

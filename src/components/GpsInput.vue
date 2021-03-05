@@ -55,9 +55,9 @@ export default {
   methods: {
     /** Set the current geolocation as the selected location */
     setGps: function () {
-      if (this.geolocation) {
-        this.latitude = this.geolocation.lat
-        this.longitude = this.geolocation.lng
+      if (this.storeGeolocation) {
+        this.latitude = this.storeGeolocation.lat
+        this.longitude = this.storeGeolocation.lng
       }
     },
     /** Updates the current position based on the previous selection */

@@ -7,7 +7,7 @@
            @shown="invalidateSize"
            @ok.prevent="onSubmit"
            ref="fieldLayoutModal">
-    <FieldMap :rows="dataset.rows" :cols="dataset.cols" ref="map" />
+    <FieldMap :rows="storeRows" :cols="storeCols" ref="map" />
   </b-modal>
 </template>
 

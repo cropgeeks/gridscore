@@ -7,9 +7,9 @@
              class="grid-table mb-0"
              table-class="position-relative"
              @head-clicked="onHeadClicked"
-             :items="dataset.data"
+             :items="storeData"
              :fields="fields">
-      <template #thead-top v-if="useGps === true">
+      <template #thead-top v-if="storeUseGps === true">
         <UserPositionIndicator :position="highlightPosition" tableId="grid-table" />
       </template>
       <!-- The first column shows the row number -->
@@ -29,9 +29,9 @@
             <span>{{ data.value.name }}</span>
           </span>
           <!-- For each trait -->
-          <template v-for="(trait, index) in dataset.traits">
+          <template v-for="(trait, index) in storeTraits">
             <!-- Show a circle in the representative trait color if it's not hidden -->
-            <span class="mx-1" :key="`trait-${index}`" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? traitColors[index % traitColors.length] : 'lightgray' }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0"><BIconCircleFill /></span>
+            <span class="mx-1" :key="`trait-${index}`" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? storeTraitColors[index % storeTraitColors.length] : 'lightgray' }" v-if="data.value.dates[index] !== null && data.value.dates[index].length > 0"><BIconCircleFill /></span>
             <!-- Otherwise show a hidden circle -->
             <span class="mx-1" :key="`trait-${index}`" :style="{ opacity: 0 }" v-else><BIconCircleFill /></span>
           </template>
@@ -45,6 +45,8 @@
 import UserPositionIndicator from '@/components/UserPositionIndicator'
 import { BIconCircleFill } from 'bootstrap-vue'
 import Vue from 'vue'
+
+import { mapGetters } from 'vuex'
 
 export default {
   props: {
@@ -65,22 +67,26 @@ export default {
     }
   },
   computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeData'
+    ]),
     /** The index of the last column. Used for the slot in the table */
     lastIndex: function () {
-      return this.dataset.cols + 1
+      return this.storeCols + 1
     },
     /** The row the user is currently in */
     highlightRow: function () {
-      if (this.useGps && this.highlightPosition) {
-        return this.dataset.rows - Math.ceil(this.dataset.rows * this.highlightPosition.y / 100.0)
+      if (this.storeUseGps && this.highlightPosition) {
+        return this.storeRows - Math.ceil(this.storeRows * this.highlightPosition.y / 100.0)
       } else {
         return null
       }
     },
     /** The column the user is currently in */
     highlightCol: function () {
-      if (this.useGps && this.highlightPosition) {
-        return Math.floor(this.dataset.cols * this.highlightPosition.x / 100.0)
+      if (this.storeUseGps && this.highlightPosition) {
+        return Math.floor(this.storeCols * this.highlightPosition.x / 100.0)
       } else {
         return null
       }
@@ -97,7 +103,7 @@ export default {
       }]
 
       // The other columns
-      for (let i = 0; i < this.dataset.cols; i++) {
+      for (let i = 0; i < this.storeCols; i++) {
         result.push({
           key: '' + (i + 1),
           variant: this.markedColumns[i] ? 'primary' : (i % 2 === 1 ? null : 'active'),
@@ -117,7 +123,7 @@ export default {
     }
   },
   watch: {
-    'dataset.cols': function () {
+    storeCols: function () {
       this.updateMarkedColumns()
     }
   },
@@ -137,21 +143,21 @@ export default {
       let result = ''
 
       // If the user position in the field is known
-      if (this.useGps && this.highlightRow !== null && this.highlightCol !== null) {
+      if (this.storeUseGps && this.highlightRow !== null && this.highlightCol !== null) {
         if ((rowIndex === this.highlightRow) && (colIndex === this.highlightCol)) {
           // If this is the cell the user is located in, highlight it green
           return 'table-success'
         } else {
           // Otherwise, compute the row and column the user is in (restricted to the field, so if the user is outside the field, this will compute the closest row and col)
-          const rowWithinBounds = Math.max(0, Math.min(this.dataset.rows - 1, this.highlightRow))
-          const colWithinBounds = Math.max(0, Math.min(this.dataset.cols - 1, this.highlightCol))
+          const rowWithinBounds = Math.max(0, Math.min(this.storeRows - 1, this.highlightRow))
+          const colWithinBounds = Math.max(0, Math.min(this.storeCols - 1, this.highlightCol))
 
           // If we're the first row and the user is in the first row and the user is in the same column, indicate the user is above
           if (rowIndex === 0 && rowWithinBounds === 0 && colIndex === colWithinBounds) {
             result += ' gps-border-top'
           }
           // If we're the last row and the user is in the last row and the user is in the same column, indicate the user is below
-          if (rowIndex === this.dataset.rows - 1 && rowWithinBounds === this.dataset.rows - 1 && colIndex === colWithinBounds) {
+          if (rowIndex === this.storeRows - 1 && rowWithinBounds === this.storeRows - 1 && colIndex === colWithinBounds) {
             result += ' gps-border-bottom'
           }
           // If we're the first column and the user is in the first column and the user is in the same row, indicate the user is to the left
@@ -159,7 +165,7 @@ export default {
             result += ' gps-border-left'
           }
           // If we're the last column and the user is in the last column and the user is in the same row, indicate the user is to the right
-          if (colIndex === this.dataset.cols - 1 && colWithinBounds === this.dataset.cols - 1 && rowIndex === rowWithinBounds) {
+          if (colIndex === this.storeCols - 1 && colWithinBounds === this.storeCols - 1 && rowIndex === rowWithinBounds) {
             result += ' gps-border-right'
           }
         }
@@ -187,7 +193,7 @@ export default {
     updateMarkedColumns: function () {
       let temp = []
 
-      for (let i = 0; i < this.dataset.cols; i++) {
+      for (let i = 0; i < this.storeCols; i++) {
         temp.push(false)
       }
 

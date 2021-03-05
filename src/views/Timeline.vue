@@ -2,41 +2,49 @@
   <div>
     <h1>{{ $t('pageTimelineTitle') }}</h1>
     <p>{{ $t('pageTimelineText') }}</p>
-    <div id="timeseries-chart" class="time-chart" v-if="dataset && dataset.data && dataset.data.length > 0 && dataset.traits && dataset.traits.length > 0"/>
+    <div id="timeseries-chart" class="time-chart" v-if="storeData && storeData.length > 0 && storeTraits && storeTraits.length > 0"/>
     <h3 v-else>{{ $t('labelNoData') }}</h3>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 /**
  * Shows the timeline for data recording of each trait as a percentage of all plots scored.
  */
 export default {
   watch: {
-    locale: function () {
+    storeLocale: function () {
       this.plot()
     }
   },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeData'
+    ])
+  },
   methods: {
     plot: function () {
-      if (!this.dataset || !this.dataset.data || this.dataset.data.length < 1 || !this.dataset.traits || this.dataset.traits.length < 1) {
+      if (!this.storeData || this.storeData.length < 1 || !this.storeTraits || this.storeTraits.length < 1) {
         return
       }
 
       this.$plotly.purge('timeseries-chart')
 
-      const plots = this.dataset.rows * this.dataset.cols
+      const plots = this.storeRows * this.storeCols
 
       // The mapping is used to figure out for each trait how many fields were scored at each timepoint
       let mapping = []
       let traces = []
       // For each trait, add an empty object to the fields
-      this.dataset.traits.forEach((t, index) => {
+      this.storeTraits.forEach(() => {
         mapping.push({})
         traces.push({})
       })
       // For each field row
-      this.dataset.data.forEach(r => {
+      this.storeData.forEach(r => {
         // For each column
         r.forEach(c => {
           c.dates.forEach((d, i) => {
@@ -66,9 +74,9 @@ export default {
         traces[index] = {
           type: 'scatter',
           mode: 'lines+markers',
-          name: this.dataset.traits[index].name,
+          name: this.storeTraits[index].name,
           line: {
-            color: this.traitColors[index % this.traitColors.length]
+            color: this.storeTraitColors[index % this.storeTraitColors.length]
           },
           // X values are the dates
           x: dates,

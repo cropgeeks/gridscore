@@ -67,7 +67,7 @@ export default {
      * Shows the modal and gets the current BrAPI URL from the configuration
      */
     show: function () {
-      this.brapiUrl = this.brapiConfig && this.brapiConfig.url ? this.brapiConfig.url : null
+      this.brapiUrl = this.storeBrapiConfig && this.storeBrapiConfig.url ? this.storeBrapiConfig.url : null
       this.$nextTick(() => this.$refs.brapiModal.show())
     },
     /**

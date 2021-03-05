@@ -39,7 +39,7 @@ export default {
     userRotate: function () {
       if (this.position && this.position !== null && this.position.heading !== null && this.position.heading >= 0 && this.position.heading <= 360) {
         // Calculate the angles between a vertical line and the right hand edge of the field layout
-        const cp = this.dataset.cornerPoints
+        const cp = this.storeCornerPoints
         const angleOne = Math.atan2(100, 0)
         const angleTwo = Math.atan2(cp[2][0] - cp[1][0], cp[2][1] - cp[1][1])
         // Convert it from radians to degrees
@@ -58,7 +58,7 @@ export default {
      * Updates the location of the user position indicator.
      */
     updateUserPosition: function () {
-      if (this.useGps && this.position && this.position.x >= 0 && this.position.x <= 100 && this.position.y >= 0 && this.position.y <= 100) {
+      if (this.storeUseGps && this.position && this.position.x >= 0 && this.position.x <= 100 && this.position.y >= 0 && this.position.y <= 100) {
         if (!document.querySelector(`#${this.tableId} .table`)) {
           return null
         }

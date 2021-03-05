@@ -1,14 +1,19 @@
 <template>
-  <div id="grid-table">
-    <b-table-simple :class="`grid-table grid${gridLinesEvery} mb-0`" table-class="position-relative" responsive striped sticky-header="100vh">
+  <div id="grid-table" class="table-responsive table-fixed-header">
+    <table :class="`table header-fixed table-striped position-relative grid-table grid${storeGridLinesEvery} mb-0`" sticky-header="100vh">
+      <colgroup v-if="storeColumnWidth">
+        <col span="1" style="width: 60px;">
+        <col v-for="columnIndex in storeCols" :key="`table-colgroup-col-${columnIndex}`" span="1" :style="`width: ${storeColumnWidth}px;`">
+        <col span="1" style="width: 60px;">
+      </colgroup>
       <thead role="rowgroup">
-        <template v-if="useGps === true">
+        <template v-if="storeUseGps === true">
           <UserPositionIndicator :position="highlightPosition" tableId="grid-table" />
         </template>
         <tr>
           <th></th>
-          <th role="columnheader" scope="col" :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">
-            <span v-if="invertNumberingX">{{ dataset.cols - column + 1 }}</span>
+          <th role="columnheader" scope="col" :class="`text-center ${columnClasses[column - 1]}`" v-for="column in storeCols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">
+            <span v-if="storeInvertNumberingX">{{ storeCols - column + 1 }}</span>
             <span v-else>{{ column }}</span>
           </th>
           <th></th>
@@ -16,8 +21,8 @@
       </thead>
       <!-- Handle click events -->
       <tbody role="rowgroup" v-on:click="onTableClick">
-        <tr role="row" v-for="(row, rowIndex) in dataset.data" :key="`table-row-${rowIndex}`">
-          <th role="rowheader" class="text-right" v-if="invertNumberingY">{{ dataset.rows - rowIndex }}</th>
+        <tr role="row" v-for="(row, rowIndex) in storeData" :key="`table-row-${rowIndex}`">
+          <th role="rowheader" class="text-right" v-if="storeInvertNumberingY">{{ storeRows - rowIndex }}</th>
           <th role="rowheader" class="text-right" v-else>{{ rowIndex + 1 }}</th>
           <td role="cell" :class="`text-center ${cellClasses[`${rowIndex},${columnIndex}`]}`" v-for="(cell, columnIndex) in row" :key="`table-cell-${rowIndex}-${columnIndex}`" :id="`${rowIndex}-${columnIndex}`">
             <div>
@@ -28,27 +33,27 @@
               <!-- For each trait -->
               <template v-for="(date, traitIndex) in cell.dates">
                 <!-- Show a circle in the representative trait color if it's not hidden -->
-                <span class="mx-1 circle-icon" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="invertView ? (date === null || date.length < 1) : (date !== null && date.length > 0)">⬤</span>
+                <span class="mx-1 circle-icon" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="storeInvertView ? (date === null || date.length < 1) : (date !== null && date.length > 0)">⬤</span>
                 <!-- Otherwise show a hidden circle -->
                 <span class="mx-1 circle-icon" :key="`table-cell-${rowIndex}-${columnIndex}-${traitIndex}`" :style="{ opacity: 0 }" v-else>⬤</span>
               </template>
             </div>
           </td>
-          <th role="rowheader" class="text-left" v-if="invertNumberingY">{{ dataset.rows - rowIndex }}</th>
+          <th role="rowheader" class="text-left" v-if="storeInvertNumberingY">{{ storeRows - rowIndex }}</th>
           <th role="rowheader" class="text-left" v-else>{{ rowIndex + 1 }}</th>
         </tr>
       </tbody>
       <tfoot>
         <tr>
           <th></th>
-          <th :class="`text-center ${columnClasses[column - 1]}`" v-for="column in dataset.cols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">
-            <span v-if="invertNumberingX">{{ dataset.cols - column + 1 }}</span>
+          <th :class="`text-center ${columnClasses[column - 1]}`" v-for="column in storeCols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">
+            <span v-if="storeInvertNumberingX">{{ storeCols - column + 1 }}</span>
             <span v-else>{{ column }}</span>
           </th>
           <th></th>
         </tr>
       </tfoot>
-    </b-table-simple>
+    </table>
   </div>
 </template>
 
@@ -56,6 +61,8 @@
 import Vue from 'vue'
 
 import UserPositionIndicator from '@/components/UserPositionIndicator'
+
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -79,15 +86,19 @@ export default {
     }
   },
   watch: {
-    'dataset.cols': function () {
+    storeCols: function () {
       this.updateMarkedColumns()
     }
   },
   computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeData'
+    ]),
     columnClasses: function () {
       let result = []
 
-      for (let col = 0; col < this.dataset.cols; col++) {
+      for (let col = 0; col < this.storeCols; col++) {
         result.push(this.markedColumns[col] ? 'table-primary' : (col % 2 !== 1 ? 'table-active' : 'table-b-table-default'))
       }
 
@@ -96,11 +107,11 @@ export default {
     cellClasses: function () {
       const result = {}
 
-      for (let row = 0; row < this.dataset.data.length; row++) {
-        for (let col = 0; col < this.dataset.cols; col++) {
+      for (let row = 0; row < this.storeData.length; row++) {
+        for (let col = 0; col < this.storeCols; col++) {
           let clazz = ''
 
-          if (this.dataset.data[row][col].comment && this.dataset.data[row][col].comment.length > 0) {
+          if (this.storeData[row][col].comment && this.storeData[row][col].comment.length > 0) {
             clazz = 'table-warning'
           } else if (this.markedColumns[col]) {
             clazz = 'table-primary'
@@ -117,24 +128,24 @@ export default {
       return result
     },
     cellStyles: function () {
-      return this.dataset.traits.map((t, index) => {
+      return this.storeTraits.map((t, index) => {
         return {
-          color: (this.visibleTraits && this.visibleTraits[index] === true) ? this.traitColors[index % this.traitColors.length] : 'lightgray'
+          color: (this.visibleTraits && this.visibleTraits[index] === true) ? this.storeTraitColors[index % this.storeTraitColors.length] : 'lightgray'
         }
       })
     },
     /** The row the user is currently in */
     highlightRow: function () {
-      if (this.useGps && this.highlightPosition) {
-        return this.dataset.rows - Math.ceil(this.dataset.rows * this.highlightPosition.y / 100.0)
+      if (this.storeUseGps && this.highlightPosition) {
+        return this.storeRows - Math.ceil(this.storeRows * this.highlightPosition.y / 100.0)
       } else {
         return null
       }
     },
     /** The column the user is currently in */
     highlightCol: function () {
-      if (this.useGps && this.highlightPosition) {
-        return Math.floor(this.dataset.cols * this.highlightPosition.x / 100.0)
+      if (this.storeUseGps && this.highlightPosition) {
+        return Math.floor(this.storeCols * this.highlightPosition.x / 100.0)
       } else {
         return null
       }
@@ -169,7 +180,7 @@ export default {
     updateMarkedColumns: function () {
       let temp = []
 
-      for (let i = 0; i < this.dataset.cols; i++) {
+      for (let i = 0; i < this.storeCols; i++) {
         temp.push(false)
       }
 
@@ -253,20 +264,15 @@ export default {
   border-bottom-color: var(--primary) !important;
 }
 
-.grid-table .table th,
-.grid-table .table td {
-  min-width: 70px;
-  max-width: 70px;
-}
-.grid-table .table td {
+.grid-table td {
   padding: 0;
 }
-.grid-table .table td > div {
+.grid-table td > div {
   padding: 0.75rem;
   cursor: pointer;
   word-break: break-all;
 }
-.grid-table .table td > div > span:empty::after{
+.grid-table td > div > span:empty::after{
   content: "\00a0";
 }
 .grid-table .gps-border-top {
@@ -286,4 +292,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.table-fixed-header          { overflow-y: auto; max-height: 100vh; margin-bottom: 0; }
+.table-fixed-header thead th { position: sticky; top: 0; z-index: 2; }
 </style>

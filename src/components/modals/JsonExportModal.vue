@@ -25,6 +25,8 @@
 <script>
 import { BrowserQRCodeSvgWriter } from '@zxing/browser'
 
+import { mapGetters } from 'vuex'
+
 const codeWriter = new BrowserQRCodeSvgWriter()
 
 /**
@@ -39,8 +41,12 @@ export default {
     }
   },
   computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeDataset'
+    ]),
     config: function () {
-      const dataCopy = JSON.parse(JSON.stringify(this.dataset))
+      const dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
       // delete dataCopy.data
       return JSON.stringify(dataCopy, undefined, 2)
     },

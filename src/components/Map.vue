@@ -23,7 +23,7 @@
           </b-row>
         </LPopup>
       </LMarker>
-      <LMarker v-if="geolocation" :lat-lng="geolocation">
+      <LMarker v-if="storeGeolocation" :lat-lng="storeGeolocation">
         <LIcon :icon-anchor="[20, 40]">
           <BIconGeoFill variant="danger" :style="{ width: '40px', height: '40px'}" />
         </LIcon>
@@ -151,8 +151,8 @@ export default {
       // Calculate bounds around all locations
       let bounds = L.latLngBounds()
       this.locations.filter(l => l !== null).forEach(l => bounds.extend(l))
-      // if (this.geolocation) {
-      //   bounds.extend(this.geolocation)
+      // if (this.storeGeolocation) {
+      //   bounds.extend(this.storeGeolocation)
       // }
       // If the bounds are valid, move the map
       if (bounds.isValid()) {

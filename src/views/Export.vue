@@ -1,11 +1,8 @@
 <template>
-  <b-modal :title="$t('modalTitleExport')"
-           :ok-title="$t('buttonClose')"
-           content-class="export-modal"
-           size="lg"
-           no-fade
-           ok-only
-           ref="exportModal">
+  <b-container>
+    <h1><b-button :to="{ name: 'home' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleExport') }}</h1>
+    <hr />
+
     <!-- Show a loading indicator while the export is generated -->
     <b-progress :value="100" height="5px" variant="info" animated v-if="!text" />
     <b-tabs content-class="mt-3" v-else>
@@ -38,17 +35,18 @@
         </div>
       </b-tab>
     </b-tabs>
-  </b-modal>
+  </b-container>
 </template>
 
 <script>
-import { BIconDownload } from 'bootstrap-vue'
+import { BIconDownload, BIconArrowLeft } from 'bootstrap-vue'
 
 import { mapGetters } from 'vuex'
 
 export default {
   components: {
-    BIconDownload
+    BIconDownload,
+    BIconArrowLeft
   },
   data: function () {
     return {

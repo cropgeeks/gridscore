@@ -1,113 +1,103 @@
 <template>
-  <div>
-    <b-modal :ok-title="$t('buttonOk')"
-            :cancel-title="$t('buttonCancel')"
-            scrollable
-            size="xl"
-            no-fade
-            @ok.prevent="onSubmit"
-            ref="setupModal">
-      <!-- Custom modal header -->
-      <template v-slot:modal-header="{ close }">
-        <h5 class="modal-title">{{ $t('modalTitleSetup') }}</h5>
+  <b-container>
+    <h1><b-button :to="{ name: 'home' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleSetup') }}</h1>
+    <hr />
+    <!-- Import and export buttons for json -->
+    <b-button-group class="mb-3">
+      <b-button @click="loadExampleData">{{ $t('buttonLoadExample') }}</b-button>
+      <b-button @click="$refs.importModal.show()">{{ $t('buttonImport') }}</b-button>
+      <b-button @click="$refs.exportModal.show()">{{ $t('buttonExport') }}</b-button>
+    </b-button-group>
 
-        <!-- Import and export buttons for json -->
-        <b-button-group>
-          <b-button variant="outline-dark" size="sm" @click="loadExampleData">{{ $t('buttonLoadExample') }}</b-button>
-          <b-button variant="outline-secondary" size="sm" @click="$refs.importModal.show()">{{ $t('buttonImport') }}</b-button>
-          <b-button variant="outline-secondary" size="sm" @click="$refs.exportModal.show()">{{ $t('buttonExport') }}</b-button>
-        </b-button-group>
+    <b-form @submit.prevent="onSubmit" id="settings-form">
+      <b-row>
+        <b-col cols=12 lg=6>
+          <!-- Field layout rows -->
+          <b-form-group label-for="rows" :description="$t('formDescriptionSettingsRow')" >
+            <template v-slot:label>
+              <BIconLayoutThreeColumns rotate="90" /><span> {{ $t('formLabelSettingsRows') }}</span>
+            </template>
+            <b-form-input id="rows" :state="state.rows" number type="number" :min="1" required autofocus v-model.number="rows" />
+          </b-form-group>
+          <!-- Field layout cols -->
+          <b-form-group label-for="cols" :description="$t('formDescriptionSettingsCol')">
+            <template v-slot:label>
+              <BIconLayoutThreeColumns /><span> {{ $t('formLabelSettingsCols') }}</span>
+            </template>
+            <b-form-input id="cols" :state="state.cols" number type="number" :min="1" required v-model.number="cols" />
+          </b-form-group>
+          <!-- Field layout varieties -->
+          <b-form-group label-for="varieties">
+            <!-- Variety label -->
+            <template v-slot:label>
+              <BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span>
+              <!-- Tooltip for the variety label info icon -->
+              <b-tooltip target="variety-label">
+                <div>{{ $t('tooltipSettingsVarieties') }}</div>
+                <div><b-img fluid src="img/variety-order.svg" width=75 height=75 /></div>
+              </b-tooltip>
+            </template>
+            <!-- Variety names input -->
+            <b-form-textarea id="varieties" :state="state.varieties" rows=6 required :placeholder="$t('formPlaceholderVarieties')" v-model="varieties" />
+            <!-- Variety names file loading -->
+            <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="varietiesFile" />
+          </b-form-group>
+        </b-col>
+        <b-col cols=12 lg=6>
+          <!-- Trait definitions -->
+          <b-list-group v-if="newTraits && newTraits.length > 0" class="mb-3 trait-list">
+            <b-list-group-item v-for="(trait, index) in newTraits" :key="`trait-${index}`" class="d-flex justify-content-between align-items-center" :variant="getTraitVariant(trait)">
+              <span>{{ trait.name }}</span>
 
-        <button class="close ml-0" @click="close()">×</button>
-      </template>
-      <b-form @submit.prevent="onSubmit" id="settings-form">
-        <b-row>
-          <b-col cols=12 lg=6>
-            <!-- Field layout rows -->
-            <b-form-group label-for="rows" :description="$t('formDescriptionSettingsRow')" >
-              <template v-slot:label>
-                <BIconLayoutThreeColumns rotate="90" /><span> {{ $t('formLabelSettingsRows') }}</span>
-              </template>
-              <b-form-input id="rows" :state="state.rows" number type="number" :min="1" required autofocus v-model.number="rows" />
-            </b-form-group>
-            <!-- Field layout cols -->
-            <b-form-group label-for="cols" :description="$t('formDescriptionSettingsCol')">
-              <template v-slot:label>
-                <BIconLayoutThreeColumns /><span> {{ $t('formLabelSettingsCols') }}</span>
-              </template>
-              <b-form-input id="cols" :state="state.cols" number type="number" :min="1" required v-model.number="cols" />
-            </b-form-group>
-            <!-- Field layout varieties -->
-            <b-form-group label-for="varieties">
-              <!-- Variety label -->
-              <template v-slot:label>
-                <BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span>
-                <!-- Tooltip for the variety label info icon -->
-                <b-tooltip target="variety-label">
-                  <div>{{ $t('tooltipSettingsVarieties') }}</div>
-                  <div><b-img fluid src="img/variety-order.svg" width=75 height=75 /></div>
-                </b-tooltip>
-              </template>
-              <!-- Variety names input -->
-              <b-form-textarea id="varieties" :state="state.varieties" rows=6 required :placeholder="$t('formPlaceholderVarieties')" v-model="varieties" />
-              <!-- Variety names file loading -->
-              <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="varietiesFile" />
-            </b-form-group>
-          </b-col>
-          <b-col cols=12 lg=6>
-            <!-- Trait definitions -->
-            <b-list-group v-if="newTraits && newTraits.length > 0" class="mb-3 trait-list">
-              <b-list-group-item v-for="(trait, index) in newTraits" :key="`trait-${index}`" class="d-flex justify-content-between align-items-center" :variant="getTraitVariant(trait)">
-                <span>{{ trait.name }}</span>
+              <!-- Trait data type selection -->
+              <b-input-group class="trait-type-select">
+                <b-form-select v-model="trait.type" :options="traitTypes" />
 
-                <!-- Trait data type selection -->
-                <b-input-group class="trait-type-select">
-                  <b-form-select v-model="trait.type" :options="traitTypes" />
-
-                  <template v-slot:append>
-                    <b-button-group>
-                      <!-- Configuration button for numeric and categorical traits -->
-                      <b-button variant="info" :title="$t('buttonConfigure')" @click="configureTrait(index)" v-if="trait.type === 'int' || trait.type === 'float' || trait.type === 'categorical'"><BIconGear /></b-button>
-                      <!-- Delete trait -->
-                      <b-button variant="danger" :title="$t('buttonDelete')" @click="newTraits.splice(index, 1)"><BIconX /></b-button>
-                    </b-button-group>
-                  </template>
-                </b-input-group>
-              </b-list-group-item>
-            </b-list-group>
-            <b-form-group label-for="trait" :description="$t('formDescriptionSettingsTraits')">
-              <template v-slot:label>
-                <BIconTags /><span> {{ $t('formLabelSettingsTraits') }}</span>
-              </template>
-              <b-input-group>
-                <!-- New trait name -->
-                <b-form-input id="trait" :state="state.traits" ref="traitName" required v-model="trait" v-on:keyup.enter="addTrait" />
                 <template v-slot:append>
-                  <b-button variant="success" :title="$t('buttonAdd')" @click="addTrait"><BIconPlus /></b-button>
+                  <b-button-group>
+                    <!-- Configuration button for numeric and categorical traits -->
+                    <b-button variant="info" :title="$t('buttonConfigure')" @click="configureTrait(index)" v-if="trait.type === 'int' || trait.type === 'float' || trait.type === 'categorical'"><BIconGear /></b-button>
+                    <!-- Delete trait -->
+                    <b-button variant="danger" :title="$t('buttonDelete')" @click="newTraits.splice(index, 1)"><BIconX /></b-button>
+                  </b-button-group>
                 </template>
               </b-input-group>
-            </b-form-group>
+            </b-list-group-item>
+          </b-list-group>
+          <b-form-group label-for="trait" :description="$t('formDescriptionSettingsTraits')">
+            <template v-slot:label>
+              <BIconTags /><span> {{ $t('formLabelSettingsTraits') }}</span>
+            </template>
+            <b-input-group>
+              <!-- New trait name -->
+              <b-form-input id="trait" :state="state.traits" ref="traitName" required v-model="trait" v-on:keyup.enter="addTrait" />
+              <template v-slot:append>
+                <b-button variant="success" :title="$t('buttonAdd')" @click="addTrait"><BIconPlus /></b-button>
+              </template>
+            </b-input-group>
+          </b-form-group>
 
-            <!-- Trait BrAPI import -->
-            <b-button @click="$refs.brapiTraitImportModal.show()"><IconBrapi /> {{ $t('buttonBrapiTraitImport') }}</b-button>
-          </b-col>
-        </b-row>
-        <!-- Map used for defining the field's corner points -->
-        <b-button v-b-toggle.collapse-1 variant="primary"><BIconBoundingBox /> {{ $t('buttonShowFieldMap') }}</b-button>
-        <b-collapse id="collapse-1" class="mt-2" v-model="mapVisible" @shown="invalidateMap">
-          <FieldMap :rows="rows" :cols="cols" ref="map" />
-        </b-collapse>
-      </b-form>
-    </b-modal>
+          <!-- Trait BrAPI import -->
+          <b-button @click="$refs.brapiTraitImportModal.show()"><IconBrapi /> {{ $t('buttonBrapiTraitImport') }}</b-button>
+        </b-col>
+      </b-row>
+      <!-- Map used for defining the field's corner points -->
+      <b-button v-b-toggle.collapse-1><BIconBoundingBox /> {{ $t('buttonShowFieldMap') }}</b-button>
+      <b-collapse id="collapse-1" class="mt-2" v-model="mapVisible" @shown="invalidateMap">
+        <FieldMap :rows="rows" :cols="cols" ref="map" />
+      </b-collapse>
+    </b-form>
+
+    <b-button @click="onSubmit" variant="primary" class="mt-3">{{ $t('buttonSave') }}</b-button>
 
     <!-- Modal to show json import/export -->
     <JsonExportModal ref="exportModal" />
-    <JsonImportModal v-on:dataset-changed="hide" ref="importModal" />
+    <JsonImportModal v-on:dataset-changed="$router.push({ name: 'home' })" ref="importModal" />
     <!-- Modal to show configuration options for a selected trait -->
     <TraitConfigurationModal :trait="traitToConfigure" v-on:config-changed="updateTraitConfig" ref="traitConfigModal" />
     <!-- Modal for trait import via BrAPI -->
     <BrapiTraitImportModal ref="brapiTraitImportModal" @traits-selected="loadBrapiTraits" />
-  </div>
+  </b-container>
 </template>
 
 <script>
@@ -118,7 +108,9 @@ import JsonExportModal from '@/components/modals/JsonExportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
 import IconBrapi from '@/components/IconBrapi'
 
-import { BIconGear, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconTags, BIconBoundingBox, BIconInfoCircle } from 'bootstrap-vue'
+import { BIconGear, BIconArrowLeft, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconTags, BIconBoundingBox, BIconInfoCircle } from 'bootstrap-vue'
+
+import { mapGetters } from 'vuex'
 
 /**
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
@@ -166,9 +158,16 @@ export default {
       }
     }
   },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeData'
+    ])
+  },
   components: {
     BIconGear,
     BIconPlus,
+    BIconArrowLeft,
     BIconX,
     BIconLayoutThreeColumns,
     BIconTextLeft,
@@ -314,11 +313,11 @@ export default {
      * Resets the modal state based on the current configuration of the dataset
      */
     reset: function () {
-      this.rows = this.dataset.rows
-      this.cols = this.dataset.cols
-      this.newTraits = JSON.parse(JSON.stringify(this.dataset.traits))
+      this.rows = this.storeRows
+      this.cols = this.storeCols
+      this.newTraits = JSON.parse(JSON.stringify(this.storeTraits))
       let varieties = []
-      this.dataset.data.forEach(r => {
+      this.storeData.forEach(r => {
         for (let c = 0; c < this.cols; c++) {
           varieties.push(r[c].name)
         }
@@ -344,22 +343,9 @@ export default {
       }).then(value => {
         if (value === true) {
           this.$store.commit('ON_DATASET_CHANGED', require('@/example-data.json'))
-          this.hide()
+          this.$router.push({ name: 'home' })
         }
       })
-    },
-    /**
-     * Shows the resets modal dialog
-     */
-    show: function () {
-      this.reset()
-      this.$refs.setupModal.show()
-    },
-    /**
-     * Hides the modal dialog
-     */
-    hide: function () {
-      this.$refs.setupModal.hide()
     },
     /**
      * Submit the result and re-create the current dataset with the new configuration.
@@ -396,12 +382,15 @@ export default {
               varieties: this.varieties.split('\n'),
               cornerPoints: this.$refs.map.getCornerPoints()
             })
-            // Hide the modal
-            this.hide()
+
+            this.$router.push({ name: 'home' })
           }
         })
       }
     }
+  },
+  mounted: function () {
+    this.reset()
   }
 }
 </script>

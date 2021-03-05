@@ -1,4 +1,5 @@
 import { mapGetters } from 'vuex'
+import store from '@/store'
 
 const axios = require('axios').default
 
@@ -6,20 +7,23 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'brapiConfig',
-      'continuousInput',
-      'dataset',
-      'firstRun',
-      'geolocation',
-      'gridLinesEvery',
-      'invertView',
-      'invertNumberingX',
-      'invertNumberingY',
-      'locale',
-      'serverUrl',
-      'traitColors',
-      'useGps',
-      'useSpeech'
+      'storeBrapiConfig',
+      'storeColumnWidth',
+      'storeCols',
+      'storeContinuousInput',
+      'storeCornerPoints',
+      'storeGeolocation',
+      'storeGridLinesEvery',
+      'storeInvertView',
+      'storeInvertNumberingX',
+      'storeInvertNumberingY',
+      'storeLocale',
+      'storeRows',
+      'storeServerUrl',
+      'storeTraitColors',
+      'storeTraits',
+      'storeUseGps',
+      'storeUseSpeech'
     ])
   },
   methods: {
@@ -29,7 +33,7 @@ export default {
      * @returns Promise
      */
     postConfigForSharing: function () {
-      return this.axios('config', this.dataset, 'post')
+      return this.axios('config', store.getters.storeDataset, 'post')
     },
     /**
      * Retrieves a dataset configuration from the server using a given UUID.
@@ -60,7 +64,7 @@ export default {
       }
 
       return axios({
-        baseURL: this.serverUrl,
+        baseURL: this.storeServerUrl,
         url: url,
         params: requestParams,
         data: requestData,

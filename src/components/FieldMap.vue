@@ -56,7 +56,7 @@ export default {
     }
   },
   watch: {
-    'dataset.cornerPoints': function (newValue) {
+    storeCornerPoints: function () {
       // Watch changes to the dataset's corner points
       this.refresh()
     }
@@ -101,8 +101,8 @@ export default {
      * Refreshes the local variables based on the dataset corner points
      */
     refresh: function () {
-      if (this.dataset && this.dataset.cornerPoints && this.dataset.cornerPoints.length === 4) {
-        this.locations = this.dataset.cornerPoints.map(l => [l[0], l[1]])
+      if (this.storeCornerPoints && this.storeCornerPoints.length === 4) {
+        this.locations = this.storeCornerPoints.map(l => [l[0], l[1]])
       }
     }
   },

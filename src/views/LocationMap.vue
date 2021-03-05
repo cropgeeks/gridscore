@@ -11,7 +11,7 @@
         <LControl>
           <b-button v-b-tooltip="$t('tooltipDefineFieldLayout')" variant="light" @click="$refs.fieldLayoutModal.show()"><BIconBoundingBox /></b-button>
         </LControl>
-        <LMarker v-if="geolocation" :latLng="geolocation">
+        <LMarker v-if="storeGeolocation" :latLng="storeGeolocation">
           <LIcon :icon-anchor="[20, 40]">
             <BIconGeoFill variant="danger" :style="{ width: '40px', height: '40px'}" />
           </LIcon>
@@ -43,6 +43,8 @@ import { LMap, LControl, LPolygon, LPolyline, LMarker, LIcon } from 'vue2-leafle
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
+import { mapGetters } from 'vuex'
+
 const fixPer = require('fix-perspective')
 
 export default {
@@ -65,10 +67,14 @@ export default {
     }
   },
   computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeData'
+    ]),
     selectedLocationData: function () {
       let result = {}
 
-      this.dataset.traits.forEach((t, i) => {
+      this.storeTraits.forEach((t, i) => {
         if (this.selectedLocation.values[i] !== null) {
           result[t.name] = {
             value: this.selectedLocation.values[i],
@@ -81,9 +87,9 @@ export default {
     },
     /** The corner points of the field */
     corners: function () {
-      if (this.dataset && this.dataset.cornerPoints && this.dataset.cornerPoints.length === 4) {
+      if (this.storeCornerPoints && this.storeCornerPoints.length === 4) {
         // Convert locations to latLngs
-        return this.dataset.cornerPoints.filter(l => l !== null).map(l => L.latLng(l[0], l[1]))
+        return this.storeCornerPoints.filter(l => l !== null).map(l => L.latLng(l[0], l[1]))
       } else {
         return null
       }
@@ -92,8 +98,8 @@ export default {
     locations: function () {
       let locs = []
 
-      if (this.dataset && this.dataset.data) {
-        this.dataset.data.forEach(row => {
+      if (this.storeData) {
+        this.storeData.forEach(row => {
           row.forEach(c => {
             if (c.geolocation) {
               locs.push(L.latLng(c.geolocation.lat, c.geolocation.lng))
@@ -106,8 +112,8 @@ export default {
     },
     /** The reversed perspective projection used to draw the lines */
     reverseProjection: function () {
-      if (this.dataset.cornerPoints) {
-        const to = this.dataset.cornerPoints.filter(l => l !== null).map(l => { return { x: l[0], y: l[1] } })
+      if (this.storeCornerPoints) {
+        const to = this.storeCornerPoints.filter(l => l !== null).map(l => { return { x: l[0], y: l[1] } })
 
         if (to.length === 4) {
           const from = [
@@ -129,17 +135,17 @@ export default {
       let lines = []
       if (this.reverseProjection) {
         // The vertical lines
-        for (let x = 1; x < this.dataset.cols; x++) {
-          const start = this.reverseProjection((100.0 / this.dataset.cols) * x, 0)
-          const end = this.reverseProjection((100.0 / this.dataset.cols) * x, 100)
+        for (let x = 1; x < this.storeCols; x++) {
+          const start = this.reverseProjection((100.0 / this.storeCols) * x, 0)
+          const end = this.reverseProjection((100.0 / this.storeCols) * x, 100)
           if (!isNaN(start.x) && !isNaN(start.y) && !isNaN(end.x) && !isNaN(end.y)) {
             lines.push([L.latLng(start.x, start.y), L.latLng(end.x, end.y)])
           }
         }
         // The horizontal lines
-        for (let y = 1; y < this.dataset.rows; y++) {
-          const start = this.reverseProjection(0, (100.0 / this.dataset.rows) * y)
-          const end = this.reverseProjection(100, (100.0 / this.dataset.rows) * y)
+        for (let y = 1; y < this.storeRows; y++) {
+          const start = this.reverseProjection(0, (100.0 / this.storeRows) * y)
+          const end = this.reverseProjection(100, (100.0 / this.storeRows) * y)
           if (!isNaN(start.x) && !isNaN(start.y) && !isNaN(end.x) && !isNaN(end.y)) {
             lines.push([L.latLng(start.x, start.y), L.latLng(end.x, end.y)])
           }
@@ -154,11 +160,11 @@ export default {
       if (this.locations) {
         this.locations.forEach(l => b.extend(l))
       }
-      if (this.dataset.cornerPoints) {
-        this.dataset.cornerPoints.filter(l => l !== null).forEach(c => b.extend(L.latLng(c[0], c[1])))
+      if (this.storeCornerPoints) {
+        this.storeCornerPoints.filter(l => l !== null).forEach(c => b.extend(L.latLng(c[0], c[1])))
       }
-      // if (this.geolocation) {
-      //   b.extend(this.geolocation)
+      // if (this.storeGeolocation) {
+      //   b.extend(this.storeGeolocation)
       // }
 
       if (b.isValid()) {
@@ -202,9 +208,9 @@ export default {
       this.$nextTick(() => window.scrollTo(0, document.body.scrollHeight))
     },
     updateMarkers: function () {
-      if (this.dataset && this.dataset.data) {
+      if (this.storeData) {
         const map = this.$refs.locationMap.mapObject
-        this.dataset.data.forEach(row => {
+        this.storeData.forEach(row => {
           row.forEach(c => {
             if (c.geolocation) {
               let marker = L.marker(L.latLng(c.geolocation.lat, c.geolocation.lng)).bindPopup('')

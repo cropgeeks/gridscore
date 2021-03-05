@@ -33,6 +33,21 @@ const router = new Router({
       component: () => import('@/views/LocationMap')
     },
     {
+      path: '/setup',
+      name: 'setup',
+      component: () => import('@/views/Setup')
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: () => import('@/views/Settings')
+    },
+    {
+      path: '/export',
+      name: 'export',
+      component: () => import('@/views/Export')
+    },
+    {
       path: '/about',
       name: 'about',
       component: () => import('@/views/About')

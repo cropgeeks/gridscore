@@ -98,7 +98,7 @@ export default {
     }
   },
   mounted: function () {
-    loadLanguageAsync(this.locale)
+    loadLanguageAsync(this.storeLocale)
     this.startGeoTracking()
   },
   destroyed: function () {

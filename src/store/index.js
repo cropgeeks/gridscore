@@ -14,6 +14,7 @@ if (!name) {
 
 const dataset = {
   cols: 1,
+  cornerPoints: [],
   rows: 1,
   traits: [],
   data: [],
@@ -24,6 +25,7 @@ const storeState = {
   state: {
     locale: 'en_GB',
     datasetIndex: 0,
+    columnWidth: 300,
     datasets: [dataset],
     serverUrl: null,
     useGps: true,
@@ -37,27 +39,32 @@ const storeState = {
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
   },
   getters: {
-    brapiConfig: (state) => state.datasets[state.datasetIndex].brapiConfig,
-    dataset: (state) => state.datasets[state.datasetIndex],
-    useGps: (state) => state.useGps,
-    useSpeech: (state) => state.useSpeech,
-    continuousInput: (state) => state.continuousInput,
-    firstRun: (state) => {
-      const ds = state.datasets[state.datasetIndex]
-      return state.datasets.length < 2 && (ds === null || ds.data === null || ds.data.length < 1)
-    },
-    serverUrl: (state) => state.serverUrl,
-    locale: (state) => state.locale,
-    gridLinesEvery: (state) => state.gridLinesEvery,
-    geolocation: (state) => state.geolocation,
-    invertView: (state) => state.invertView,
-    invertNumberingX: (state) => state.invertNumberingX,
-    invertNumberingY: (state) => state.invertNumberingY,
-    traitColors: (state) => state.traitColors
+    storeBrapiConfig: (state) => state.datasets[state.datasetIndex].brapiConfig,
+    storeColumnWidth: (state) => state.columnWidth,
+    storeData: (state) => state.datasets[state.datasetIndex].data,
+    storeDataset: (state) => state.datasets[state.datasetIndex],
+    storeCols: (state) => state.datasets[state.datasetIndex].cols,
+    storeCornerPoints: (state) => state.datasets[state.datasetIndex].cornerPoints,
+    storeRows: (state) => state.datasets[state.datasetIndex].rows,
+    storeTraits: (state) => state.datasets[state.datasetIndex].traits,
+    storeUseGps: (state) => state.useGps,
+    storeUseSpeech: (state) => state.useSpeech,
+    storeContinuousInput: (state) => state.continuousInput,
+    storeServerUrl: (state) => state.serverUrl,
+    storeLocale: (state) => state.locale,
+    storeGridLinesEvery: (state) => state.gridLinesEvery,
+    storeGeolocation: (state) => state.geolocation,
+    storeInvertView: (state) => state.invertView,
+    storeInvertNumberingX: (state) => state.invertNumberingX,
+    storeInvertNumberingY: (state) => state.invertNumberingY,
+    storeTraitColors: (state) => state.traitColors
   },
   mutations: {
     ON_DATASET_INDEX_CHANGED_MUTATION: function (state, newDatasetIndex) {
       state.datasetIndex = newDatasetIndex
+    },
+    ON_COLUMN_WIDTH_CHANGED_MUTATION: function (state, newColumnWidth) {
+      state.columnWidth = newColumnWidth
     },
     ON_COLS_CHANGED_MUTATION: function (state, newCols) {
       state.datasets[state.datasetIndex].cols = newCols
@@ -147,6 +154,9 @@ const storeState = {
   actions: {
     setDatasetIndex: function ({ commit }, datasetIndex) {
       commit('ON_DATASET_INDEX_CHANGED_MUTATION', datasetIndex)
+    },
+    setColumnWidth: function ({ commit }, columnWidth) {
+      commit('ON_COLUMN_WIDTH_CHANGED_MUTATION', columnWidth)
     },
     setCols: function ({ commit }, cols) {
       commit('ON_COLS_CHANGED_MUTATION', cols)
