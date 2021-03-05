@@ -75,8 +75,7 @@ export default {
   },
   data: function () {
     return {
-      markedColumns: [],
-      dataCopy: null
+      markedColumns: []
     }
   },
   watch: {
@@ -178,9 +177,6 @@ export default {
     }
   },
   mounted: function () {
-    const tempCopy = JSON.parse(JSON.stringify(this.dataset.data))
-    Object.freeze(tempCopy)
-    this.dataCopy = tempCopy
     this.updateMarkedColumns()
   }
 }

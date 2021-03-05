@@ -364,7 +364,7 @@ export default {
     /**
      * Submit the result and re-create the current dataset with the new configuration.
      */
-    onSubmit: function (e) {
+    onSubmit: function () {
       // Validate the form
       this.formValidated = true
       this.state = {
