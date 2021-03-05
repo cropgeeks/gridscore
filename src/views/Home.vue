@@ -25,10 +25,9 @@
     </div>
 
     <GridTableLite v-on:cell-clicked="onCellClicked" :visibleTraits="visibleTraits" :highlightPosition="userPosition" v-if="dataset && dataset.traits && dataset.traits.length > 0" />
-    <h3 class="ml-3 mt-3" v-else><BIconArrowUpCircleFill /> {{ $t('labelHomeIntro') }}</h3>
-
-    <!-- <GridTable v-on:cell-clicked="onCellClicked" v-if="dataset && dataset.traits && dataset.traits.length > 0" :visibleTraits="visibleTraits" :highlightPosition="userPosition" />
-    <h3 class="ml-3 mt-3" v-else><BIconArrowUpCircleFill /> {{ $t('labelHomeIntro') }}</h3> -->
+    <div v-else>
+      <h3 class="ml-3 mt-3"><BIconArrowUpCircleFill /> {{ $t('labelHomeIntro') }} Alternatively, <b-button @click="loadExampleData">{{ $t('buttonLoadExampleData') }}</b-button></h3>
+    </div>
 
     <ExportModal ref="exportModal" />
     <SetupModal ref="setupModal" v-on:settings-changed="onSettingsChanged" />
@@ -123,6 +122,9 @@ export default {
     }
   },
   methods: {
+    loadExampleData: function () {
+      this.$store.commit('ON_DATASET_CHANGED', require('@/example-data.json'))
+    },
     openDataInput: function () {
       if (this.searchTermLowerCase === null) {
         return

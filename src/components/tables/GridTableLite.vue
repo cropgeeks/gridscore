@@ -14,13 +14,13 @@
           <th></th>
         </tr>
       </thead>
-      <tbody role="rowgroup">
+      <!-- Handle click events -->
+      <tbody role="rowgroup" v-on:click="onTableClick">
         <tr role="row" v-for="(row, rowIndex) in dataset.data" :key="`table-row-${rowIndex}`">
           <th role="rowheader" class="text-right" v-if="invertNumberingY">{{ dataset.rows - rowIndex }}</th>
           <th role="rowheader" class="text-right" v-else>{{ rowIndex + 1 }}</th>
-          <td role="cell" :class="`text-center ${cellClasses[rowIndex][columnIndex]}`" v-for="(cell, columnIndex) in row" :key="`table-cell-${rowIndex}-${columnIndex}`">
-            <!-- Handle click events -->
-            <div v-on:click="onClick(rowIndex, columnIndex)" :class="borderStyles[rowIndex][columnIndex]">
+          <td role="cell" :class="`text-center ${cellClasses[`${rowIndex},${columnIndex}`]}`" v-for="(cell, columnIndex) in row" :key="`table-cell-${rowIndex}-${columnIndex}`" :id="`${rowIndex}-${columnIndex}`">
+            <div>
               <!-- Variety name -->
               <span class="d-block grid-cell-name" v-if="cell.name">
                 <span>{{cell.name }}</span>
@@ -95,21 +95,24 @@ export default {
       return result
     },
     cellClasses: function () {
-      let result = []
+      const result = {}
 
       for (let row = 0; row < this.dataset.data.length; row++) {
-        let rowData = []
-
         for (let col = 0; col < this.dataset.cols; col++) {
-          let result = this.markedColumns[col] ? 'table-primary' : ''
+          let clazz = ''
 
-          if (!result) {
-            result = col % 2 !== 1 ? 'table-active' : ''
+          if (this.dataset.data[row][col].comment && this.dataset.data[row][col].comment.length > 0) {
+            clazz = 'table-warning'
+          } else if (this.markedColumns[col]) {
+            clazz = 'table-primary'
+          } else if (col % 2 !== 1) {
+            clazz = 'table-active'
           }
 
-          rowData.push(result)
+          if (clazz && clazz.length > 0) {
+            result[`${row},${col}`] = clazz
+          }
         }
-        result.push(rowData)
       }
 
       return result
@@ -136,63 +139,25 @@ export default {
       } else {
         return null
       }
-    },
-    borderStyles: function () {
-      let result = []
-
-      for (let row = 0; row < this.dataset.data.length; row++) {
-        let rowData = []
-
-        for (let col = 0; col < this.dataset.cols; col++) {
-          let theClasses = ''
-
-          // If the user position in the field is known
-          if (this.useGps && this.highlightRow !== null && this.highlightCol !== null) {
-            if ((row === this.highlightRow) && (col === this.highlightCol)) {
-              // If this is the cell the user is located in, highlight it green
-              theClasses += 'table-success'
-            } else {
-              // Otherwise, compute the row and column the user is in (restricted to the field, so if the user is outside the field, this will compute the closest row and col)
-              const rowWithinBounds = Math.max(0, Math.min(this.dataset.rows - 1, this.highlightRow))
-              const colWithinBounds = Math.max(0, Math.min(this.dataset.cols - 1, this.highlightCol))
-
-              // If we're the first row and the user is in the first row and the user is in the same column, indicate the user is above
-              if (row === 0 && rowWithinBounds === 0 && col === colWithinBounds) {
-                theClasses += ' gps-border-top'
-              }
-              // If we're the last row and the user is in the last row and the user is in the same column, indicate the user is below
-              if (row === this.dataset.rows - 1 && rowWithinBounds === this.dataset.rows - 1 && col === colWithinBounds) {
-                theClasses += ' gps-border-bottom'
-              }
-              // If we're the first column and the user is in the first column and the user is in the same row, indicate the user is to the left
-              if (col === 0 && colWithinBounds === 0 && row === rowWithinBounds) {
-                theClasses += ' gps-border-left'
-              }
-              // If we're the last column and the user is in the last column and the user is in the same row, indicate the user is to the right
-              if (col === this.dataset.cols - 1 && colWithinBounds === this.dataset.cols - 1 && row === rowWithinBounds) {
-                theClasses += ' gps-border-right'
-              }
-            }
-          }
-
-          // Else, check if there's a comment, then show warning colour
-          if ((this.dataset.data && this.dataset.data[row] && this.dataset.data[row][col]) && this.dataset.data[row][col].comment && this.dataset.data[row][col].comment.length > 0) {
-            theClasses += ' table-warning'
-          }
-
-          rowData.push(theClasses)
-        }
-
-        result.push(rowData)
-      }
-
-      return result
     }
   },
   methods: {
     /** Mark the column on user click */
     onHeadClicked: function (column) {
       Vue.set(this.markedColumns, column, !this.markedColumns[column])
+    },
+    onTableClick: function (event) {
+      const target = event.target.closest('td')
+
+      if (target) {
+        const [row, col] = target.id.split('-')
+
+        /** Emit an event to handle user selections */
+        this.$emit('cell-clicked', {
+          row: +row,
+          col: +col
+        })
+      }
     },
     /** Handle cell click events */
     onClick: function (row, col) {

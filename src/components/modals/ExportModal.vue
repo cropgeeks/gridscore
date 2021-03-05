@@ -20,7 +20,9 @@
         <!-- Toggle for showing dates -->
         <b-form-checkbox class="mb-2" switch v-model="showDates">{{ $t('labelCheckboxExportUseDates') }}</b-form-checkbox>
         <!-- Link to actually download the data -->
-        <BIconDownload /> <a :href="getHrefData" :download="getFilenameData" v-if="text && (text !== $t('labelNoData'))"> {{ $t('linkExport') }}</a>
+        <div v-if="text && (text !== $t('labelNoData'))">
+          <BIconDownload /> <a :href="getHrefData" :download="getFilenameData"> {{ $t('linkExport') }}</a>
+        </div>
       </b-tab>
       <!-- Tab for the trait definitions -->
       <b-tab :title="$t('tabTitleExportTraits')">
@@ -31,7 +33,9 @@
           <b-form-textarea rows="8" readonly :value="traits" id="exportTraits" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
         </b-form-group>
         <!-- Link to actually download the data -->
-        <BIconDownload /> <a :href="getHrefTraits" :download="getFilenameTraits" v-if="traits && (traits !== $t('labelNoData'))"> {{ $t('linkExport') }}</a>
+        <div v-if="traits && (traits !== $t('labelNoData'))">
+          <BIconDownload /> <a :href="getHrefTraits" :download="getFilenameTraits"> {{ $t('linkExport') }}</a>
+        </div>
       </b-tab>
     </b-tabs>
   </b-modal>
@@ -64,7 +68,7 @@ export default {
     },
     traits: function () {
       if (!this.dataset || !this.dataset.traits || this.dataset.traits.length < 1) {
-        return
+        return this.$t('labelNoData')
       }
 
       // Header row

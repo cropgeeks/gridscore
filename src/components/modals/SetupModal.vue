@@ -120,8 +120,6 @@ import IconBrapi from '@/components/IconBrapi'
 
 import { BIconGear, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconTags, BIconBoundingBox, BIconInfoCircle } from 'bootstrap-vue'
 
-import exampleData from '@/example-data.json'
-
 /**
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
  */
@@ -338,21 +336,6 @@ export default {
       this.mapVisible = false
     },
     loadExampleData: function () {
-      // this.reset()
-
-      // this.rows = exampleData.rows
-      // this.cols = exampleData.cols
-      // this.newTraits = JSON.parse(JSON.stringify(exampleData.traits))
-      // let varieties = []
-      // exampleData.data.forEach(r => {
-      //   for (let c = 1; c <= this.cols; c++) {
-      //     varieties.push(r[c].name)
-      //   }
-      // })
-      // this.varieties = varieties.join('\n')
-      // this.$refs.map.setCornerPoints(exampleData.cornerPoints)
-      // this.mapVisible = true
-
       // Ask for confirmation
       this.$bvModal.msgBoxConfirm(this.$t('modalTextSetupWarning'), {
         title: this.$t('modalTitleSetupWarning'),
@@ -360,7 +343,7 @@ export default {
         cancelTitle: this.$t('buttonCancel')
       }).then(value => {
         if (value === true) {
-          this.$store.commit('ON_DATASET_CHANGED', exampleData)
+          this.$store.commit('ON_DATASET_CHANGED', require('@/example-data.json'))
           this.hide()
         }
       })
