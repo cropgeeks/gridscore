@@ -219,18 +219,6 @@ export default {
 .grid-table td > div > span:empty::after{
   content: "\00a0";
 }
-.grid-table .gps-border-top {
-  border-top: 5px solid var(--success);
-}
-.grid-table .gps-border-left {
-  border-left: 5px solid var(--success);
-}
-.grid-table .gps-border-right {
-  border-right: 5px solid var(--success);
-}
-.grid-table .gps-border-bottom {
-  border-bottom: 5px solid var(--success);
-}
 .grid-table .grid-cell-name {
   white-space: nowrap;
   overflow: hidden;

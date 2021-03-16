@@ -4,7 +4,7 @@
     <hr />
     <b-form @submit.prevent="onSubmit" class="settings-form">
       <b-row>
-        <b-col>
+        <b-col cols=12 md=6>
           <h2>{{ $t('pageSettingsGeneralTitle') }}</h2>
           <b-form-group :label="$t('formLabelSettingsGps')" label-for="use-gps">
             <b-form-checkbox v-model="tempUseGps" switch id="use-gps">{{ $t('buttonToggleGps') }}</b-form-checkbox>
@@ -36,7 +36,7 @@
             </b-form-group>
           </div>
         </b-col>
-        <b-col>
+        <b-col cols=12 md=6>
           <h2>{{ $t('pageSettingsVisualTitle') }}</h2>
           <b-form-group :label="$t('formLabelSettingsInvertView')" label-for="invert-view" :description="$t('formDescriptionSettingsInvertView')">
             <b-form-checkbox v-model="tempInvertView" switch id="invert-view">{{ $t('buttonToggleInvertView') }}</b-form-checkbox>
