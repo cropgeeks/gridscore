@@ -1,5 +1,5 @@
 <template>
-  <h4 id="user-position" class="position-absolute no-user-select" :style="{ left: userLeft, top: userTop, transform: userRotate, opacity: 0.75, margin: 0, padding: 0 }" v-if="userLeft && userTop">
+  <h4 id="user-position" class="position-absolute no-user-select" :style="{ left: userLeft, top: userTop, transform: userRotate, opacity: 0.75, margin: 0, padding: 0 }" v-show="userLeft && userTop">
     <template v-if="position !== null && position.heading !== undefined && position.heading !== null"><BIconCursorFill /></template>
     <template v-else><BIconBullseye /></template>
   </h4>
@@ -64,21 +64,21 @@ export default {
         }
         // Get the widths of the table, the top left cell and the bottom right cell
         const tableWidth = document.querySelector(`#${this.tableId} .table`).offsetWidth
-        const topLeftWidth = document.querySelector(`#${this.tableId} .table thead tr th:first-child`).offsetWidth
-        const bottomRightWidth = document.querySelector(`#${this.tableId} .table tfoot tr th:last-child`).offsetWidth
+        const firstColWidth = document.querySelector(`#${this.tableId} .table thead tr th:first-child`).offsetWidth
+        const lastColWidth = document.querySelector(`#${this.tableId} .table tfoot tr th:last-child`).offsetWidth
         const iconWidth = document.querySelector(`#${this.tableId} #user-position`).offsetWidth
 
         // Calculate the percentage position within just the body of the table (without first and last column), then add the first column width and subtract half the height of the icon to center it
-        this.userLeft = `${topLeftWidth + (tableWidth - topLeftWidth - bottomRightWidth) * this.position.x / 100 - iconWidth / 2}px`
+        this.userLeft = `${firstColWidth + (tableWidth - firstColWidth - lastColWidth) * this.position.x / 100 - iconWidth / 2}px`
 
         // Get the heights of the table, the top left cell and the bottom right cell
         const tableHeight = document.querySelector(`#${this.tableId} .table`).offsetHeight
-        const topLeftHeight = document.querySelector(`#${this.tableId} .table thead tr th:first-child`).offsetHeight
-        const bottomRightHeight = document.querySelector(`#${this.tableId} .table tfoot tr th:last-child`).offsetHeight
+        const headerHeight = document.querySelector(`#${this.tableId} .table thead tr th:first-child`).offsetHeight
+        const footerHeight = document.querySelector(`#${this.tableId} .table tfoot tr th:last-child`).offsetHeight
         const iconHeight = document.querySelector(`#${this.tableId} #user-position`).offsetHeight
 
         // Calculate the percentage position within just the body of the table (without first and last row), then add the first row height and substract half the width of the icon to center it
-        this.userTop = `${topLeftHeight + (tableHeight - topLeftHeight - bottomRightHeight) * (100 - this.position.y) / 100 - iconHeight / 2}px`
+        this.userTop = `${headerHeight + (tableHeight - headerHeight - footerHeight) * (100 - this.position.y) / 100 - iconHeight / 2}px`
       } else {
         this.userLeft = null
         this.userTop = null

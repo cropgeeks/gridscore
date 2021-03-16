@@ -13,6 +13,11 @@ const router = new Router({
       component: () => import('@/views/Home')
     },
     {
+      path: '/dataset/:datasetId',
+      name: 'dataset',
+      component: () => import('@/views/DataView')
+    },
+    {
       path: '/uuid-import/:uuid',
       name: 'uuid-import',
       component: () => import('@/views/UuidImport')
@@ -36,6 +41,11 @@ const router = new Router({
       path: '/setup',
       name: 'setup',
       component: () => import('@/views/Setup')
+    },
+    {
+      path: '/share',
+      name: 'share',
+      component: () => import('@/views/Share')
     },
     {
       path: '/settings',

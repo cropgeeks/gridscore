@@ -53,6 +53,10 @@ export default {
     cols: {
       type: Number,
       default: 1
+    },
+    useCurrentDataset: {
+      type: Boolean,
+      default: true
     }
   },
   watch: {
@@ -101,7 +105,7 @@ export default {
      * Refreshes the local variables based on the dataset corner points
      */
     refresh: function () {
-      if (this.storeCornerPoints && this.storeCornerPoints.length === 4) {
+      if (this.useCurrentDataset && this.storeCornerPoints && this.storeCornerPoints.length === 4) {
         this.locations = this.storeCornerPoints.map(l => [l[0], l[1]])
       }
     }

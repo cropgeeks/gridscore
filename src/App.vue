@@ -1,6 +1,7 @@
 <template>
   <div>
-    <b-navbar toggleable="lg" type="dark" variant="primary">
+    <b-navbar toggleable="lg" type="dark" variant="primary" id="main-navigation">
+      <button v-b-toggle.sidebar variant="outline-light" id="dataset-selector" class="mr-3 navbar-toggler collapsed"><span class="navbar-toggler-icon" /></button>
       <b-navbar-brand :to="{ name: 'home' }" class="d-flex align-items-center">
         <img src="img/gridscore2.svg" height="40px" class="d-inline-block align-top mr-3" alt="GridScore">
         GridScore
@@ -32,17 +33,38 @@
       </b-collapse>
     </b-navbar>
 
+    <b-sidebar id="sidebar" title="GridScore" shadow backdrop v-model="sidebarShown" @shown="notifyCaller" @hidden="notifyCaller">
+      <b-img fluid class="py-4 mx-auto d-block" src="img/gridscore2.svg" />
+
+      <template>
+        <h2 class="px-3">{{ $t('widgetSidebarTitle') }}</h2>
+        <b-list-group class="rounded-0">
+          <b-list-group-item :variant="dataset.id === storeDatasetId ? 'primary' : 'null'" button class="d-flex justify-content-between align-items-center" v-for="dataset in datasets" :key="`dataset-${dataset.id}`" @click="onDatasetSelected(dataset.id)">
+            {{ dataset.id }} - {{ dataset.name }}<b-badge variant="danger" v-b-tooltip="$t('buttonDelete')" pill @click.prevent.stop="onDatasetDeleteClicked(dataset.id)">&times;</b-badge></b-list-group-item>
+          <b-list-group-item variant="info" button @click="$router.push({ name: 'setup' })"><BIconPlus /> {{ $t('buttonAdd') }}</b-list-group-item>
+        </b-list-group>
+      </template>
+    </b-sidebar>
+
     <!-- The main content -->
     <b-container fluid class="mt-3">
       <router-view :key="$route.path" />
     </b-container>
+
+    <Tour :steps="tourSteps" :resetOnRouterNav="false" :hideBackButton="true" ref="tour" />
   </div>
 </template>
 
 <script>
+import Tour from '@/components/Tour'
+
 import { loadLanguageAsync } from '@/plugins/i18n'
 
-import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconGridFill, BIconInfoCircle, BIconFlag } from 'bootstrap-vue'
+import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconGridFill, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
+
+import { EventBus } from '@/plugins/event-bus'
+
+import idb from '@/plugins/idb'
 
 export default {
   name: 'App',
@@ -52,10 +74,72 @@ export default {
     BIconGraphUp,
     BIconGridFill,
     BIconInfoCircle,
-    BIconFlag
+    BIconFlag,
+    BIconPlus,
+    Tour
   },
   data: function () {
     return {
+      tourSteps: [{
+        title: () => this.$t('tourTitleWelcome'),
+        text: () => this.$t('tourTextWelcome'),
+        target: () => '#main-navigation',
+        position: 'bottom'
+      }, {
+        title: () => this.$t('tourTitleMenu'),
+        text: () => this.$t('tourTextMenu'),
+        target: () => '#main-navigation',
+        position: 'bottom'
+      }, {
+        title: () => this.$t('tourTitleSidebar'),
+        text: () => this.$t('tourTextSidebar'),
+        target: () => '#sidebar',
+        position: 'right',
+        beforeShow: () => new Promise(resolve => this.toggleSidebar({ show: true, done: () => resolve() })),
+        afterShow: () => new Promise(resolve => this.toggleSidebar({ show: false, done: () => resolve() }))
+      }, {
+        title: () => this.$t('tourTitleSetup'),
+        text: () => this.$t('tourTextSetup'),
+        target: () => '#settings-form',
+        position: 'top',
+        beforeShow: () => new Promise(resolve => this.$router.push({ name: 'setup' }).then(() => resolve()))
+      }, {
+        title: () => this.$t('tourTitleSetupDatasetName'),
+        text: () => this.$t('tourTextSetupDatasetName'),
+        target: () => '#settings-form #dataset-name',
+        position: 'bottom'
+      }, {
+        title: () => this.$t('tourTitleSetupRows'),
+        text: () => this.$t('tourTextSetupRows'),
+        target: () => '#settings-form #rows',
+        position: 'bottom'
+      }, {
+        title: () => this.$t('tourTitleSetupCols'),
+        text: () => this.$t('tourTextSetupCols'),
+        target: () => '#settings-form #cols',
+        position: 'bottom'
+      }, {
+        title: () => this.$t('tourTitleSetupGermplasm'),
+        text: () => this.$t('tourTextSetupGermplasm'),
+        target: () => '#settings-form #varieties',
+        position: 'top'
+      }, {
+        title: () => this.$t('tourTitleSetupTraits'),
+        text: () => this.$t('tourTextSetupTraits'),
+        target: () => '#settings-form #trait',
+        position: 'bottom'
+      }, {
+        title: () => this.$t('tourTitleSetupMap'),
+        text: () => this.$t('tourTextSetupMap'),
+        target: () => '#settings-form #map-toggle-button',
+        position: 'top',
+        afterShow: () => new Promise(resolve => this.$router.push({ name: 'home' }).then(() => resolve()))
+      }, {
+        title: () => this.$t('tourTitleConclusion'),
+        text: () => this.$t('tourTextConclusion'),
+        target: () => '#main-navigation',
+        position: 'bottom'
+      }],
       languages: [{
         locale: 'en_GB',
         name: 'British English',
@@ -65,10 +149,32 @@ export default {
         name: 'Deutsch - Deutschland',
         icon: '🇩🇪'
       }],
-      geolocationWatchId: null
+      geolocationWatchId: null,
+      datasets: [],
+      sidebarShown: false,
+      sidebarCaller: null
     }
   },
   methods: {
+    onDatasetSelected: function (datasetId) {
+      if (datasetId !== this.storeDatasetId) {
+        this.$store.dispatch('loadDataset', datasetId)
+        this.$router.push({ name: 'dataset', params: { datasetId: datasetId } })
+      }
+    },
+    onDatasetDeleteClicked: function (datasetId) {
+      this.$bvModal.msgBoxConfirm(this.$t('modalTextDeleteDataset'), {
+          title: this.$t('modalTitleDeleteDataset'),
+          okTitle: this.$t('buttonYes'),
+          okVariant: 'danger',
+          cancelTitle: this.$t('buttonNo')
+        })
+          .then(value => {
+            if (value) {
+              this.$store.dispatch('deleteDataset', datasetId)
+            }
+          })
+    },
     /**
      * When the locale is changed, update the i18n settings
      * @param language The newly selected locale
@@ -95,16 +201,117 @@ export default {
           }, null, options)
         }
       }
+    },
+    fakeGpsMovement: function () {
+      const start = {
+        lat: 56.481662,
+        lng: -3.107443
+      }
+      const end = {
+        lat: 56.481585,
+        lng: -3.110989
+      }
+
+      let counter = 0
+      let steps = 100
+      setTimeout(() => {
+        const wrapper = document.querySelector('#grid-table')
+        const table = document.querySelector('#grid-table .table')
+        if (wrapper && table) {
+          wrapper.scrollTop = table.offsetHeight
+          wrapper.scrollLeft = table.offsetWidth * 0.25
+        }
+
+        const id = setInterval(() => {
+          counter++
+          if (counter === steps) {
+            clearInterval(id)
+          } else {
+            const dLat = start.lat + ((end.lat - start.lat) / steps) * counter
+            const dLng = start.lng + ((end.lng - start.lng) / steps) * counter
+
+            this.$store.dispatch('setGeolocation', {
+              lat: dLat,
+              lng: dLng,
+              elv: 100,
+              heading: 270
+            })
+
+            if (wrapper) {
+              const bottom = table.offsetHeight
+              const wrapperHeight = wrapper.offsetHeight
+              let scrollTop = bottom - (counter / steps) * bottom - wrapperHeight / 2
+
+              wrapper.scroll({
+                top: scrollTop,
+                behavior: 'smooth'
+              })
+            }
+          }
+        }, 10000 / steps)
+      }, 20000)
+    },
+    updateDatasets: function () {
+      idb.getDatasets().then(datasets => {
+        this.datasets = datasets
+      })
+    },
+    loadDataset: function () {
+      if (this.storeDatasetId !== undefined && this.storeDatasetId !== null) {
+        this.$store.dispatch('loadDataset', this.storeDatasetId)
+        this.$router.push({ name: 'dataset', params: { datasetId: this.storeDatasetId } })
+      }
+    },
+    navigateToDataset: function () {
+      const route = this.$router.currentRoute
+      if (route.name !== 'dataset' || (route.params && (route.params.datasetId !== this.storeDatasetId))) {
+        this.$router.push({ name: 'dataset', params: { datasetId: this.storeDatasetId } })
+      }
+    },
+    navigateHome: function () {
+      const route = this.$router.currentRoute
+      if (route.name !== 'home') {
+        this.$router.push({ name: 'home' })
+      }
+    },
+    toggleSidebar: function (data) {
+      this.sidebarShown = data.show
+
+      if (data && data.done) {
+        this.sidebarCaller = data.done
+      }
+    },
+    notifyCaller: function () {
+      if (this.sidebarCaller) {
+        this.sidebarCaller()
+        this.sidebarCaller = null
+      }
+    },
+    showIntroductionTour: function () {
+      this.$refs.tour.start()
     }
   },
   mounted: function () {
     loadLanguageAsync(this.storeLocale)
     this.startGeoTracking()
+
+    EventBus.$on('datasets-changed', this.updateDatasets)
+    EventBus.$on('dataset-changed', this.navigateToDataset)
+    EventBus.$on('dataset-deleted', this.navigateHome)
+    EventBus.$on('show-introduction-tour', this.showIntroductionTour)
+    this.updateDatasets()
+
+    this.loadDataset()
   },
   destroyed: function () {
     if (this.geolocationWatchId && navigator.geolocation) {
       navigator.geolocation.clearWatch(this.geolocationWatchId)
     }
+
+    EventBus.$off('datasets-changed', this.updateDatasets)
+    EventBus.$off('dataset-changed', this.navigateToDataset)
+    EventBus.$off('dataset-deleted', this.navigateHome)
+    EventBus.$off('show-introduction-tour', this.showIntroductionTour)
   }
 }
 </script>
@@ -126,5 +333,15 @@ html {
 }
 .input-group .btn {
   line-height: 21px;
+}
+
+#sidebar img {
+  max-width: 50%;
+}
+#sidebar .badge:hover {
+  cursor: pointer;
+}
+#dataset-selector {
+  display: block;
 }
 </style>

@@ -12,6 +12,8 @@ export default {
       'storeCols',
       'storeContinuousInput',
       'storeCornerPoints',
+      'storeDatasetId',
+      'storeDatasetName',
       'storeGeolocation',
       'storeGridLinesEvery',
       'storeInvertView',

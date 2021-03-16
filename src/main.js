@@ -26,8 +26,10 @@ import {
   FormSelectPlugin,
   InputGroupPlugin,
   TooltipPlugin,
+  PopoverPlugin,
   SpinnerPlugin,
-  JumbotronPlugin
+  JumbotronPlugin,
+  SidebarPlugin
 } from 'bootstrap-vue'
 
 import router from '@/router'
@@ -71,9 +73,11 @@ Vue.use(FormGroupPlugin)
 Vue.use(FormTextareaPlugin)
 Vue.use(FormFilePlugin)
 Vue.use(ListGroupPlugin)
+Vue.use(SidebarPlugin)
 Vue.use(FormSelectPlugin)
 Vue.use(InputGroupPlugin)
 Vue.use(TooltipPlugin)
+Vue.use(PopoverPlugin)
 Vue.use(SpinnerPlugin)
 Vue.use(JumbotronPlugin)
 Vue.mixin(mixin)

@@ -48,8 +48,7 @@ export default {
                 }
 
                 // Send to the store
-                this.$store.commit('ON_DATASET_CHANGED', config)
-                this.$router.push({ name: 'home' })
+                this.$store.dispatch('addDataset', config)
               }
             })
             .catch(err => {

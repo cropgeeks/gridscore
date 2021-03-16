@@ -60,6 +60,12 @@
           </b-form-group>
         </b-col>
       </b-row>
+      <b-button v-b-toggle.collapse-advanced>{{ $t('buttonAdvancedSettings') }}</b-button>
+      <b-collapse id="collapse-advanced" class="mt-2 border rounded p-3">
+        <p class="text-danger">{{ $t('labelAdvancedSettingsWarning') }}</p>
+
+        <b-button variant="danger" @click="resetApp"><BIconExclamationTriangleFill /> {{ $t('buttonWarningResetApp') }}</b-button>
+      </b-collapse>
     </b-form>
 
     <b-button @click="onSubmit" variant="primary" class="mt-3">{{ $t('buttonSave') }}</b-button>
@@ -67,7 +73,7 @@
 </template>
 
 <script>
-import { BIconArrowClockwise, BIconPlus, BIconX, BIconSlashCircle, BIconArrowLeft } from 'bootstrap-vue'
+import { BIconArrowClockwise, BIconPlus, BIconX, BIconSlashCircle, BIconArrowLeft, BIconExclamationTriangleFill } from 'bootstrap-vue'
 
 /**
  * Modal to let the user change some basic settings like truncation of variety names.
@@ -78,7 +84,8 @@ export default {
     BIconX,
     BIconArrowClockwise,
     BIconSlashCircle,
-    BIconArrowLeft
+    BIconArrowLeft,
+    BIconExclamationTriangleFill
   },
   data: function () {
     return {
@@ -109,6 +116,19 @@ export default {
       this.tempInvertNumberingX = this.storeInvertNumberingX
       this.tempInvertNumberingY = this.storeInvertNumberingY
       this.tempColors = JSON.parse(JSON.stringify(this.storeTraitColors))
+    },
+    resetApp: function () {
+      this.$bvModal.msgBoxConfirm(this.$t('modalTextWarningReset'), {
+          title: this.$t('modalTitleWarningReset'),
+          okTitle: this.$t('buttonYes'),
+          okVariant: 'danger',
+          cancelTitle: this.$t('buttonNo')
+        })
+          .then(value => {
+            if (value) {
+              this.$store.dispatch('resetGridScore')
+            }
+          })
     },
     onSubmit: function () {
       // Dispatch to the store

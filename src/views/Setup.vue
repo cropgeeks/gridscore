@@ -12,12 +12,19 @@
     <b-form @submit.prevent="onSubmit" id="settings-form">
       <b-row>
         <b-col cols=12 lg=6>
+          <!-- Dataset name -->
+          <b-form-group label-for="dataset-name" :description="$t('formDescriptionSettingsDatasetName')">
+            <template v-slot:label>
+              <BIconTextareaT /><span> {{ $t('formLabelSettingsDatasetName') }}</span>
+            </template>
+            <b-form-input id="dataset-name" :state="state.datasetName" required autofocus v-model="datasetName" />
+          </b-form-group>
           <!-- Field layout rows -->
           <b-form-group label-for="rows" :description="$t('formDescriptionSettingsRow')" >
             <template v-slot:label>
               <BIconLayoutThreeColumns rotate="90" /><span> {{ $t('formLabelSettingsRows') }}</span>
             </template>
-            <b-form-input id="rows" :state="state.rows" number type="number" :min="1" required autofocus v-model.number="rows" />
+            <b-form-input id="rows" :state="state.rows" number type="number" :min="1" required v-model.number="rows" />
           </b-form-group>
           <!-- Field layout cols -->
           <b-form-group label-for="cols" :description="$t('formDescriptionSettingsCol')">
@@ -82,17 +89,17 @@
         </b-col>
       </b-row>
       <!-- Map used for defining the field's corner points -->
-      <b-button v-b-toggle.collapse-1><BIconBoundingBox /> {{ $t('buttonShowFieldMap') }}</b-button>
+      <b-button v-b-toggle.collapse-1 id="map-toggle-button"><BIconBoundingBox /> {{ $t('buttonShowFieldMap') }}</b-button>
       <b-collapse id="collapse-1" class="mt-2" v-model="mapVisible" @shown="invalidateMap">
-        <FieldMap :rows="rows" :cols="cols" ref="map" />
+        <FieldMap :rows="rows" :cols="cols" :useCurrentDataset="false" ref="map" />
       </b-collapse>
     </b-form>
 
-    <b-button @click="onSubmit" variant="primary" class="mt-3">{{ $t('buttonSave') }}</b-button>
+    <b-button @click="onSubmit" variant="primary" class="mt-3"><BIconPlus /> {{ $t('buttonAdd') }}</b-button>
 
     <!-- Modal to show json import/export -->
     <JsonExportModal ref="exportModal" />
-    <JsonImportModal v-on:dataset-changed="$router.push({ name: 'home' })" ref="importModal" />
+    <JsonImportModal ref="importModal" />
     <!-- Modal to show configuration options for a selected trait -->
     <TraitConfigurationModal :trait="traitToConfigure" v-on:config-changed="updateTraitConfig" ref="traitConfigModal" />
     <!-- Modal for trait import via BrAPI -->
@@ -108,9 +115,7 @@ import JsonExportModal from '@/components/modals/JsonExportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
 import IconBrapi from '@/components/IconBrapi'
 
-import { BIconGear, BIconArrowLeft, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconTags, BIconBoundingBox, BIconInfoCircle } from 'bootstrap-vue'
-
-import { mapGetters } from 'vuex'
+import { BIconGear, BIconArrowLeft, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
 
 /**
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
@@ -118,6 +123,7 @@ import { mapGetters } from 'vuex'
 export default {
   data: function () {
     return {
+      datasetName: null,
       rows: 1,
       cols: 1,
       newTraits: null,
@@ -143,6 +149,7 @@ export default {
         text: this.$t('traitTypeCategorical')
       }],
       state: {
+        datasetName: null,
         rows: null,
         cols: null,
         traits: null,
@@ -156,13 +163,13 @@ export default {
       if (newValue) {
         this.loadVarietiesFile()
       }
+    },
+    storeDatasetId: function () {
+      this.reset()
+    },
+    storeDatasetName: function () {
+      this.reset()
     }
-  },
-  computed: {
-    /** Mapgetters exposing the store configuration */
-    ...mapGetters([
-      'storeData'
-    ])
   },
   components: {
     BIconGear,
@@ -174,6 +181,7 @@ export default {
     BIconBoundingBox,
     BIconTags,
     BIconInfoCircle,
+    BIconTextareaT,
     IconBrapi,
     FieldMap,
     BrapiTraitImportModal,
@@ -313,18 +321,14 @@ export default {
      * Resets the modal state based on the current configuration of the dataset
      */
     reset: function () {
-      this.rows = this.storeRows
-      this.cols = this.storeCols
-      this.newTraits = JSON.parse(JSON.stringify(this.storeTraits))
-      let varieties = []
-      this.storeData.forEach(r => {
-        for (let c = 0; c < this.cols; c++) {
-          varieties.push(r[c].name)
-        }
-      })
-      this.varieties = varieties.join('\n')
+      this.datasetName = null
+      this.rows = 1
+      this.cols = 1
+      this.newTraits = []
+      this.varieties = null
       this.formValidated = false
       this.state = {
+        datasetName: null,
         rows: null,
         cols: null,
         traits: null,
@@ -342,8 +346,8 @@ export default {
         cancelTitle: this.$t('buttonCancel')
       }).then(value => {
         if (value === true) {
-          this.$store.commit('ON_DATASET_CHANGED', require('@/example-data.json'))
-          this.$router.push({ name: 'home' })
+          this.$store.dispatch('addDataset', require('@/example-data.json'))
+          // this.$router.push({ name: 'home' })
         }
       })
     },
@@ -354,6 +358,7 @@ export default {
       // Validate the form
       this.formValidated = true
       this.state = {
+        datasetName: this.datasetName !== undefined && this.datasetName !== null && this.datasetName.length > 0,
         rows: this.rows > 0,
         cols: this.cols > 0,
         traits: (this.newTraits !== null) && (this.newTraits.length > 0),
@@ -374,16 +379,32 @@ export default {
           cancelTitle: this.$t('buttonCancel')
         }).then(value => {
           if (value === true) {
-            // If confirmed, emit an event with the new configuration
-            this.$emit('settings-changed', {
+            const dataset = {
+              name: this.datasetName,
               rows: parseInt(this.rows),
               cols: parseInt(this.cols),
               traits: this.newTraits,
               varieties: this.varieties.split('\n'),
               cornerPoints: this.$refs.map.getCornerPoints()
-            })
+            }
 
-            this.$router.push({ name: 'home' })
+            let data = []
+            let counter = 0
+            for (let y = 0; y < dataset.rows; y++) {
+              let rowData = []
+              for (let x = 0; x < dataset.cols; x++) {
+                rowData.push({
+                  name: dataset.varieties.length > counter ? dataset.varieties[counter++] : null,
+                  dates: new Array(dataset.traits.length).fill(null),
+                  values: new Array(dataset.traits.length).fill(null),
+                  geolocation: null,
+                  comment: null
+                })
+              }
+              data.push(rowData)
+            }
+            dataset.data = data
+            this.$store.dispatch('addDataset', dataset)
           }
         })
       }

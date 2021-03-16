@@ -58,11 +58,18 @@ export default {
     ...mapGetters([
       'storeData'
     ]),
+    safeFilename: function () {
+      if (this.storeDatasetName) {
+        return this.storeDatasetName.replace(/[^a-z0-9]/gi, '-').toLowerCase()
+      } else {
+        return ''
+      }
+    },
     getFilenameData: function () {
-      return `data-${new Date().toISOString().split('T')[0]}.txt`
+      return `data-${this.safeFilename}-${new Date().toISOString().split('T')[0]}.txt`
     },
     getFilenameTraits: function () {
-      return `traits-${new Date().toISOString().split('T')[0]}.txt`
+      return `traits-${this.safeFilename}-${new Date().toISOString().split('T')[0]}.txt`
     },
     getHrefData: function () {
       return 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.text)
@@ -127,7 +134,7 @@ export default {
             // Get it (either actual data or date)
             const data = this.showDates ? cell.dates : cell.values
             // If there is a value and they aren't all empty
-            if (data && data.length > 0 && !data.every(c => c === null || c.length < 1)) {
+            if (cell.comment || (data && data.length > 0 && !data.every(c => c === null || c.length < 1))) {
               result += '\n'
               // Variety name
               result += cell.name
@@ -152,14 +159,6 @@ export default {
       }
 
       return result
-    }
-  },
-  methods: {
-    show: function () {
-      this.$nextTick(() => this.$refs.exportModal.show())
-    },
-    hide: function () {
-      this.$nextTick(() => this.$refs.exportModal.hide())
     }
   }
 }

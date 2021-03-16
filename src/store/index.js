@@ -2,6 +2,10 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 
+import { EventBus } from '@/plugins/event-bus'
+
+import idb from '@/plugins/idb'
+
 const localStorage = window.localStorage
 
 Vue.use(Vuex)
@@ -12,21 +16,23 @@ if (!name) {
   name = 'gridscore-' + window.location.pathname
 }
 
-const dataset = {
-  cols: 1,
-  cornerPoints: [],
-  rows: 1,
-  traits: [],
-  data: [],
-  brapiConfig: null
-}
+let store
 
 const storeState = {
   state: {
     locale: 'en_GB',
-    datasetIndex: 0,
+    datasetId: null,
+    dataset: {
+      id: null,
+      name: 'First dataset',
+      cols: 1,
+      cornerPoints: [],
+      rows: 1,
+      traits: [],
+      data: [],
+      brapiConfig: null
+    },
     columnWidth: 300,
-    datasets: [dataset],
     serverUrl: null,
     useGps: true,
     useSpeech: false,
@@ -39,14 +45,16 @@ const storeState = {
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
   },
   getters: {
-    storeBrapiConfig: (state) => state.datasets[state.datasetIndex].brapiConfig,
+    storeBrapiConfig: (state) => state.dataset ? state.dataset.brapiConfig : null,
     storeColumnWidth: (state) => state.columnWidth,
-    storeData: (state) => state.datasets[state.datasetIndex].data,
-    storeDataset: (state) => state.datasets[state.datasetIndex],
-    storeCols: (state) => state.datasets[state.datasetIndex].cols,
-    storeCornerPoints: (state) => state.datasets[state.datasetIndex].cornerPoints,
-    storeRows: (state) => state.datasets[state.datasetIndex].rows,
-    storeTraits: (state) => state.datasets[state.datasetIndex].traits,
+    storeData: (state) => state.dataset ? state.dataset.data : null,
+    storeDataset: (state) => state.dataset ? state.dataset : null,
+    storeDatasetId: (state) => state.datasetId,
+    storeDatasetName: (state) => state.dataset ? state.dataset.name : null,
+    storeCols: (state) => state.dataset ? state.dataset.cols : null,
+    storeCornerPoints: (state) => state.dataset ? state.dataset.cornerPoints : null,
+    storeRows: (state) => state.dataset ? state.dataset.rows : null,
+    storeTraits: (state) => state.dataset ? state.dataset.traits : null,
     storeUseGps: (state) => state.useGps,
     storeUseSpeech: (state) => state.useSpeech,
     storeContinuousInput: (state) => state.continuousInput,
@@ -60,6 +68,66 @@ const storeState = {
     storeTraitColors: (state) => state.traitColors
   },
   mutations: {
+    ON_DATASET_LOAD_MUTATION: function (state, datasetId) {
+      if (datasetId) {
+        idb.getDataset(datasetId)
+          .then(dataset => {
+            if (dataset) {
+              idb.getDatasetData(datasetId)
+                .then(data => {
+                  const ds = JSON.parse(JSON.stringify(dataset))
+                  ds.data = []
+
+                  let row = -1
+                  for (let i = 0; i < data.length; i++) {
+                    const dp = data[i]
+
+                    if (row !== dp.row) {
+                      row++
+                      ds.data.push([])
+                    }
+
+                    ds.data[ds.data.length - 1].push(dp)
+                  }
+
+                  state.dataset = ds
+                  state.datasetId = ds.id
+
+                  EventBus.$emit('dataset-changed')
+                })
+            } else {
+              state.dataset = null
+              state.datasetId = null
+            }
+          })
+      } else {
+        state.dataset = null
+        state.datasetId = null
+      }
+    },
+    ON_DATASET_ADDED_MUTATION: function (state, newDataset) {
+      idb.addDataset(newDataset)
+        .then(dsId => {
+          state.datasetId = dsId
+          idb.setDatasetData(dsId, newDataset.data)
+            .then(() => {
+              state.dataset = newDataset
+              EventBus.$emit('datasets-changed')
+              EventBus.$emit('dataset-changed')
+            })
+        })
+    },
+    ON_DATASET_DELETED_MUTATION: function (state, datasetId) {
+      idb.deleteDatasetData(datasetId)
+        .then(() => idb.deleteDataset(datasetId))
+        .then(() => {
+          EventBus.$emit('datasets-changed')
+          EventBus.$emit('dataset-deleted')
+        })
+
+      state.datasetId = null
+      state.dataset = null
+    },
     ON_DATASET_INDEX_CHANGED_MUTATION: function (state, newDatasetIndex) {
       state.datasetIndex = newDatasetIndex
     },
@@ -67,43 +135,48 @@ const storeState = {
       state.columnWidth = newColumnWidth
     },
     ON_COLS_CHANGED_MUTATION: function (state, newCols) {
-      state.datasets[state.datasetIndex].cols = newCols
+      state.dataset.cols = newCols
     },
     ON_ROWS_CHANGED_MUTATION: function (state, newRows) {
-      state.datasets[state.datasetIndex].rows = newRows
+      state.dataset.rows = newRows
     },
     ON_TRAITS_CHANGED_MUTATION: function (state, newTraits) {
-      state.datasets[state.datasetIndex].traits = newTraits
+      state.dataset.traits = newTraits
     },
     ON_CORNER_POINTS_CHANGED_MUTATION: function (state, newCornerPoints) {
-      state.datasets[state.datasetIndex].cornerPoints = newCornerPoints
-    },
-    ON_DATASET_CHANGED: function (state, newDataset) {
-      Vue.set(state.datasets, state.datasetIndex, newDataset)
+      state.dataset.cornerPoints = newCornerPoints
+
+      idb.updateDatasetCornerPoints(state.datasetId, newCornerPoints)
     },
     ON_BRAPI_CONFIG_CHANGED: function (state, newBrapiConfig) {
       if (newBrapiConfig && newBrapiConfig.url && newBrapiConfig.url.indexOf('/', newBrapiConfig.url.length - 1) === -1) {
         newBrapiConfig.url += '/'
       }
 
-      state.datasets[state.datasetIndex].brapiConfig = newBrapiConfig
+      state.dataset.brapiConfig = newBrapiConfig
     },
     ON_SERVER_URL_CHANGED: function (state, newServerUrl) {
       state.serverUrl = newServerUrl
     },
-    ON_DATA_CHANGED_MUTATION: function (state, newData) {
-      state.datasets[state.datasetIndex].data = newData
+    ON_DATASET_UPDATED_MUTATION: function (state, newData) {
+      idb.updateDatasetAndData(newData)
+        .then(() => EventBus.$emit('datasets-changed'))
     },
     ON_DATA_POINT_CHANGED_MUTATION: function (state, dataPoint) {
-      state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col].dates = dataPoint.dates
-      state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col].values = dataPoint.values
+      // To save time, write directly to the temporary dataset object
+      state.dataset.data[dataPoint.row][dataPoint.col].dates = dataPoint.dates
+      state.dataset.data[dataPoint.row][dataPoint.col].values = dataPoint.values
 
       // Use Vue.set, because this wasn't a part of the object from the start, so needs setting to be reactive
-      Vue.set(state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col], 'comment', dataPoint.comment)
+      Vue.set(state.dataset.data[dataPoint.row][dataPoint.col], 'comment', dataPoint.comment)
 
       if (dataPoint.geolocation) {
-        state.datasets[state.datasetIndex].data[dataPoint.row][dataPoint.col].geolocation = dataPoint.geolocation
+        state.dataset.data[dataPoint.row][dataPoint.col].geolocation = dataPoint.geolocation
       }
+
+      // Then update the database
+      idb.updateDatapoint(state.datasetId, dataPoint)
+        .then(() => EventBus.$emit('data-point-changed', dataPoint.row, dataPoint.col))
     },
     ON_USE_GPS_CHANGED_MUTATION: function (state, newUseGps) {
       state.useGps = newUseGps
@@ -152,6 +225,35 @@ const storeState = {
     }
   },
   actions: {
+    loadDataset: function ({ commit }, datasetId) {
+      commit('ON_DATASET_LOAD_MUTATION', datasetId)
+    },
+    addDataset: function ({ commit }, dataset) {
+      commit('ON_DATASET_ADDED_MUTATION', dataset)
+    },
+    deleteDataset: function ({ commit }, datasetId) {
+      commit('ON_DATASET_DELETED_MUTATION', datasetId)
+    },
+    resetGridScore: function ({ commit }) {
+      idb.deleteDatabase().then(() => {
+        commit('ON_DATASET_INDEX_CHANGED_MUTATION', null)
+        commit('ON_COLUMN_WIDTH_CHANGED_MUTATION', 300)
+        commit('ON_USE_GPS_CHANGED_MUTATION', true)
+        commit('ON_USE_SPEECH_CHANGED_MUTATION', false)
+        commit('ON_LOCALE_CHANGED_MUTATION', 'en_GB')
+        commit('ON_GRID_LINES_EVERY_CHANGED_MUTATION', 5)
+        commit('ON_GEOLOCATION_CHANGED_MUTATION', null)
+        commit('ON_CONTINUOUS_INPUT_CHANGED_MUTATION', false)
+        commit('ON_TRAIT_COLORS_CHANGED_MUTATION', ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600'])
+        commit('ON_INVERT_VIEW_CHANGED_MUTATION', false)
+        commit('ON_INVERT_NUMBERING_X_CHANGED_MUTATION', false)
+        commit('ON_INVERT_NUMBERING_Y_CHANGED_MUTATION', false)
+        commit('ON_DATASET_LOAD_MUTATION', null)
+
+        EventBus.$emit('datasets-changed')
+        EventBus.$emit('dataset-deleted')
+      })
+    },
     setDatasetIndex: function ({ commit }, datasetIndex) {
       commit('ON_DATASET_INDEX_CHANGED_MUTATION', datasetIndex)
     },
@@ -170,11 +272,8 @@ const storeState = {
     setCornerPoints: function ({ commit }, cornerPoints) {
       commit('ON_CORNER_POINTS_CHANGED_MUTATION', cornerPoints)
     },
-    setData: function ({ commit }, data) {
-      commit('ON_DATA_CHANGED_MUTATION', data)
-    },
-    setDataset: function ({ commit }, dataset) {
-      commit('ON_DATASET_CHANGED', dataset)
+    updateDataset: function ({ commit }, update) {
+      commit('ON_DATASET_UPDATED_MUTATION', update)
     },
     setBrapiConfig: function ({ commit }, brapiConfig) {
       commit('ON_BRAPI_CONFIG_CHANGED', brapiConfig)
@@ -260,16 +359,28 @@ const storeState = {
               })
             }
           })
+
+          // Add a new database entry, cause we're not using localstorage anymore
+          setTimeout(() => store.dispatch('addDataset', result.datasets[0]), 5000)
         }
 
         return JSON.stringify(result)
       },
-      setItem: (key, value) => localStorage.setItem(key, value),
+      setItem: (key, value) => {
+        const parsed = JSON.parse(value)
+
+        // Remove dataset information, we no longer store this here.
+        delete parsed.datasets
+        delete parsed.dataset
+        delete parsed.datasetIndex
+
+        localStorage.setItem(key, JSON.stringify(parsed))
+      },
       removeItem: key => localStorage.removeItem(key)
     }
   })]
 }
 
-const store = new Vuex.Store(storeState)
+store = new Vuex.Store(storeState)
 
 export default store

@@ -112,6 +112,8 @@ import { BIconCameraFill, BIconCircleFill, BIconMic, BIconCaretLeftFill, BIconCa
 
 import { mapGetters } from 'vuex'
 
+import { EventBus } from '@/plugins/event-bus.js'
+
 /**
  * Shows a modal used to enter the data into GridScore. Each trait is shown and based on its type a different method for data input is show.
  */
@@ -419,14 +421,18 @@ export default {
       const comment = (this.comment !== undefined && this.comment !== null && this.comment.length > 0) ? this.comment : null
 
       // Update the store with the newly set data point
-      this.$store.dispatch('setDataPoint', {
+      this.$store.commit('ON_DATA_POINT_CHANGED_MUTATION', {
         row: this.row,
         col: this.col,
+        name: this.name,
         values: this.values,
         dates: this.dates,
         geolocation: this.storeUseGps ? this.storeGeolocation : null,
         comment: comment
       })
+
+      EventBus.$emit('data-point-changed', this.row, this.col)
+
       this.hide()
     }
   },
