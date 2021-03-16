@@ -31,7 +31,14 @@ export default {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
       'storeData'
-    ])
+    ]),
+    safeDatasetName: function () {
+      if (this.storeDatasetName) {
+        return this.storeDatasetName.replace(/[^a-z0-9]/gi, '-').toLowerCase()
+      } else {
+        return ''
+      }
+    }
   },
   watch: {
     trait: function () {
@@ -209,7 +216,16 @@ export default {
           annotations: []
         }
 
-        this.$plotly.newPlot('heatmap-chart', data, layout, { responsive: true })
+        const filename = this.traits[this.trait].text.replace(/[^a-z0-9]/gi, '-').toLowerCase()
+        const config = {
+          responsive: true,
+          toImageButtonOptions: {
+            format: 'png',
+            filename: `heatmap-${this.safeDatasetName}-${filename}-${new Date().toISOString().split('T')[0]}`
+          }
+        }
+
+        this.$plotly.newPlot('heatmap-chart', data, layout, config)
       }
     }
   },

@@ -23,7 +23,14 @@ export default {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
       'storeData'
-    ])
+    ]),
+    safeDatasetName: function () {
+      if (this.storeDatasetName) {
+        return this.storeDatasetName.replace(/[^a-z0-9]/gi, '-').toLowerCase()
+      } else {
+        return ''
+      }
+    }
   },
   methods: {
     plot: function () {
@@ -116,7 +123,15 @@ export default {
         legend: { orientation: 'h' }
       }
 
-      this.$plotly.newPlot('timeseries-chart', traces, layout, { responsive: true })
+      const config = {
+        responsive: true,
+        toImageButtonOptions: {
+          format: 'png',
+          filename: `timeline-${this.safeDatasetName}-${new Date().toISOString().split('T')[0]}`
+        }
+      }
+
+      this.$plotly.newPlot('timeseries-chart', traces, layout, config)
     }
   },
   mounted: function () {
