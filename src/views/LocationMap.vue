@@ -42,6 +42,7 @@ import { BIconBoundingBox, BIconCalendar3, BIconGeoAlt, BIconGeoFill } from 'boo
 import { LMap, LControl, LPolygon, LPolyline, LMarker, LIcon } from 'vue2-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster'
 
 import { mapGetters } from 'vuex'
 
@@ -210,6 +211,9 @@ export default {
     updateMarkers: function () {
       if (this.storeData) {
         const map = this.$refs.locationMap.mapObject
+
+        var markers = L.markerClusterGroup()
+
         this.storeData.forEach(row => {
           row.forEach(c => {
             if (c.geolocation) {
@@ -220,10 +224,13 @@ export default {
                 // Set the popup content on click
                 this.$nextTick(() => popup.setContent(this.$refs.popupContent))
               })
-              marker.addTo(map)
+              markers.addLayer(marker)
+              // marker.addTo(map)
             }
           })
         })
+
+        map.addLayer(markers)
       }
     }
   }
@@ -231,6 +238,9 @@ export default {
 </script>
 
 <style>
+@import "~leaflet.markercluster/dist/MarkerCluster.css";
+@import "~leaflet.markercluster/dist/MarkerCluster.Default.css";
+
 .location-map {
   height: 100vh;
 }

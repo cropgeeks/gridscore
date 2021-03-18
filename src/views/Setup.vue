@@ -85,7 +85,7 @@
           </b-form-group>
 
           <!-- Trait BrAPI import -->
-          <b-button @click="$refs.brapiTraitImportModal.show()"><IconBrapi /> {{ $t('buttonBrapiTraitImport') }}</b-button>
+          <b-button @click="$refs.brapiTraitImportModal.show()" class="mb-3"><IconBrapi /> {{ $t('buttonBrapiTraitImport') }}</b-button>
         </b-col>
       </b-row>
       <!-- Map used for defining the field's corner points -->

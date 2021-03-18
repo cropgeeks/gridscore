@@ -110,6 +110,7 @@
   "modalTextExportQR": "Untenstehenden QR Code auf dem empfangenden Gerät scannen. Die Konfiguration wird dort dann verfügbar sein.",
   "modalTitleSettings": "Einstellungen",
   "modalTitleSetup": "Einrichtung",
+  "pageAboutGitHubLink": "Der Quellcode von GridScore is auf <a href='https://github.com/cropgeeks/gridscore/'>GitHub</a> verfügbar.",
   "pageAboutParagraphOne": "GridScore ist eine Feldversuch-Phänotypisierungs-App für Merkmalsdaten. Mit ihm kann man festhalten was im Feld auf einem Beet-Level passiert. Dies könnten zum Beispiel das Hervortreten der Pflanze, die Blütezeit, Pflanzenhöhe, Blütenfarbe usw. sein.",
   "pageAboutParagraphTwo": "GridScore wurde entwickelt von <a href='https://hutton.ac.uk/staff/sebastian-raubach'>Sebastian Raubach</a>. Miriam Schreiber, Joanne Russel und Paul Shaw waren maßgeblich beteiligt am Testen von GridScore.Bei Fragen, Anregungen oder generellem Feedback bitte direkt an <a href='mailto:sebastian.raubach@hutton.ac.uk'>Sebastian</a> wenden.",
   "pageFieldLayoutText": "Gehe zu allen vier Ecken des Feldes und drück den Knopf nebem den Eingebefeldern um die GPS position zu nutzen oder gib sie direkt ein.",

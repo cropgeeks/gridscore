@@ -7,6 +7,7 @@
       </div>
       <p>{{ $t('pageAboutParagraphOne') }}</p>
       <p v-html="$t('pageAboutParagraphTwo')" />
+      <p><BIconGithub/> <span v-html="$t('pageAboutGitHubLink')" /></p>
     </b-container>
 
     <!-- Hutton banner -->
@@ -38,8 +39,12 @@
 </template>
 
 <script>
-export default {
+import { BIconGithub } from 'bootstrap-vue'
 
+export default {
+  components: {
+    BIconGithub
+  }
 }
 </script>
 
