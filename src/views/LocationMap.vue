@@ -242,7 +242,7 @@ export default {
 @import "~leaflet.markercluster/dist/MarkerCluster.Default.css";
 
 .location-map {
-  height: 100vh;
+  height: 90vh;
 }
 .leaflet-popup-content {
   min-width: 200px!important;
