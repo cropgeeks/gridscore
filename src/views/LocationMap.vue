@@ -212,7 +212,9 @@ export default {
       if (this.storeData) {
         const map = this.$refs.locationMap.mapObject
 
-        var markers = L.markerClusterGroup()
+        var markers = L.markerClusterGroup({
+          disableClusteringAtZoom: 20
+        })
 
         this.storeData.forEach(row => {
           row.forEach(c => {

@@ -203,17 +203,34 @@ export default {
       }
     },
     fakeGpsMovement: function () {
-      const start = {
-        lat: 56.481662,
-        lng: -3.107443
-      }
-      const end = {
-        lat: 56.481585,
-        lng: -3.110989
-      }
+      const points = [
+        {
+          lat: 56.481678,
+          lng: -3.107542,
+          steps: 200,
+          heading: 270
+        }, {
+          lat: 56.481585,
+          lng: -3.110989,
+          steps: 20,
+          heading: 0
+        }, {
+          lat: 56.481776,
+          lng: -3.111069,
+          steps: 200,
+          heading: 90
+        }, {
+          lat: 56.481824,
+          lng: -3.107601,
+          steps: 20,
+          heading: 180
+        }
+      ]
 
       let counter = 0
-      let steps = 100
+      let steps = points[0].steps
+      let heading = points[0].heading
+      let pointIndex = 0
       setTimeout(() => {
         const wrapper = document.querySelector('#grid-table')
         const table = document.querySelector('#grid-table .table')
@@ -225,22 +242,38 @@ export default {
         const id = setInterval(() => {
           counter++
           if (counter === steps) {
-            clearInterval(id)
+            counter = 0
+            pointIndex = (pointIndex + 1) % points.length
+            steps = points[pointIndex].steps
+            heading = points[pointIndex].heading
+            if (pointIndex === 0) {
+              clearInterval(id)
+            }
           } else {
+            const start = points[pointIndex]
+            const end = points[(pointIndex + 1) % points.length]
             const dLat = start.lat + ((end.lat - start.lat) / steps) * counter
             const dLng = start.lng + ((end.lng - start.lng) / steps) * counter
+
+            console.log(pointIndex, dLat, dLng)
 
             this.$store.dispatch('setGeolocation', {
               lat: dLat,
               lng: dLng,
               elv: 100,
-              heading: 270
+              heading: heading
             })
 
-            if (wrapper) {
+            if (wrapper && (heading === 270 || heading === 90)) {
               const bottom = table.offsetHeight
               const wrapperHeight = wrapper.offsetHeight
-              let scrollTop = bottom - (counter / steps) * bottom - wrapperHeight / 2
+              let scrollTop
+
+              if (heading === 270) {
+                scrollTop = bottom - (counter / steps) * bottom - wrapperHeight / 2
+              } else if (heading === 90) {
+                scrollTop = bottom - ((steps - counter) / steps) * bottom - wrapperHeight / 2
+              }
 
               wrapper.scroll({
                 top: scrollTop,
@@ -248,8 +281,8 @@ export default {
               })
             }
           }
-        }, 10000 / steps)
-      }, 20000)
+        }, 100)
+      }, 20001)
     },
     updateDatasets: function () {
       idb.getDatasets().then(datasets => {
@@ -294,6 +327,7 @@ export default {
   mounted: function () {
     loadLanguageAsync(this.storeLocale)
     this.startGeoTracking()
+    // this.fakeGpsMovement()
 
     EventBus.$on('datasets-changed', this.updateDatasets)
     EventBus.$on('dataset-changed', this.navigateToDataset)
