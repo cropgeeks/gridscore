@@ -4,11 +4,11 @@
     <hr/>
     <p v-html="$t('pageShareText')" />
     <b-row>
-      <b-col cols=12 md=6 class="border-right">
+      <b-col cols=12 md=6 class="mb-3 pb-3 border-bottom border-md-bottom-0 border-md-right">
         <h2>{{ $t('modalTitleExportConfig') }}</h2>
         <Export />
       </b-col>
-      <b-col cols=12 md=6>
+      <b-col cols=12 md=6 class="mb-3 pb-3">
         <h2>{{ $t('modalTitleImportConfig') }}</h2>
         <Import />
       </b-col>
