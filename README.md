@@ -24,20 +24,34 @@ All your data is stored in the app and can be exported at any time. This, howeve
 ![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-setup.png "Setup")
 The setup screen is used to define some basic characteristics of your field trial. Row and column counts as well as a list of germplasm/variety names is used to identify each plot uniquely. Traits are then defined along with their type which can be one of 'integer', 'floating point', 'date', 'text' or 'categorical' (pick from a list of options).
 
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-field-map.png "Field Plant")
 Optionally, the corner points of the field can be configured. This can either be done my walking to the corners of the field and clicking the button to get your GPS position or by manually entering the location. Defining the corner points allows GridScore to show your recorded data in the context of the field plots as well as to highlight your location in the data recording table for easier navigation and orientation.
 
 
 ### Grid view
-![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-grid.jpg "Grid view")
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-grid.png "Grid view")
 The main data table represents your field plan with rows and columns. Each cell is a plot and shows you a short version of the germplasm/variety name. Clicking on a cell opens the data entry dialog where you can enter the data values for each trait. The coloured dots in each cell represent whether the respective trait has already been scored. This is especially useful when scoring time-based traits like emergence, which allows you to only visit the cells without the corresponding data indicator.
 
+### Data entry
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-data-entry.png "Data entry")
+Data is entered for each defined trait using the type-specific input fields. Dates are scored using a calendar, numbers using a number input and categories using a dropdown box.
+Optionally, comments can be added to data entries. Text-to-speech can also be used for these comments instead of manually typing data into the app.
+
 ### Timeline
-![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-timeline.jpg "Timeline")
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-timeline.png "Timeline")
 The timeline shows how many plots have already been scored per trait. This represents the development over time, and can highlight differences in traits or time offsets between traits. The y axis ranges from 0 to 100 percent of scored plots.
 
 ### Field heatmap
-![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-heatmap.jpg "Heatmap")
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-heatmap.png "Heatmap")
 Sometimes there are factors that can affect certain parts of the field. The heatmap plot shows your data in a colour-coded way to highlight possible localised artifacts. For date and text traits, the heatmap shows the recording date in days after the first data value. For integer and floating point traits, the heatmap shows the actual data value.
 
 ### Image tagging
 In addition to the features highlighted above, GridScore can prompt your mobile device to take a photo which will then be tagged with the germplasm/variety name and a timestamp to significantly reduce the amount of effort that has to go into organising your photographs later.
+
+### Settings
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-settings.png "Settings")
+Some more advanced settings are located on the dedicated settings screen. Colors, column widths, grid lines as well as many other things can be changed here.
+
+### Sharing
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-sharing.png "Sharing")
+GridScore can easily share your trial setup as well as all the valuable data you recorded between devices by simply scanning a QR code. Generate a code on device A then scan it on device B and your data has been transfered. Simple as that.

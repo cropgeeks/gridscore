@@ -430,7 +430,7 @@ export default {
   max-width: 50%;
 }
 .trait-list {
-  max-height: 30vh;
+  max-height: 50vh;
   overflow-y: auto;
 }
 </style>
