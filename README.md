@@ -13,7 +13,9 @@ GridScore is a field trial phenotyping app for trait data. It lets you keep trac
 ## Installation
 GridScore is a so-called Progressive Web App (PWA), which means that it's basically a website, but on phones and tablets it can be installed to work offline. The mechanism for installing a PWA on your device will vary depending on the operating system. On Android a banner will appear at the bottom of the screen prompting you to install the application. On iOS, press the share icon and then add the app to your home screen.
 
-To check out GridScore visit the website at https://ics.hutton.ac.uk/gridscore/
+To check out GridScore visit the website at: https://ics.hutton.ac.uk/gridscore/
+
+Or install the Android app from Google Play: https://play.google.com/store/apps/details?id=uk.ac.hutton.ics.gridscore2
 
 ## Data
 All your data is stored in the app and can be exported at any time. This, however, also means that your data is at the mercy of the operating system's data retention policy. Android does not automatically delete the data, unless the user clears the browser's data manually. On iOS, recent changes mean that Apple will delete any website's (and by extension any PWA's) data after 7 days if the app hasn't been used in the meantime. We therefore recommend to regularly export your data and ideally open the app every few days to prevent iOS from deleting your data. To be safe, stick to Android devices for now.
