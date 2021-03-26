@@ -14,6 +14,7 @@
           <b-nav-item :to="{ name: 'home' }"><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
           <b-nav-item :to="{ name: 'timeline' }"><BIconGraphUp /> {{ $t('menuTimeSeries') }}</b-nav-item>
           <b-nav-item :to="{ name: 'heatmap' }"><BIconGridFill /> {{ $t('menuHeatmap') }}</b-nav-item>
+          <b-nav-item :to="{ name: 'stats' }"><BIconBarChartSteps /> {{ $t('menuStats') }}</b-nav-item>
           <b-nav-item :to="{ name: 'location-map' }"><BIconMap /> {{ $t('menuLocationMap') }}</b-nav-item>
         </b-navbar-nav>
 
@@ -60,7 +61,7 @@ import Tour from '@/components/Tour'
 
 import { loadLanguageAsync } from '@/plugins/i18n'
 
-import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconGridFill, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
+import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconBarChartSteps, BIconGridFill, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
 
 import { EventBus } from '@/plugins/event-bus'
 
@@ -75,6 +76,7 @@ export default {
     BIconGridFill,
     BIconInfoCircle,
     BIconFlag,
+    BIconBarChartSteps,
     BIconPlus,
     Tour
   },

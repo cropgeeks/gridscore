@@ -30,6 +30,26 @@ export default {
   },
   methods: {
     /**
+     * For the given trait, return the i18n text
+     * @param trait The trait for which to return the text
+     */
+    getTraitTypeText: function (trait) {
+      switch (trait.type) {
+        case 'date':
+          return this.$t('traitTypeDate')
+        case 'int':
+          return this.$t('traitTypeInt')
+        case 'float':
+          return this.$t('traitTypeFloat')
+        case 'text':
+          return this.$t('traitTypeText')
+        case 'categorical':
+          return this.$t('traitTypeCategorical')
+        default:
+          return null
+      }
+    },
+    /**
      * Sends the currently selected dataset configuration to the server.
      * The server will respond with a UUID that uniquely identifies this configuration allowing to share it with other devices.
      * @returns Promise

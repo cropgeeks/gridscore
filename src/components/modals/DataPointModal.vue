@@ -272,26 +272,6 @@ export default {
       return this.getToday().toISOString().split('T')[0]
     },
     /**
-     * For the given trait, return the i18n text
-     * @param trait The trait for which to return the text
-     */
-    getTraitTypeText: function (trait) {
-      switch (trait.type) {
-        case 'date':
-          return this.$t('traitTypeDate')
-        case 'int':
-          return this.$t('traitTypeInt')
-        case 'float':
-          return this.$t('traitTypeFloat')
-        case 'text':
-          return this.$t('traitTypeText')
-        case 'categorical':
-          return this.$t('traitTypeCategorical')
-        default:
-          return null
-      }
-    },
-    /**
      * Shows the modal and resets it to its initial state
      */
     show: function () {
