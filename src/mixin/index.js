@@ -22,6 +22,7 @@ export default {
       'storeLocale',
       'storeRows',
       'storeServerUrl',
+      'storeShowStatsInTable',
       'storeTraitColors',
       'storeTraits',
       'storeUseGps',

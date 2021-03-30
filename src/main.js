@@ -28,6 +28,7 @@ import {
   TooltipPlugin,
   PopoverPlugin,
   SpinnerPlugin,
+  ProgressPlugin,
   JumbotronPlugin,
   SidebarPlugin
 } from 'bootstrap-vue'
@@ -80,6 +81,7 @@ Vue.use(TooltipPlugin)
 Vue.use(PopoverPlugin)
 Vue.use(SpinnerPlugin)
 Vue.use(JumbotronPlugin)
+Vue.use(ProgressPlugin)
 Vue.mixin(mixin)
 
 // Set base URL based on environment

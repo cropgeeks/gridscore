@@ -12,9 +12,15 @@
         </template>
         <tr>
           <th></th>
-          <th role="columnheader" scope="col" :class="`text-center ${columnClasses[column - 1]}`" v-for="column in storeCols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">
-            <span v-if="storeInvertNumberingX">{{ storeCols - column + 1 }}</span>
-            <span v-else>{{ column }}</span>
+          <th role="columnheader" scope="col" :class="`p-0 text-center ${columnClasses[column - 1]}`" v-for="column in storeCols" :key="`table-column-${column}`" @click="onHeadClicked(column - 1)">
+            <div class="p-3">
+              <span v-if="storeInvertNumberingX">{{ storeCols - column + 1 }}</span>
+              <span v-else>{{ column }}</span>
+            </div>
+
+            <div v-if="traitStats" class="d-flex align-items-end" :style="{ height: `${traitStatsHeight}px` }">
+              <div v-for="(trait, traitIndex) in storeTraits" :key="`trait-stats-col-${column}-${traitIndex}`" class="w-100" :style="{ height: `${traitStats[trait.name].cols[column - 1].count / traitStats[trait.name].cols[column - 1].total * traitStatsHeight}px`, backgroundColor: storeTraitColors[traitIndex % storeTraitColors.length] }" />
+            </div>
           </th>
           <th></th>
         </tr>
@@ -22,17 +28,28 @@
       <!-- Handle click events -->
       <tbody role="rowgroup" v-on:click="onTableClick">
         <tr role="row" v-for="rowIndex in storeRows" :key="`table-row-${rowIndex}`">
-          <th role="rowheader" class="text-right" v-if="storeInvertNumberingY">{{ storeRows - rowIndex + 1 }}</th>
-          <th role="rowheader" class="text-right" v-else>{{ rowIndex }}</th>
+          <th role="rowheader" :class="`${traitStats ? 'pr-3 position-relative' : ''} p-0 text-right h-100`">
+            <div class="p-3 d-inline-block">
+              <span v-if="storeInvertNumberingY">{{ storeRows - rowIndex + 1 }}</span>
+              <span v-else>{{ rowIndex }}</span>
+            </div>
+            <div class="d-inline-block h-100 position-absolute" :style="{ right: 0, top: 0, bottom: 0 }" v-if="traitStats">
+              <div v-if="traitStats" class="d-flex flex-column align-items-end h-100" :style="{ width: `${traitStatsHeight}px` }">
+                <div v-for="(trait, traitIndex) in storeTraits" :key="`trait-stats-col-${rowIndex}-${traitIndex}`" class="h-100" :style="{ width: `${traitStats[trait.name].rows[rowIndex - 1].count / traitStats[trait.name].rows[rowIndex - 1].total * traitStatsHeight}px`, backgroundColor: storeTraitColors[traitIndex % storeTraitColors.length] }" />
+              </div>
+            </div>
+          </th>
           <GridTableCell :row="rowIndex - 1" :col="colIndex - 1" :highlightRow="highlightRow" :highlightCol="highlightCol" :visibleTraits="visibleTraits" :markedColumns="markedColumns" v-for="colIndex in storeCols" :key="`table-row-${rowIndex}-col-${colIndex}`" />
-          <th role="rowheader" class="text-left" v-if="storeInvertNumberingY">{{ storeRows - rowIndex  + 1}}</th>
-          <th role="rowheader" class="text-left" v-else>{{ rowIndex }}</th>
+          <th role="rowheader" class="text-left p-3">
+            <span v-if="storeInvertNumberingY">{{ storeRows - rowIndex + 1 }}</span>
+            <span v-else>{{ rowIndex }}</span>
+          </th>
         </tr>
       </tbody>
       <tfoot>
         <tr>
           <th></th>
-          <th :class="`text-center ${columnClasses[column - 1]}`" v-for="column in storeCols" :key="`table-column-${column}`">
+          <th :class="`p-3 text-center ${columnClasses[column - 1]}`" v-for="column in storeCols" :key="`table-column-${column}`">
             <span v-if="storeInvertNumberingX">{{ storeCols - column + 1 }}</span>
             <span v-else>{{ column }}</span>
           </th>
@@ -64,11 +81,16 @@ export default {
     highlightPosition: {
       type: Object,
       default: () => null
+    },
+    traitStats: {
+      type: Object,
+      default: () => null
     }
   },
   data: function () {
     return {
-      markedColumns: []
+      markedColumns: [],
+      traitStatsHeight: 20
     }
   },
   watch: {

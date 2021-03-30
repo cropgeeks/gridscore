@@ -42,6 +42,7 @@ const storeState = {
     invertView: false,
     invertNumberingX: false,
     invertNumberingY: false,
+    showStatsInTable: false,
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
   },
   getters: {
@@ -65,6 +66,7 @@ const storeState = {
     storeInvertView: (state) => state.invertView,
     storeInvertNumberingX: (state) => state.invertNumberingX,
     storeInvertNumberingY: (state) => state.invertNumberingY,
+    storeShowStatsInTable: (state) => state.showStatsInTable,
     storeTraitColors: (state) => state.traitColors
   },
   mutations: {
@@ -222,6 +224,9 @@ const storeState = {
     },
     ON_INVERT_NUMBERING_Y_CHANGED_MUTATION: function (state, newInvertNumberingY) {
       state.invertNumberingY = newInvertNumberingY
+    },
+    ON_SHOW_STATS_IN_TABLE_CHANGED_MUTATION: function (state, newShowStatsInTable) {
+      state.showStatsInTable = newShowStatsInTable
     }
   },
   actions: {
@@ -313,6 +318,9 @@ const storeState = {
     },
     setInvertNumberingY: function ({ commit }, invertNumberingY) {
       commit('ON_INVERT_NUMBERING_Y_CHANGED_MUTATION', invertNumberingY)
+    },
+    setShowStatsInTable: function ({ commit }, showStatsInTable) {
+      commit('ON_SHOW_STATS_IN_TABLE_CHANGED_MUTATION', showStatsInTable)
     }
   },
   plugins: [createPersistedState({

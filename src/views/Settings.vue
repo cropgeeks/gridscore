@@ -38,6 +38,9 @@
         </b-col>
         <b-col cols=12 md=6>
           <h2>{{ $t('pageSettingsVisualTitle') }}</h2>
+          <b-form-group :label="$t('formLabelSettingsShowStatsInTable')" label-for="invert-view" :description="$t('formDescriptionSettingsShowStatsInTable')">
+            <b-form-checkbox v-model="tempShowStatsInTable" switch id="invert-view">{{ $t('buttonToggleShowStatsInTable') }}</b-form-checkbox>
+          </b-form-group>
           <b-form-group :label="$t('formLabelSettingsInvertView')" label-for="invert-view" :description="$t('formDescriptionSettingsInvertView')">
             <b-form-checkbox v-model="tempInvertView" switch id="invert-view">{{ $t('buttonToggleInvertView') }}</b-form-checkbox>
           </b-form-group>
@@ -95,6 +98,7 @@ export default {
       tempInvertView: false,
       tempInvertNumberingX: false,
       tempInvertNumberingY: false,
+      tempShowStatsInTable: false,
       tempGridLinesEvery: 5,
       tempColumnWidth: null,
       tempColors: [],
@@ -115,6 +119,7 @@ export default {
       this.tempColumnWidth = this.storeColumnWidth
       this.tempInvertNumberingX = this.storeInvertNumberingX
       this.tempInvertNumberingY = this.storeInvertNumberingY
+      this.tempShowStatsInTable = this.storeShowStatsInTable
       this.tempColors = JSON.parse(JSON.stringify(this.storeTraitColors))
     },
     resetApp: function () {
@@ -152,6 +157,9 @@ export default {
       }
       if (this.tempInvertNumberingY !== this.storeInvertNumberingY) {
         this.$store.dispatch('setInvertNumberingY', this.tempInvertNumberingY)
+      }
+      if (this.tempShowStatsInTable !== this.storeShowStatsInTable) {
+        this.$store.dispatch('setShowStatsInTable', this.tempShowStatsInTable)
       }
       if (this.tempColumnWidth !== this.storeColumnWidth) {
         this.$store.dispatch('setColumnWidth', this.tempColumnWidth)

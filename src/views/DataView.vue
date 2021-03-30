@@ -17,15 +17,18 @@
       <b-button @click="$router.push({ name: 'share' })" class="mx-1" v-b-tooltip="$t('tooltipShare')"><BIconShareFill /></b-button>
 
       <b-button-group class="d-flex flex-row align-items-center flex-wrap">
-        <b-button v-for="(trait, index) in storeTraits" :key="`trait-${index}`" variant="light" @click="toggleVisibility(index)" v-b-tooltip="$t('tooltipTraitToggle')">
+        <b-button v-for="(trait, index) in storeTraits" :key="`trait-${index}`" class="position-relative" variant="light" @click="toggleVisibility(index)" v-b-tooltip="$t('tooltipTraitToggle')">
           <span class="mx-1" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? storeTraitColors[index % storeTraitColors.length] : 'lightgray' }"><BIconCircleFill /> {{ trait.name }}</span>
+          <b-progress class="trait-progress" height="3px" v-if="traitStats[trait.name]">
+            <b-progress-bar :value="traitStats[trait.name].count / traitStats[trait.name].total * 100" :style="{ backgroundColor: storeTraitColors[index % storeTraitColors.length] }"/>
+          </b-progress>
         </b-button>
       </b-button-group>
 
       <b-button @click="$router.push({ name: 'export' })" class="ml-auto">{{ $t('buttonExport') }}</b-button>
     </div>
 
-    <GridTableIndividualCell @cell-clicked="onCellClicked" :visibleTraits="visibleTraits" :highlightPosition="userPosition" v-if="storeTraits && storeTraits.length > 0" />
+    <GridTableIndividualCell @cell-clicked="onCellClicked" :traitStats="storeShowStatsInTable ? traitStats : null" :visibleTraits="visibleTraits" :highlightPosition="userPosition" v-if="storeTraits && storeTraits.length > 0" />
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
   </div>
 </template>
@@ -50,7 +53,8 @@ export default {
         row: null,
         col: null
       },
-      visibleTraits: null
+      visibleTraits: null,
+      traitStats: null
     }
   },
   watch: {
@@ -149,6 +153,7 @@ export default {
       }
     },
     update: function () {
+      this.traitStats = null
       if (this.storeTraits) {
         this.visibleTraits = this.storeTraits.map(t => true)
       } else {
@@ -157,6 +162,40 @@ export default {
 
       if (this.storeContinuousInput === true) {
         this.focusInterval = setInterval(this.forceFocus, 1000)
+      }
+
+      this.updateTraitStats()
+    },
+    updateTraitStats: function () {
+      if (this.storeTraits) {
+        // If we don't have stats yet, get them from the dataset
+        const tempStats = {}
+
+        this.storeTraits.forEach((t, tIndex) => {
+          tempStats[t.name] = {
+            rows: Array.from(Array(this.storeRows).keys()).map(i => { return { count: 0, total: 0 } }),
+            cols: Array.from(Array(this.storeCols).keys()).map(i => { return { count: 0, total: 0 } }),
+            count: 0,
+            total: 0
+          }
+
+          this.storeData.forEach((r, rowIndex) => {
+            r.forEach((c, colIndex) => {
+              tempStats[t.name].total++
+              tempStats[t.name].rows[rowIndex].total++
+              tempStats[t.name].cols[colIndex].total++
+              if (c.values[tIndex] !== undefined && c.values[tIndex] !== null && c.values[tIndex] !== '') {
+                tempStats[t.name].rows[rowIndex].count++
+                tempStats[t.name].cols[colIndex].count++
+                tempStats[t.name].count++
+              }
+            })
+          })
+        })
+
+        Object.freeze(tempStats)
+
+        this.traitStats = tempStats
       }
     }
   },
@@ -168,17 +207,25 @@ export default {
     }
 
     EventBus.$on('dataset-changed', this.update)
+    EventBus.$on('data-point-changed', this.updateTraitStats)
   },
   beforeDestroy: function () {
     if (this.focusInterval) {
       clearInterval(this.focusInterval)
     }
     EventBus.$off('dataset-changed', this.update)
+    EventBus.$off('data-point-changed', this.updateTraitStats)
   }
 }
 </script>
 
 <style>
+.trait-progress {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
 .grayed-out {
   filter: grayscale(100%);
 }
