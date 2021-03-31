@@ -1,5 +1,5 @@
 <template>
-  <td role="cell" :class="`text-center ${cellClasses}`" :id="`${row}-${col}`" v-if="row !== null && col !== null && cell">
+  <td role="cell" :class="`position-relative text-center ${cellClasses}`" :id="`${row}-${col}`" v-if="row !== null && col !== null && cell">
     <div>
       <!-- Variety name -->
       <span class="d-block grid-cell-name">
@@ -14,6 +14,7 @@
         <span class="mx-1 circle-icon" :key="`table-cell-${row}-${col}-${traitIndex}`" :style="{ opacity: 0 }" v-else>⬤</span>
       </template>
     </div>
+    <div class="position-absolute cell-bookmark" v-if="cell.isMarked" />
   </td>
 </template>
 
@@ -106,6 +107,16 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.cell-bookmark {
+  top: 0;
+  right: 5px;
+  height: 15px;
+  padding: 0px;
+  -webkit-transform: rotate(0deg) skew(0deg);
+  transform: rotate(0deg) skew(0deg);
+  border-left: 7px solid #3E3F3A;
+  border-right: 7px solid #3E3F3A;
+  border-bottom: 7px solid transparent;
+}
 </style>

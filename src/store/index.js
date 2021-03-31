@@ -168,6 +168,11 @@ const storeState = {
       // To save time, write directly to the temporary dataset object
       state.dataset.data[dataPoint.row][dataPoint.col].dates = dataPoint.dates
       state.dataset.data[dataPoint.row][dataPoint.col].values = dataPoint.values
+      if (dataPoint.isMarked) {
+        state.dataset.data[dataPoint.row][dataPoint.col].isMarked = dataPoint.isMarked
+      } else {
+        delete state.dataset.data[dataPoint.row][dataPoint.col].isMarked
+      }
 
       // Use Vue.set, because this wasn't a part of the object from the start, so needs setting to be reactive
       Vue.set(state.dataset.data[dataPoint.row][dataPoint.col], 'comment', dataPoint.comment)

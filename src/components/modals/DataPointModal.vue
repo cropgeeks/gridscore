@@ -1,6 +1,5 @@
 <template>
-  <b-modal :title="name"
-           :ok-title="$t('buttonOk')"
+  <b-modal :ok-title="$t('buttonOk')"
            :cancel-title="$t('buttonCancel')"
            @ok.prevent="onSubmit"
            @hide="disableSpeechRecognition"
@@ -8,6 +7,20 @@
            size="lg"
            no-fade
            ref="dataPointModal">
+    <template v-slot:modal-header="{ close }">
+      <h5 class="modal-title">{{ name }}</h5>
+
+      <b-button :pressed.sync="isMarked">
+        <template v-if="isMarked">
+          <BIconBookmarkCheckFill /> {{ $t('buttonUnbookmarkCell') }}
+        </template>
+        <template v-else>
+          <BIconBookmark /> {{ $t('buttonBookmarkCell') }}
+        </template>
+      </b-button>
+
+      <button class="close ml-0" @click="close()">×</button>
+    </template>
     <p>{{ $t('modalTextDataEntry') }}</p>
     <b-form @submit.prevent="onSubmit" :validated="formValidated">
       <b-form-group v-for="(trait, index) in storeTraits"
@@ -108,7 +121,7 @@
 <script>
 import Vue from 'vue'
 import ImageModal from '@/components/modals/ImageModal'
-import { BIconCameraFill, BIconCircleFill, BIconMic, BIconCaretLeftFill, BIconCaretRightFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
+import { BIconCameraFill, BIconBookmarkCheckFill, BIconBookmark, BIconCircleFill, BIconMic, BIconCaretLeftFill, BIconCaretRightFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
 
 import { mapGetters } from 'vuex'
 
@@ -138,6 +151,7 @@ export default {
       },
       name: null,
       comment: null,
+      isMarked: false,
       imageFile: null,
       imageData: null,
       formValidated: false,
@@ -169,6 +183,8 @@ export default {
   components: {
     BIconCameraFill,
     BIconCircleFill,
+    BIconBookmarkCheckFill,
+    BIconBookmark,
     BIconCaretLeftFill,
     BIconCaretRightFill,
     BIconCalendar3,
@@ -282,6 +298,7 @@ export default {
       this.values = JSON.parse(JSON.stringify(this.storeData[this.row][this.col].values))
       this.dates = JSON.parse(JSON.stringify(this.storeData[this.row][this.col].dates))
       this.name = this.storeData[this.row][this.col].name
+      this.isMarked = this.storeData[this.row][this.col].isMarked || false
       this.comment = this.storeData[this.row][this.col].comment
       this.$nextTick(() => this.$refs.dataPointModal.show())
 
@@ -405,6 +422,7 @@ export default {
         row: this.row,
         col: this.col,
         name: this.name,
+        isMarked: this.isMarked,
         values: this.values,
         dates: this.dates,
         geolocation: this.storeUseGps ? this.storeGeolocation : null,
