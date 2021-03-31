@@ -47,6 +47,10 @@ The timeline shows how many plots have already been scored per trait. This repre
 ![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-heatmap.png "Heatmap")
 Sometimes there are factors that can affect certain parts of the field. The heatmap plot shows your data in a colour-coded way to highlight possible localised artifacts. For date and text traits, the heatmap shows the recording date in days after the first data value. For integer and floating point traits, the heatmap shows the actual data value.
 
+### Trait statistics
+![](https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/screenshot-trait-stats.png "Trait statistics")
+Another way of looking at your data is by plotting the data for each trait in either a boxplot or a bar chart to show the value distribution. This highlights important statistics like minimum, maximum, median as well as outliers.
+
 ### Image tagging
 In addition to the features highlighted above, GridScore can prompt your mobile device to take a photo which will then be tagged with the germplasm/variety name and a timestamp to significantly reduce the amount of effort that has to go into organising your photographs later.
 
