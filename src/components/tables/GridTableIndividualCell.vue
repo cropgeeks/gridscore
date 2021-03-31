@@ -18,7 +18,7 @@
               <span v-else>{{ column }}</span>
             </div>
 
-            <div v-if="traitStats" class="d-flex align-items-end" :style="{ height: `${traitStatsHeight}px` }">
+            <div v-if="traitStats" class="trait-stats-col d-flex align-items-end" :style="{ height: `${traitStatsHeight}px` }">
               <div v-for="(trait, traitIndex) in storeTraits" :key="`trait-stats-col-${column}-${traitIndex}`" class="w-100" :style="{ height: `${traitStats[trait.name].cols[column - 1].count / traitStats[trait.name].cols[column - 1].total * traitStatsHeight}px`, backgroundColor: storeTraitColors[traitIndex % storeTraitColors.length] }" />
             </div>
           </th>
@@ -34,7 +34,7 @@
               <span v-else>{{ rowIndex }}</span>
             </div>
             <div class="d-inline-block h-100 position-absolute" :style="{ right: 0, top: 0, bottom: 0 }" v-if="traitStats">
-              <div v-if="traitStats" class="d-flex flex-column align-items-end h-100" :style="{ width: `${traitStatsHeight}px` }">
+              <div v-if="traitStats" class="trait-stats-row d-flex flex-column align-items-end h-100" :style="{ width: `${traitStatsHeight}px` }">
                 <div v-for="(trait, traitIndex) in storeTraits" :key="`trait-stats-col-${rowIndex}-${traitIndex}`" class="h-100" :style="{ width: `${traitStats[trait.name].rows[rowIndex - 1].count / traitStats[trait.name].rows[rowIndex - 1].total * traitStatsHeight}px`, backgroundColor: storeTraitColors[traitIndex % storeTraitColors.length] }" />
               </div>
             </div>
@@ -245,6 +245,12 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.grid-table .trait-stats-col > div {
+  margin: 0 1px;
+}
+.grid-table .trait-stats-row > div {
+  margin: 1px 0;
 }
 
 .table-fixed-header          { overflow-y: auto; max-height: 100vh; margin-bottom: 0; }

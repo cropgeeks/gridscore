@@ -38,8 +38,8 @@
         </b-col>
         <b-col cols=12 md=6>
           <h2>{{ $t('pageSettingsVisualTitle') }}</h2>
-          <b-form-group :label="$t('formLabelSettingsShowStatsInTable')" label-for="invert-view" :description="$t('formDescriptionSettingsShowStatsInTable')">
-            <b-form-checkbox v-model="tempShowStatsInTable" switch id="invert-view">{{ $t('buttonToggleShowStatsInTable') }}</b-form-checkbox>
+          <b-form-group :label="$t('formLabelSettingsShowStatsInTable')" label-for="stats-in-table" :description="$t('formDescriptionSettingsShowStatsInTable')">
+            <b-form-checkbox v-model="tempShowStatsInTable" switch id="stats-in-table">{{ $t('buttonToggleShowStatsInTable') }}</b-form-checkbox>
           </b-form-group>
           <b-form-group :label="$t('formLabelSettingsInvertView')" label-for="invert-view" :description="$t('formDescriptionSettingsInvertView')">
             <b-form-checkbox v-model="tempInvertView" switch id="invert-view">{{ $t('buttonToggleInvertView') }}</b-form-checkbox>
