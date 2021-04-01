@@ -163,6 +163,11 @@ export default {
 .grid-table {
   table-layout: fixed;
 }
+.grid-table th:first-child,
+.grid-table td:first-child {
+  position: sticky !important;
+  left: 0px;
+}
 .grid-table .circle-icon {
   font-size: 18px;
 }

@@ -67,9 +67,6 @@ export default {
       if (this.isUserPosition) {
         return 'table-success'
       }
-      if (this.cell.comment && this.cell.comment.length > 0) {
-        return 'table-warning'
-      }
       if (this.markedColumns && this.markedColumns[this.col]) {
         return 'table-primary'
       }

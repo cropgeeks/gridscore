@@ -15,6 +15,8 @@
   "buttonLoadExample": "Beispiel laden",
   "buttonLoadExampleData": "Beispiel-Daten laden",
   "buttonUuidImport": "Konfiguration laden",
+  "buttonUnbookmarkCell": "Lesezeichen entfernen",
+  "buttonBookmarkCell": "Lesezeichen hinzufügen",
   "buttonSave": "Speichern",
   "buttonWarningResetApp": "GridScore zurücksetzen",
   "buttonNext": "Weiter",

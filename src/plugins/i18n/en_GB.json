@@ -17,6 +17,8 @@
   "buttonLoadExample": "Load example",
   "buttonLoadExampleData": "Load example data",
   "buttonUuidImport": "Load configuration",
+  "buttonUnbookmarkCell": "Remove bookmark",
+  "buttonBookmarkCell": "Add bookmark",
   "buttonSave": "Save",
   "buttonWarningResetApp": "Reset GridScore",
   "buttonSetupTrial": "Set up a trial",
