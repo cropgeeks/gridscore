@@ -103,17 +103,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.cell-bookmark {
-  top: 0;
-  right: 5px;
-  height: 15px;
-  padding: 0px;
-  -webkit-transform: rotate(0deg) skew(0deg);
-  transform: rotate(0deg) skew(0deg);
-  border-left: 7px solid #3E3F3A;
-  border-right: 7px solid #3E3F3A;
-  border-bottom: 7px solid transparent;
-}
-</style>

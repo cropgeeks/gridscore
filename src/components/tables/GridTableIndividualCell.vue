@@ -171,6 +171,17 @@ export default {
 .grid-table .circle-icon {
   font-size: 18px;
 }
+.grid-table .cell-bookmark {
+  top: 0;
+  right: 5px;
+  height: 15px;
+  padding: 0px;
+  -webkit-transform: rotate(0deg) skew(0deg);
+  transform: rotate(0deg) skew(0deg);
+  border-left: 7px solid #8E8C84;
+  border-right: 7px solid #8E8C84;
+  border-bottom: 7px solid transparent;
+}
 .grid-table thead th {
   border-bottom: 1px solid;
   border-bottom-color: var(--primary) !important;
