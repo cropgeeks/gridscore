@@ -14,11 +14,21 @@
           <!-- The data is shown here, non-wrapped. On focus, select everything -->
           <b-form-textarea rows="8" readonly :value="text" id="exportText" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
         </b-form-group>
-        <!-- Toggle for showing dates -->
-        <b-form-checkbox class="mb-2" switch v-model="showDates">{{ $t('labelCheckboxExportUseDates') }}</b-form-checkbox>
         <!-- Link to actually download the data -->
         <div v-if="text && (text !== $t('labelNoData'))">
           <BIconDownload /> <a :href="getHrefData" :download="getFilenameData"> {{ $t('linkExport') }}</a>
+        </div>
+
+        <hr />
+
+        <b-form-group :label="$t('formLabelExportDatesText')"
+                        label-for="exportDatesText">
+          <!-- The data is shown here, non-wrapped. On focus, select everything -->
+          <b-form-textarea rows="8" readonly :value="datesText" id="exportDatesText" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
+        </b-form-group>
+        <!-- Link to actually download the data -->
+        <div v-if="datesText && (datesText !== $t('labelNoData'))">
+          <BIconDownload /> <a :href="getHrefDates" :download="getFilenameDates"> {{ $t('linkExport') }}</a>
         </div>
       </b-tab>
       <!-- Tab for the trait definitions -->
@@ -48,11 +58,6 @@ export default {
     BIconDownload,
     BIconArrowLeft
   },
-  data: function () {
-    return {
-      showDates: 0
-    }
-  },
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
@@ -68,8 +73,14 @@ export default {
     getFilenameData: function () {
       return `data-${this.safeFilename}-${new Date().toISOString().split('T')[0]}.txt`
     },
+    getFilenameDates: function () {
+      return `dates-${this.safeFilename}-${new Date().toISOString().split('T')[0]}.txt`
+    },
     getFilenameTraits: function () {
       return `traits-${this.safeFilename}-${new Date().toISOString().split('T')[0]}.txt`
+    },
+    getHrefDates: function () {
+      return 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.datesText)
     },
     getHrefData: function () {
       return 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.text)
@@ -115,6 +126,51 @@ export default {
 
       return result
     },
+    datesText: function () {
+      if (!this.storeData || this.storeData.length < 1 || !this.storeTraits || this.storeTraits.length < 1) {
+        return this.$t('labelNoData')
+      }
+
+      // Header row
+      let result = `Line/Trait\t${this.storeTraits.map(t => t.name).join('\t')}\tLat\tLng\tElv\tComment`
+
+      // For each field row
+      for (let y = 0; y < this.storeRows; y++) {
+        // And each field column
+        for (let x = 0; x < this.storeCols; x++) {
+          // Get the data cell
+          const cell = this.storeData[y][x]
+          // If there is data
+          if (cell) {
+            // Get it
+            const data = cell.dates
+            // If there is a value and they aren't all empty
+            if (cell.comment || (data && data.length > 0 && !data.every(c => c === null || c.length < 1))) {
+              result += '\n'
+              // Variety name
+              result += cell.name
+
+              // Values joined
+              result += '\t' + data.join('\t')
+
+              // Geolocation if available
+              if (cell.geolocation) {
+                result += '\t' + (cell.geolocation.lat ? cell.geolocation.lat : '')
+                result += '\t' + (cell.geolocation.lng ? cell.geolocation.lng : '')
+                result += '\t' + (cell.geolocation.elv ? cell.geolocation.elv : '')
+              } else {
+                result += '\t\t\t'
+              }
+
+              // Comments
+              result += '\t' + (cell.comment ? cell.comment : '')
+            }
+          }
+        }
+      }
+
+      return result
+    },
     text: function () {
       if (!this.storeData || this.storeData.length < 1 || !this.storeTraits || this.storeTraits.length < 1) {
         return this.$t('labelNoData')
@@ -131,8 +187,8 @@ export default {
           const cell = this.storeData[y][x]
           // If there is data
           if (cell) {
-            // Get it (either actual data or date)
-            const data = this.showDates ? cell.dates : cell.values
+            // Get it
+            const data = cell.values
             // If there is a value and they aren't all empty
             if (cell.comment || (data && data.length > 0 && !data.every(c => c === null || c.length < 1))) {
               result += '\n'
