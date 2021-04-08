@@ -181,5 +181,13 @@
   "tourTextSetupMap": "Falls GridScore deine Position im Versuchsfeld anzeigen soll, gib die Eckpunkte des Feldes an.",
   "tourTitleConclusion": "Ende",
   "tourTextConclusion": "Dies war eine kurze Einleitung zu GridScore. Experimentier mit den Einstellungen um zu verstehen was möglich ist. Vielleicht wären die Beispieldaten ein guter Startpunkt!",
-  "widgetSidebarTitle": "Datensätze"
+  "widgetSidebarTitle": "Datensätze",
+  "widgetGuideOrderUpLeft": "Hoch, links, runter, links",
+  "widgetGuideOrderUpRight": "Hoch, rechts, runter, rechts",
+  "widgetGuideOrderDownLeft": "Down, links, hoch, links",
+  "widgetGuideOrderDownRight": "Down, rechts, hoch, rechts",
+  "widgetGuideOrderLeftUp": "Links, hoch, rechts, hoch",
+  "widgetGuideOrderLeftDown": "Links, runter, rechts, runter",
+  "widgetGuideOrderRightDown": "Right, runter, links, runter",
+  "widgetGuideOrderRightUp": "Right, hoch, links, hoch"
 }

@@ -181,5 +181,13 @@
   "tourTextSetupMap": "If you want GridScore to highlight your current location within the trial, define the corner points of the field.",
   "tourTitleConclusion": "The End",
   "tourTextConclusion": "This was a short introduction to GridScore. Play around and experiment with it to see how it works. Maybe start by loading the example trial!",
-  "widgetSidebarTitle": "Datasets"
+  "widgetSidebarTitle": "Datasets",
+  "widgetGuideOrderUpLeft": "Up, left, down, left",
+  "widgetGuideOrderUpRight": "Up, right, down, right",
+  "widgetGuideOrderDownLeft": "Down, left, up, left",
+  "widgetGuideOrderDownRight": "Down, right, up, right",
+  "widgetGuideOrderLeftUp": "Left, up, right, up",
+  "widgetGuideOrderLeftDown": "Left, down, right, down",
+  "widgetGuideOrderRightDown": "Right, down, left, down",
+  "widgetGuideOrderRightUp": "Right, up, left, up"
 }

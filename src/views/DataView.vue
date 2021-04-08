@@ -19,7 +19,7 @@
       <b-button-group class="d-flex flex-row align-items-center flex-wrap">
         <b-button v-for="(trait, index) in storeTraits" :key="`trait-${index}`" class="position-relative" variant="light" @click="toggleVisibility(index)" v-b-tooltip="$t('tooltipTraitToggle')">
           <span class="mx-1" :style="{ color: (visibleTraits && visibleTraits[index] === true) ? storeTraitColors[index % storeTraitColors.length] : 'lightgray' }"><BIconCircleFill /> {{ trait.name }}</span>
-          <b-progress class="trait-progress" height="3px" v-if="traitStats[trait.name]">
+          <b-progress class="trait-progress" height="3px" v-if="traitStats && traitStats[trait.name]">
             <b-progress-bar :value="traitStats[trait.name].count / traitStats[trait.name].total * 100" :style="{ backgroundColor: storeTraitColors[index % storeTraitColors.length] }"/>
           </b-progress>
         </b-button>
@@ -126,10 +126,19 @@ export default {
       this.storeData.forEach((r, rowIndex) => {
         r.forEach((c, columnIndex) => {
           if (c.name !== undefined && c.name !== null && c.name.toLowerCase() === this.searchTermLowerCase) {
-            this.onCellClicked({
-              row: rowIndex,
-              col: columnIndex
+            const cell = document.querySelector(`#grid-table table tr:nth-child(${rowIndex}) td:nth-child(${columnIndex + 1})`)
+
+            if (cell) {
+              cell.scrollIntoView()
+            }
+
+            this.$nextTick(() => {
+              this.onCellClicked({
+                row: rowIndex,
+                col: columnIndex
+              })
             })
+
             this.searchTerm = null
           }
         })
