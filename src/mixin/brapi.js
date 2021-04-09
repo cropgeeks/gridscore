@@ -1,3 +1,4 @@
+import { mapGetters } from 'vuex'
 const axios = require('axios').default
 
 export default {
@@ -7,6 +8,12 @@ export default {
       serverInfos: {
       }
     }
+  },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeBrapiConfig'
+    ])
   },
   methods: {
     /**

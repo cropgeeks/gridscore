@@ -1,3 +1,5 @@
+import { mapGetters } from 'vuex'
+
 export default {
   data: function () {
     return {
@@ -59,6 +61,13 @@ export default {
         image: require('@/assets/scoring-order-r-u.svg')
       }]
     }
+  },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeCols',
+      'storeRows'
+    ])
   },
   methods: {
     guideCellSequence: function (startX, startY, startDirection, nextMethod) {

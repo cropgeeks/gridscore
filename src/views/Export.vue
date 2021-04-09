@@ -61,7 +61,11 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeData'
+      'storeCols',
+      'storeData',
+      'storeDatasetName',
+      'storeRows',
+      'storeTraits'
     ]),
     safeFilename: function () {
       if (this.storeDatasetName) {

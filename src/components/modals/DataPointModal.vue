@@ -25,18 +25,20 @@
       <button class="close ml-0" @click="close()">×</button>
     </template>
     <template v-if="!isGuidedWalk">
-      <b-button v-b-toggle.data-point-guide-collapse class="mb-3">{{ $t('buttonStartGuidedWalkToggle') }}</b-button>
+      <b-button v-b-toggle.data-point-guide-collapse class="mb-3"><BIconSignpost /> {{ $t('buttonStartGuidedWalkToggle') }}</b-button>
       <b-collapse id="data-point-guide-collapse" class="mb-3">
+        <p class="text-info">{{ $t('widgetGuideOrderText') }}</p>
         <GuideOrderSelector :row="localRow" :col="localCol" @order-selected="orderSelected"/>
-        <b-button @click="isGuidedWalk = true">{{ $t('buttonStartGuidedWalk') }}</b-button>
+        <b-button :disabled="!selectedOrder" @click="isGuidedWalk = true"><BIconPlay /> {{ $t('buttonStartGuidedWalk') }}</b-button>
       </b-collapse>
     </template>
-    <DataPointEntry :row="localRow" :col="localCol" :key="`${localRow}-${localCol}`" ref="dataPointEntry" />
+    <DataPointEntry :isMarked="isMarked" :row="localRow" :col="localCol" :key="`${localRow}-${localCol}`" ref="dataPointEntry" />
 
     <template v-slot:modal-footer="{ ok, cancel }">
       <template v-if="isGuidedWalk">
         <b-button @click="prev" :disabled="walkingOrderIndex <= 0"><BIconChevronLeft /> {{ $t('buttonBack') }}</b-button>
-        <b-button @click="next" :disabled="walkingOrderIndex >= walkingOrder.length - 1">{{ $t('buttonNext') }} <BIconChevronRight /></b-button>
+        <b-button @click="finish" v-if="walkingOrderIndex >= walkingOrder.length - 1">{{ $t('buttonFinish') }} <BIconCheck2All /></b-button>
+        <b-button @click="next" v-else>{{ $t('buttonNext') }} <BIconChevronRight /></b-button>
       </template>
       <template v-else>
         <b-button variant="secondary" @click="cancel">{{ $t('buttonCancel') }}</b-button>
@@ -49,7 +51,7 @@
 <script>
 import DataPointEntry from '@/components/DataPointEntry'
 import GuideOrderSelector from '@/components/GuideOrderSelector'
-import { BIconBookmarkCheckFill, BIconBookmark, BIconChevronLeft, BIconChevronRight } from 'bootstrap-vue'
+import { BIconBookmarkCheckFill, BIconBookmark, BIconCheck2All, BIconPlay, BIconSignpost, BIconChevronLeft, BIconChevronRight } from 'bootstrap-vue'
 import types from '@/mixin/types'
 
 /**
@@ -83,7 +85,10 @@ export default {
   },
   components: {
     BIconBookmarkCheckFill,
+    BIconSignpost,
+    BIconPlay,
     BIconBookmark,
+    BIconCheck2All,
     BIconChevronLeft,
     BIconChevronRight,
     DataPointEntry,
@@ -150,6 +155,13 @@ export default {
         }
       })
     },
+    finish: function () {
+      this.$refs.dataPointEntry.verify(valid => {
+        if (valid) {
+          this.hide()
+        }
+      })
+    },
     update: function () {
       if (this.localRow !== null && this.localCol !== null) {
         const cell = this.$store.getters.storeData[this.localRow][this.localCol]
@@ -175,7 +187,11 @@ export default {
      * Handle the submit event. Checks restrictions before accepting the data.
      */
     onSubmit: function () {
-      this.$refs.dataPointEntry.verify()
+      this.$refs.dataPointEntry.verify(valid => {
+        if (valid) {
+          this.hide()
+        }
+      })
     },
     onHide: function () {
       this.$nextTick(() => this.$refs.dataPointEntry.disableSpeechRecognition())

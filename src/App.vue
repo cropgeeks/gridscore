@@ -57,14 +57,11 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Tour from '@/components/Tour'
-
 import { loadLanguageAsync } from '@/plugins/i18n'
-
 import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconBarChartSteps, BIconGridFill, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
-
 import { EventBus } from '@/plugins/event-bus'
-
 import idb from '@/plugins/idb'
 
 export default {
@@ -156,6 +153,13 @@ export default {
       sidebarShown: false,
       sidebarCaller: null
     }
+  },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeDatasetId',
+      'storeLocale'
+    ])
   },
   methods: {
     onDatasetSelected: function (datasetId) {

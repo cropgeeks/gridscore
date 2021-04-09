@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { EventBus } from '@/plugins/event-bus.js'
 
 export default {
@@ -60,6 +61,14 @@ export default {
     }
   },
   computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeDatasetId',
+      'storeInvertView',
+      'storeTraitColors',
+      'storeTraits',
+      'storeUseGps'
+    ]),
     isUserPosition: function () {
       return this.storeUseGps === true && this.highlightRow === this.row && this.highlightCol === this.col
     },

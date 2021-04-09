@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { BIconCursorFill, BIconBullseye } from 'bootstrap-vue'
 
 export default {
@@ -36,6 +37,11 @@ export default {
     }
   },
   computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeCornerPoints',
+      'storeUseGps'
+    ]),
     userRotate: function () {
       if (this.position && this.position !== null && this.position.heading !== null && this.position.heading >= 0 && this.position.heading <= 360) {
         // Calculate the angles between a vertical line and the right hand edge of the field layout

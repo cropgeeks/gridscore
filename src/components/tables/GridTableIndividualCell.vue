@@ -62,6 +62,7 @@
 
 <script>
 import Vue from 'vue'
+import { mapGetters } from 'vuex'
 
 import GridTableCell from '@/components/tables/GridTableCell'
 import UserPositionIndicator from '@/components/UserPositionIndicator'
@@ -99,6 +100,18 @@ export default {
     }
   },
   computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeCols',
+      'storeColumnWidth',
+      'storeGridLinesEvery',
+      'storeInvertNumberingX',
+      'storeInvertNumberingY',
+      'storeRows',
+      'storeTraitColors',
+      'storeTraits',
+      'storeUseGps'
+    ]),
     /** The row the user is currently in */
     highlightRow: function () {
       if (this.storeUseGps && this.highlightPosition) {

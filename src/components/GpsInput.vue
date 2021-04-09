@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { BIconGeoAltFill } from 'bootstrap-vue'
 
 /**
@@ -33,6 +34,12 @@ export default {
       latitude: null,
       longitude: null
     }
+  },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeGeolocation'
+    ])
   },
   watch: {
     currentPosition: function () {

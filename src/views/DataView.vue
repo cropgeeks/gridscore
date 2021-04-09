@@ -88,7 +88,15 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeData'
+      'storeCols',
+      'storeContinuousInput',
+      'storeCornerPoints',
+      'storeData',
+      'storeGeolocation',
+      'storeRows',
+      'storeShowStatsInTable',
+      'storeTraitColors',
+      'storeTraits'
     ]),
     searchTermLowerCase: function () {
       if (this.searchTerm) {

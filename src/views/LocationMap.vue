@@ -70,7 +70,12 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeData'
+      'storeCols',
+      'storeCornerPoints',
+      'storeData',
+      'storeGeolocation',
+      'storeRows',
+      'storeTraits'
     ]),
     selectedLocationData: function () {
       let result = {}

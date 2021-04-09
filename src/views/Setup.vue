@@ -115,6 +115,7 @@ import JsonExportModal from '@/components/modals/JsonExportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
 import IconBrapi from '@/components/IconBrapi'
 
+import { mapGetters } from 'vuex'
 import { BIconGear, BIconArrowLeft, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
 
 /**
@@ -157,6 +158,13 @@ export default {
       },
       varietiesFile: null
     }
+  },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeDatasetId',
+      'storeDatasetName'
+    ])
   },
   watch: {
     varietiesFile: function (newValue) {

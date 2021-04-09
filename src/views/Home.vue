@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { EventBus } from '@/plugins/event-bus'
 
 import { BIconJournalPlus, BIconFileSpreadsheet, BIconPlayFill } from 'bootstrap-vue'
@@ -26,6 +27,12 @@ export default {
     BIconJournalPlus,
     BIconFileSpreadsheet,
     BIconPlayFill
+  },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeDatasetId'
+    ])
   },
   methods: {
     startTour: function () {

@@ -93,7 +93,17 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeData'
+      'storeCols',
+      'storeColumnWidth',
+      'storeData',
+      'storeGridLinesEvery',
+      'storeInvertView',
+      'storeInvertNumberingX',
+      'storeInvertNumberingY',
+      'storeRows',
+      'storeTraitColors',
+      'storeTraits',
+      'storeUseGps'
     ]),
     columnClasses: function () {
       let result = []

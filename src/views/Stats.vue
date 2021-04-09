@@ -24,7 +24,10 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeData'
+      'storeData',
+      'storeDatasetName',
+      'storeTraitColors',
+      'storeTraits'
     ]),
     safeDatasetName: function () {
       if (this.storeDatasetName) {

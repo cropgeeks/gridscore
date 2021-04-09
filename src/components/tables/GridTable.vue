@@ -69,7 +69,12 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeData'
+      'storeCols',
+      'storeData',
+      'storeRows',
+      'storeTraitColors',
+      'storeTraits',
+      'storeUseGps'
     ]),
     /** The index of the last column. Used for the slot in the table */
     lastIndex: function () {

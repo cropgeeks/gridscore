@@ -30,7 +30,13 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeData'
+      'storeCols',
+      'storeData',
+      'storeDatasetName',
+      'storeLocale',
+      'storeRows',
+      'storeTraitColors',
+      'storeTraits'
     ]),
     safeDatasetName: function () {
       if (this.storeDatasetName) {

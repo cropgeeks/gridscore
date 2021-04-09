@@ -12,11 +12,19 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import FieldMap from '@/components/FieldMap'
 
 export default {
   components: {
     FieldMap
+  },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeCols',
+      'storeRows'
+    ])
   },
   methods: {
     /**

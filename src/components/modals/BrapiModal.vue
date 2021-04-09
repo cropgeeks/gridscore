@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { BIconArrowClockwise } from 'bootstrap-vue'
 
 /**
@@ -61,6 +62,12 @@ export default {
       type: Boolean,
       default: false
     }
+  },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeBrapiConfig'
+    ])
   },
   methods: {
     /**

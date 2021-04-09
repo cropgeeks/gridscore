@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { LMap, LMarker, LPolygon, LPolyline, LPopup, LIcon } from 'vue2-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -78,6 +79,10 @@ export default {
     }
   },
   computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeGeolocation'
+    ]),
     /** The marker objects to show on the map */
     markers: function () {
       if (this.locations) {

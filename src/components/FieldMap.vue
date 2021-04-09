@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Vue from 'vue'
 
 import GpsInput from '@/components/GpsInput'
@@ -58,6 +59,12 @@ export default {
       type: Boolean,
       default: true
     }
+  },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeCornerPoints'
+    ])
   },
   watch: {
     storeCornerPoints: function () {

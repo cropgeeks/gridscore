@@ -7,26 +7,7 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeBrapiConfig',
-      'storeColumnWidth',
-      'storeCols',
-      'storeContinuousInput',
-      'storeCornerPoints',
-      'storeDatasetId',
-      'storeDatasetName',
-      'storeGeolocation',
-      'storeGridLinesEvery',
-      'storeInvertView',
-      'storeInvertNumberingX',
-      'storeInvertNumberingY',
-      'storeLocale',
-      'storeRows',
-      'storeServerUrl',
-      'storeShowStatsInTable',
-      'storeTraitColors',
-      'storeTraits',
-      'storeUseGps',
-      'storeUseSpeech'
+      'storeServerUrl'
     ])
   },
   methods: {

@@ -76,6 +76,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { BIconArrowClockwise, BIconPlus, BIconX, BIconSlashCircle, BIconArrowLeft, BIconExclamationTriangleFill } from 'bootstrap-vue'
 
 /**
@@ -105,6 +106,21 @@ export default {
       newColor: 'black',
       validGridLines: [2, 3, 4, 5]
     }
+  },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeColumnWidth',
+      'storeContinuousInput',
+      'storeGridLinesEvery',
+      'storeInvertView',
+      'storeInvertNumberingX',
+      'storeInvertNumberingY',
+      'storeShowStatsInTable',
+      'storeTraitColors',
+      'storeUseGps',
+      'storeUseSpeech'
+    ])
   },
   methods: {
     /**

@@ -125,6 +125,10 @@ export default {
     col: {
       type: Number,
       default: null
+    },
+    isMarked: {
+      type: Boolean,
+      default: false
     }
   },
   data: function () {
@@ -135,7 +139,6 @@ export default {
       },
       name: null,
       comment: null,
-      isMarked: false,
       imageFile: null,
       imageData: null,
       formValidated: false,
@@ -149,7 +152,12 @@ export default {
   computed: {
      /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeData'
+      'storeData',
+      'storeGeolocation',
+      'storeTraitColors',
+      'storeTraits',
+      'storeUseGps',
+      'storeUseSpeech'
     ]),
     supportsSpeechRecognition: function () {
       return ('webkitSpeechRecognition' in window)
