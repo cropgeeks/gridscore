@@ -276,7 +276,7 @@ export default {
         this.values = JSON.parse(JSON.stringify(this.storeData[this.row][this.col].values))
         this.dates = JSON.parse(JSON.stringify(this.storeData[this.row][this.col].dates))
         this.name = this.storeData[this.row][this.col].name
-        this.isMarked = this.storeData[this.row][this.col].isMarked || false
+        // this.isMarked = this.storeData[this.row][this.col].isMarked || false
         this.comment = this.storeData[this.row][this.col].comment
 
         this.speak(this.name)

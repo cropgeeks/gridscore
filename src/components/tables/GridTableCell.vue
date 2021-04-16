@@ -8,10 +8,12 @@
       </span>
       <!-- For each trait -->
       <template v-for="(date, traitIndex) in cell.dates">
-        <!-- Show a circle in the representative trait color if it's not hidden -->
-        <span class="mx-1 circle-icon" :key="`table-cell-${row}-${col}-${traitIndex}`" :style="cellStyles[traitIndex]" v-if="storeInvertView ? (date === null || date.length < 1) : (date !== null && date.length > 0)">⬤</span>
-        <!-- Otherwise show a hidden circle -->
-        <span class="mx-1 circle-icon" :key="`table-cell-${row}-${col}-${traitIndex}`" :style="{ opacity: 0 }" v-else>⬤</span>
+        <span class="mx-1 circle-icon" :key="`table-cell-${row}-${col}-${traitIndex}`" :style="cellStyles[traitIndex]">
+          <!-- Show a circle in the representative trait color if it's not hidden -->
+          <template v-if="storeInvertView ? (date === null || date.length < 1) : (date !== null && date.length > 0)">⬤</template>
+          <!-- Otherwise show a hidden circle -->
+          <template v-else>⭘</template>
+        </span>
       </template>
     </div>
     <div class="position-absolute cell-bookmark" v-if="cell.isMarked" />

@@ -104,6 +104,7 @@ export default {
 
 <style>
 #user-position {
+  z-index: 1;
   transition: top .1s ease-in-out, left .1s ease-in-out;
 }
 </style>
