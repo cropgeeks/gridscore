@@ -43,13 +43,7 @@ export default {
     shareUrl: function () {
       if (this.serverUuid) {
         const uuidPart = this.$router.resolve({ name: 'uuid-import', params: { uuid: this.serverUuid } }).resolved.path
-        let url = window.location.href
-        console.log(url.lastIndexOf('/'), url.length + 1)
-        if (url.lastIndexOf('/') === url.length + 1) {
-          url = url.substring(0, url.length - 1)
-        }
-
-        return `${url}${uuidPart}`
+        return window.location.origin + location.pathname + '#' + uuidPart
       } else {
         return null
       }
