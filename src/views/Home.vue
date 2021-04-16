@@ -43,12 +43,6 @@ export default {
     },
     redirect: function () {
       this.$router.push({ name: 'dataset', params: { datasetId: this.storeDatasetId } })
-    },
-    loadDataset: function () {
-      if (this.storeDatasetId !== undefined && this.storeDatasetId !== null) {
-        this.$store.dispatch('loadDataset', this.storeDatasetId)
-        this.$router.push({ name: 'dataset', params: { datasetId: this.storeDatasetId } })
-      }
     }
   },
   created: function () {

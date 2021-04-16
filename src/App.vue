@@ -288,6 +288,12 @@ export default {
         }, 100)
       }, 20001)
     },
+    loadDataset: function () {
+      if (this.storeDatasetId !== undefined && this.storeDatasetId !== null) {
+        this.$store.dispatch('loadDataset', this.storeDatasetId)
+        this.$router.push({ name: 'dataset', params: { datasetId: this.storeDatasetId } })
+      }
+    },
     updateDatasets: function () {
       idb.getDatasets().then(datasets => {
         this.datasets = datasets
@@ -332,6 +338,7 @@ export default {
     EventBus.$on('dataset-deleted', this.navigateHome)
     EventBus.$on('show-introduction-tour', this.showIntroductionTour)
     this.updateDatasets()
+    this.loadDataset()
   },
   destroyed: function () {
     if (this.geolocationWatchId && navigator.geolocation) {
