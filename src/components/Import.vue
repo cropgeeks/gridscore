@@ -11,18 +11,22 @@
       </b-form-group>
 
       <p class="font-weight-bold">{{ $t('modalTextImportOr') }}</p>
-      <b-button @click="() => {showCamera = true}">{{ $t('formLabelImportDataServerUuid') }}</b-button>
+      <b-input class="mb-3" v-model="uuid" :placeholder="$t('formPlaceholderUuid')" />
+      <b-button @click="onImportClicked">{{ $t('formLabelImportDataServerUuid') }}</b-button>
       <template v-if="showCamera">
         <p class="text-muted mt-3">{{ $t('formDescriptionImportDataServerUuid') }}</p>
         <p class="text-danger mt-3" v-if="serverError">{{ serverError }}</p>
         <QrcodeStream @decode="onDecode" @init="scrollToCamera" ref="cameraInput" />
       </template>
     </b-form>
+    <YesNoCancelModal :title="$t('modalTitleReplaceDatasets')" :message="$t('modalTextReplaceDatasets')" :yesTitle="$t('buttonReplace')" :noTitle="$t('buttonImportAsNew')" :cancelTitle="$t('buttonCancel')" ref="yesNoCancelModal" @yes="yes" @no="no" />
   </div>
 </template>
 
 <script>
+import YesNoCancelModal from '@/components/modals/YesNoCancelModal'
 import { QrcodeStream } from 'vue-qrcode-reader'
+import idb from '@/plugins/idb'
 
 export default {
   data: function () {
@@ -30,7 +34,8 @@ export default {
       config: null,
       dataFile: null,
       serverError: null,
-      showCamera: false
+      showCamera: false,
+      uuid: null
     }
   },
   watch: {
@@ -41,9 +46,17 @@ export default {
     }
   },
   components: {
-    QrcodeStream
+    QrcodeStream,
+    YesNoCancelModal
   },
   methods: {
+    onImportClicked: function () {
+      if (this.uuid) {
+        this.onDecode(this.uuid)
+      } else {
+        this.showCamera = true
+      }
+    },
     scrollToCamera: async function (promise) {
       try {
         await promise
@@ -96,19 +109,46 @@ export default {
       this.serverError = null
       this.showCamera = false
     },
-    importExport: function () {
+    importExport: async function () {
       let newData = JSON.parse(this.config)
 
       if (newData) {
-        if (!newData.name) {
-          newData.name = `Imported data: ${new Date().toISOString().split('T')[0]}`
-        }
         if (!newData.data) {
           newData.data = []
+        }
+
+        // If the dataset has a name
+        if (newData.name) {
+          // Get all existing datasets
+          const datasets = await idb.getDatasets()
+
+          // If there are any
+          if (datasets) {
+            // Check if one exists that matches
+            const match = datasets.filter(d => d.name === newData.name && d.rows === newData.rows && d.cols === newData.cols)
+
+            // If so, ask if user wants to overwrite it
+            if (match && match.length > 0) {
+              this.newData = newData
+              newData.id = match[0].id
+              this.$refs.yesNoCancelModal.show()
+              return
+            }
+          }
+        } else {
+          newData.name = `Imported data: ${new Date().toISOString().split('T')[0]}`
         }
       }
 
       this.$store.dispatch('addDataset', newData)
+    },
+    yes: function () {
+      this.$store.dispatch('updateDataset', this.newData)
+      this.$router.push({ name: 'home' })
+    },
+    no: function () {
+      delete this.newData.id
+      this.$store.dispatch('addDataset', this.newData)
     }
   }
 }

@@ -162,7 +162,11 @@ const storeState = {
     },
     ON_DATASET_UPDATED_MUTATION: function (state, newData) {
       idb.updateDatasetAndData(newData)
-        .then(() => EventBus.$emit('datasets-changed'))
+        .then(() => {
+          state.datasetId = newData.id
+          EventBus.$emit('datasets-changed')
+          EventBus.$emit('dataset-changed')
+        })
     },
     ON_DATA_POINT_CHANGED_MUTATION: function (state, dataPoint) {
       // To save time, write directly to the temporary dataset object
