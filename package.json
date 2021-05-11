@@ -35,7 +35,7 @@
     "@vue/cli-plugin-babel": "~4.4.0",
     "@vue/cli-plugin-eslint": "~4.4.0",
     "@vue/cli-plugin-pwa": "~4.4.1",
-    "@vue/cli-service": "~4.4.0",
+    "@vue/cli-service": "~4.5.13",
     "@vue/eslint-config-standard": "~4.0.0",
     "babel-eslint": "~10.1.0",
     "copyfiles": "^2.3.0",

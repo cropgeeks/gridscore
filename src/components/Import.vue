@@ -31,6 +31,12 @@ import idb from '@/plugins/idb'
 import { mapGetters } from 'vuex'
 
 export default {
+  props: {
+    useDatasetUuid: {
+      type: Boolean,
+      default: true
+    }
+  },
   data: function () {
     return {
       config: null,
@@ -119,7 +125,7 @@ export default {
       this.serverError = null
       this.showCamera = false
 
-      if (this.storeDataset && this.storeDataset.uuid) {
+      if (this.useDatasetUuid && this.storeDataset && this.storeDataset.uuid) {
         this.uuid = this.storeDataset.uuid
       }
     },

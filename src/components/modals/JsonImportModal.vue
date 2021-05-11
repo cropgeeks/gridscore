@@ -6,7 +6,7 @@
            @shown="$refs.importView.reset()"
            no-fade
            ref="importModal">
-    <Import ref="importView" />
+    <Import ref="importView" :useDatasetUuid="false" />
   </b-modal>
 </template>
 
