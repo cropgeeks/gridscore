@@ -101,7 +101,9 @@ export default {
       name: dataset.name || 'newDataset',
       traits: dataset.traits,
       cornerPoints: dataset.cornerPoints,
-      brapiConfig: dataset.brapiConfig
+      brapiConfig: dataset.brapiConfig,
+      uuid: dataset.uuid,
+      lastUpdatedOn: new Date().toISOString()
     })
   },
   deleteDataset: async function (datasetId) {

@@ -32,7 +32,7 @@ const storeState = {
       data: [],
       brapiConfig: null
     },
-    columnWidth: 150,
+    columnWidth: 120,
     serverUrl: null,
     useGps: true,
     useSpeech: false,
