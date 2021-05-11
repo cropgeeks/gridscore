@@ -13,8 +13,8 @@ const router = new Router({
       component: () => import('@/views/Home')
     },
     {
-      path: '/dataset/:datasetId',
-      name: 'dataset',
+      path: '/data',
+      name: 'data',
       component: () => import('@/views/DataView')
     },
     {

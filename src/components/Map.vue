@@ -205,6 +205,6 @@ export default {
 
 <style>
 .field-map {
-  height: 400px !important;
+  height: 50vh !important;
 }
 </style>

@@ -3,7 +3,7 @@
     <h1><b-button :to="{ name: 'home' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleSetup') }}</h1>
     <hr />
     <!-- Import and export buttons for json -->
-    <b-button-group class="mb-3">
+    <b-button-group class="mb-3 d-block" id="settings-buttons">
       <b-button @click="loadExampleData">{{ $t('buttonLoadExample') }}</b-button>
       <b-button @click="$refs.importModal.show()">{{ $t('buttonImport') }}</b-button>
       <b-button @click="$refs.exportModal.show()">{{ $t('buttonExport') }}</b-button>
@@ -37,15 +37,30 @@
           <b-form-group label-for="varieties">
             <!-- Variety label -->
             <template v-slot:label>
-              <BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span>
-              <!-- Tooltip for the variety label info icon -->
-              <b-tooltip target="variety-label">
-                <div>{{ $t('tooltipSettingsVarieties') }}</div>
-                <div><b-img fluid src="img/variety-order.svg" width=75 height=75 /></div>
-              </b-tooltip>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <template v-if="varietiesInRowFormat">
+                    <BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span>
+                    <!-- Tooltip for the variety label info icon -->
+                    <b-tooltip target="variety-label">
+                      <div>{{ $t('tooltipSettingsVarieties') }}</div>
+                      <div><b-img fluid src="img/variety-order.svg" width=75 height=75 /></div>
+                    </b-tooltip>
+                  </template>
+                  <template v-else>
+                    <BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span>
+                    <!-- Tooltip for the variety label info icon -->
+                    <b-tooltip target="variety-label">
+                      <div>{{ $t('tooltipSettingsVarietiesGrid') }}</div>
+                      <div><b-img fluid src="img/variety-order-grid.svg" width=75 height=75 /></div>
+                    </b-tooltip>
+                  </template>
+                </div>
+                <span><b-form-checkbox v-model="varietiesInRowFormat" switch>{{ varietiesInRowFormat ? $t('formLabelSettingsRowMode') : $t('formLabelSettingsTabMode') }}</b-form-checkbox></span>
+              </div>
             </template>
             <!-- Variety names input -->
-            <b-form-textarea id="varieties" :state="state.varieties" rows=6 required :placeholder="$t('formPlaceholderVarieties')" v-model="varieties" />
+            <b-form-textarea id="varieties" @keydown.tab.prevent="tabber($event)" :state="state.varieties" rows=6 required :placeholder="varietiesInRowFormat ? $t('formPlaceholderVarieties') : $t('formPlaceholderVarietiesGrid')" v-model="varieties" />
             <!-- Variety names file loading -->
             <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="varietiesFile" />
           </b-form-group>
@@ -133,6 +148,7 @@ export default {
       varieties: null,
       formValidated: false,
       mapVisible: false,
+      varietiesInRowFormat: false,
       traitTypes: [{
         value: 'date',
         text: this.$t('traitTypeDate')
@@ -198,6 +214,16 @@ export default {
     TraitConfigurationModal
   },
   methods: {
+    tabber: function (event) {
+      const text = this.varieties
+      const originalSelectionStart = event.target.selectionStart
+      const textStart = text.slice(0, originalSelectionStart)
+      const textEnd = text.slice(originalSelectionStart)
+
+      this.varieties = `${textStart}\t${textEnd}`
+      event.target.value = this.varieties // required to make the cursor stay in place.
+      event.target.selectionEnd = event.target.selectionStart = originalSelectionStart + 1
+    },
     /**
      * Loads the given selected BrAPI traits into the list of new traits for this dataset
      * @param brapiTraits The traits selected in the BrAPI modal dialog
@@ -392,7 +418,7 @@ export default {
               rows: parseInt(this.rows),
               cols: parseInt(this.cols),
               traits: this.newTraits,
-              varieties: this.varieties.split('\n'),
+              varieties: this.varietiesInRowFormat ? this.varieties.split('\n') : this.varieties.split('\n').map(r => r.split('\t')).reduce((a, b) => a.concat(b), []),
               cornerPoints: this.$refs.map.getCornerPoints()
             }
 

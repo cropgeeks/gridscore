@@ -12,7 +12,7 @@
 
       <p class="font-weight-bold">{{ $t('modalTextImportOr') }}</p>
       <b-input class="mb-3" v-model="uuid" :placeholder="$t('formPlaceholderUuid')" />
-      <b-button @click="onImportClicked">{{ $t('formLabelImportDataServerUuid') }}</b-button>
+      <b-button @click="onImportClicked">{{ uuid === storeDataset.uuid ? $t('buttonImportLoadDataset') : $t('formLabelImportDataServerUuid') }}</b-button>
       <template v-if="showCamera">
         <p class="text-muted mt-3">{{ $t('formDescriptionImportDataServerUuid') }}</p>
         <p class="text-danger mt-3" v-if="serverError">{{ serverError }}</p>
@@ -28,6 +28,8 @@ import YesNoCancelModal from '@/components/modals/YesNoCancelModal'
 import { QrcodeStream } from 'vue-qrcode-reader'
 import idb from '@/plugins/idb'
 
+import { mapGetters } from 'vuex'
+
 export default {
   data: function () {
     return {
@@ -38,11 +40,20 @@ export default {
       uuid: null
     }
   },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeDataset'
+    ])
+  },
   watch: {
     dataFile: function (newValue) {
       if (newValue) {
         this.loadDataFile()
       }
+    },
+    'storeDataset.uuid': function () {
+      this.reset()
     }
   },
   components: {
@@ -63,7 +74,6 @@ export default {
 
         this.$nextTick(() => this.$refs.cameraInput.$el.scrollIntoView())
       } catch (error) {
-        console.error(error)
         this.serverError = error.name
       }
     },
@@ -108,6 +118,10 @@ export default {
       this.dataFile = null
       this.serverError = null
       this.showCamera = false
+
+      if (this.storeDataset && this.storeDataset.uuid) {
+        this.uuid = this.storeDataset.uuid
+      }
     },
     importExport: async function () {
       let newData = JSON.parse(this.config)
@@ -125,7 +139,8 @@ export default {
           // If there are any
           if (datasets) {
             // Check if one exists that matches
-            const match = datasets.filter(d => d.name === newData.name && d.rows === newData.rows && d.cols === newData.cols)
+            const match = datasets.filter(d => d.name === newData.name && d.rows === newData.rows && d.cols === newData.cols) ||
+              datasets.filter(d => d.uuid === newData.uuid)
 
             // If so, ask if user wants to overwrite it
             if (match && match.length > 0) {
@@ -144,12 +159,15 @@ export default {
     },
     yes: function () {
       this.$store.dispatch('updateDataset', this.newData)
-      this.$router.push({ name: 'home' })
+      // this.$router.push({ name: 'home' })
     },
     no: function () {
       delete this.newData.id
       this.$store.dispatch('addDataset', this.newData)
     }
+  },
+  mounted: function () {
+    this.reset()
   }
 }
 </script>

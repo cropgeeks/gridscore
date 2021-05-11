@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <h1><b-button :to="{ name: 'home' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleExport') }}</h1>
+    <h1><b-button :to="{ name: 'data' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleExport') }}</h1>
     <hr />
 
     <!-- Show a loading indicator while the export is generated -->
@@ -131,7 +131,7 @@ export default {
       return result
     },
     datesText: function () {
-      if (!this.storeData || this.storeData.length < 1 || !this.storeTraits || this.storeTraits.length < 1) {
+      if (!this.storeData || this.storeData.size < 1 || !this.storeTraits || this.storeTraits.length < 1) {
         return this.$t('labelNoData')
       }
 
@@ -143,7 +143,7 @@ export default {
         // And each field column
         for (let x = 0; x < this.storeCols; x++) {
           // Get the data cell
-          const cell = this.storeData[y][x]
+          const cell = this.storeData.get(`${y}-${x}`)
           // If there is data
           if (cell) {
             // Get it
@@ -188,7 +188,7 @@ export default {
         // And each field column
         for (let x = 0; x < this.storeCols; x++) {
           // Get the data cell
-          const cell = this.storeData[y][x]
+          const cell = this.storeData.get(`${y}-${x}`)
           // If there is data
           if (cell) {
             // Get it

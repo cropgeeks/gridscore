@@ -8,29 +8,37 @@ export default {
       if (db) {
         return resolve(db)
       } else {
-        openDB('gridscore-' + window.location.pathname, 1, {
+        openDB('gridscore-' + window.location.pathname, 3, {
           upgrade: function (db, oldVersion, newVersion, transaction) {
-            switch (newVersion) {
-              case 1:
-                const datasets = db.createObjectStore('datasets', { keyPath: 'id', autoIncrement: true })
-                datasets.createIndex('name', 'name', { unique: false })
-                datasets.createIndex('rows', 'rows', { unique: false })
-                datasets.createIndex('cols', 'cols', { unique: false })
-                datasets.createIndex('traits', 'traits', { unique: false })
-                datasets.createIndex('cornerPoints', 'cornerPoints', { unique: false })
-                datasets.createIndex('brapiConfig', 'brapiConfig', { unique: false })
+            let datasets
+            if (oldVersion < 1) {
+              datasets = db.createObjectStore('datasets', { keyPath: 'id', autoIncrement: true })
+              datasets.createIndex('name', 'name', { unique: false })
+              datasets.createIndex('rows', 'rows', { unique: false })
+              datasets.createIndex('cols', 'cols', { unique: false })
+              datasets.createIndex('traits', 'traits', { unique: false })
+              datasets.createIndex('cornerPoints', 'cornerPoints', { unique: false })
+              datasets.createIndex('brapiConfig', 'brapiConfig', { unique: false })
 
-                const data = db.createObjectStore('data', { keyPath: ['dsId', 'row', 'col'] })
-                data.createIndex('dsId', 'dsId', { unique: false })
-                data.createIndex('row', 'row', { unique: false })
-                data.createIndex('col', 'col', { unique: false })
-                data.createIndex('name', 'name', { unique: false })
-                data.createIndex('dates', 'dates', { unique: false })
-                data.createIndex('values', 'values', { unique: false })
-                data.createIndex('geolocation', 'geolocation', { unique: false })
-                data.createIndex('comment', 'comment', { unique: false })
-
-                break
+              const data = db.createObjectStore('data', { keyPath: ['dsId', 'row', 'col'] })
+              data.createIndex('dsId', 'dsId', { unique: false })
+              data.createIndex('row', 'row', { unique: false })
+              data.createIndex('col', 'col', { unique: false })
+              data.createIndex('name', 'name', { unique: false })
+              data.createIndex('dates', 'dates', { unique: false })
+              data.createIndex('values', 'values', { unique: false })
+              data.createIndex('geolocation', 'geolocation', { unique: false })
+              data.createIndex('comment', 'comment', { unique: false })
+            }
+            if (oldVersion < 2) {
+              // Add a last updated on column to the datasets
+              datasets = transaction.objectStore('datasets')
+              datasets.createIndex('lastUpdatedOn', 'lastUpdatedOn', { unique: false })
+            }
+            if (oldVersion < 3) {
+              // Add a last updated on column to the datasets
+              datasets = transaction.objectStore('datasets')
+              datasets.createIndex('uuid', 'uuid', { unique: false })
             }
           }
         }).then(db => resolve(db))
@@ -58,6 +66,14 @@ export default {
     } else {
       return new Promise(resolve => resolve([]))
     }
+  },
+  updateDatasetUuid: async function (datasetId, uuid) {
+    const db = await this.getDb()
+
+    const dataset = await this.getDataset(datasetId)
+    dataset.uuid = uuid
+
+    return db.put('datasets', dataset)
   },
   updateDatasetCornerPoints: async function (datasetId, cornerPoints) {
     const db = await this.getDb()
@@ -103,6 +119,10 @@ export default {
   },
   updateDatapoint: async function (datasetId, dataPoint) {
     const db = await this.getDb()
+
+    const dataset = await this.getDataset(datasetId)
+    dataset.lastUpdatedOn = new Date().toISOString()
+    await db.put('datasets', dataset)
 
     const copy = JSON.parse(JSON.stringify(dataPoint))
     copy.dsId = datasetId

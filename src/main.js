@@ -21,6 +21,7 @@ import {
   FormTextareaPlugin,
   FormRadioPlugin,
   FormFilePlugin,
+  CardPlugin,
   TabsPlugin,
   ListGroupPlugin,
   FormSelectPlugin,
@@ -57,6 +58,7 @@ Vue.use(ImagePlugin)
 Vue.use(LayoutPlugin)
 Vue.use(ModalPlugin)
 Vue.use(TabsPlugin)
+Vue.use(CardPlugin)
 Vue.use(DropdownPlugin)
 Vue.use(BVModalPlugin)
 Vue.use(CollapsePlugin)

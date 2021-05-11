@@ -2,13 +2,14 @@
   <b-form-radio-group
         id="radio-slots"
         v-model="selectedOrder"
-        name="radio-options-order">
+        name="radio-options-order"
+        v-if="visible">
     <b-row class="guide-order">
-      <b-col v-for="option in guideOrderTypes" :key="`guide-option-${option.name}`" cols=6 lg=3 class="mb-3">
+      <b-col v-for="option in precomputedOrders" :key="`guide-option-${option.type.name}`" cols=6 lg=3 class="mb-3">
         <div class="rounded p-3 bg-light h-100 border">
-          <b-form-radio :value="option.name" :disabled="!option.valid(col, row)" class="h-100">
-            <div class="guide-text-label">{{ $t(option.text) }}</div>
-            <b-img class="guide-image" fluid :src="option.image" />
+          <b-form-radio :value="option.type.name" :disabled="!option.valid" class="h-100">
+            <div class="guide-text-label">{{ $t(option.type.text) }}</div>
+            <b-img class="guide-image" fluid :src="option.type.image" />
           </b-form-radio>
         </div>
       </b-col>
@@ -28,6 +29,20 @@ export default {
     col: {
       type: Number,
       default: 0
+    },
+    visible: {
+      type: Boolean,
+      default: false
+    }
+  },
+  computed: {
+    precomputedOrders: function () {
+      return this.guideOrderTypes.map(o => {
+        return {
+          type: o,
+          valid: o.valid(this.col, this.row)
+        }
+      })
     }
   },
   data: function () {

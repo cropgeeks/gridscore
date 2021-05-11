@@ -6,7 +6,7 @@
     <template v-if="storeTraits && storeTraits.length > 0">
       <div v-for="(trait, index) in storeTraits" :key="`trait-stats-${index}`">
         <h2><span :style="{ color: storeTraitColors[index % storeTraitColors.length] }"><BIconCircleFill /> {{ trait.name }} <b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span></h2>
-        <div class="stats-chart" :id="`trait-chart-${index}`" />
+        <div class="stats-chart" :ref="`trait-chart-${index}`" />
       </div>
     </template>
   </div>
@@ -40,8 +40,8 @@ export default {
   methods: {
     update: function () {
       this.storeTraits.forEach((trait, index) => {
-        const id = `trait-chart-${index}`
-        this.$plotly.purge(id)
+        const div = this.$refs[`trait-chart-${index}`][0]
+        this.$plotly.purge(div)
 
         const data = []
 
@@ -49,7 +49,8 @@ export default {
           case 'float':
           case 'int':
           case 'date': {
-            const datapoints = this.storeData.map(row => row.map(cell => { return { value: cell.values[index], name: cell.name } }).reduce((a, b) => a.concat(b), [])).reduce((a, b) => a.concat(b), [])
+            const datapoints = []
+            this.storeData.forEach((c, k) => datapoints.push({ value: c.values[index], name: c.name }))
             data.push({
               x: datapoints.map(d => d.value),
               text: datapoints.map(d => d.name),
@@ -67,8 +68,9 @@ export default {
           case 'text':
           case 'categorical':
             const map = {}
-            const array = this.storeData.map(row => row.map(cell => cell.values[index]).reduce((a, b) => a.concat(b), [])).reduce((a, b) => a.concat(b), [])
-            array.forEach(c => {
+            const datapoints = []
+            this.storeData.forEach((c, k) => datapoints.push(c.values[index]))
+            datapoints.forEach(c => {
               if (map[c]) {
                 map[c] += 1
               } else {
@@ -105,7 +107,8 @@ export default {
           },
           xaxis: {
             zeroline: false
-          }
+          },
+          hovermode: 'closest'
         }
 
         const filename = trait.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()
@@ -117,7 +120,12 @@ export default {
           }
         }
 
-        this.$plotly.newPlot(id, data, layout, config)
+        this.$plotly.newPlot(div, data, layout, config)
+        // div.on('plotly_click', data => {
+        //   // One point was clicked
+        //   if (data.points && data.points.length === 1) {
+        //   }
+        // })
       })
     }
   },

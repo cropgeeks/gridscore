@@ -42,7 +42,9 @@ const storeState = {
     invertView: false,
     invertNumberingX: false,
     invertNumberingY: false,
+    hideToggledTraits: false,
     showStatsInTable: false,
+    visibleTraits: null,
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
   },
   getters: {
@@ -67,37 +69,36 @@ const storeState = {
     storeInvertNumberingX: (state) => state.invertNumberingX,
     storeInvertNumberingY: (state) => state.invertNumberingY,
     storeShowStatsInTable: (state) => state.showStatsInTable,
-    storeTraitColors: (state) => state.traitColors
+    storeHideToggledTraits: (state) => state.hideToggledTraits,
+    storeTraitColors: (state) => state.traitColors,
+    storeVisibleTraits: (state) => state.visibleTraits
   },
   mutations: {
     ON_DATASET_LOAD_MUTATION: function (state, datasetId) {
+      state.datasetId = datasetId
       if (datasetId) {
+        EventBus.$emit('set-loading', true)
         idb.getDataset(datasetId)
           .then(dataset => {
             if (dataset) {
               idb.getDatasetData(datasetId)
                 .then(data => {
                   const ds = JSON.parse(JSON.stringify(dataset))
-                  ds.data = []
+                  ds.data = new Map()
 
-                  let row = -1
                   for (let i = 0; i < data.length; i++) {
                     const dp = data[i]
-
-                    if (row !== dp.row) {
-                      row++
-                      ds.data.push([])
-                    }
-
-                    ds.data[ds.data.length - 1].push(dp)
+                    ds.data.set(`${dp.row}-${dp.col}`, dp)
                   }
 
                   state.dataset = ds
-                  state.datasetId = ds.id
-
+                })
+                .finally(() => {
+                  EventBus.$emit('set-loading', false)
                   EventBus.$emit('dataset-changed')
                 })
             } else {
+              EventBus.$emit('set-loading', false)
               state.dataset = null
               state.datasetId = null
             }
@@ -108,23 +109,38 @@ const storeState = {
       }
     },
     ON_DATASET_ADDED_MUTATION: function (state, newDataset) {
+      EventBus.$emit('set-loading', true)
       idb.addDataset(newDataset)
         .then(dsId => {
           state.datasetId = dsId
           idb.setDatasetData(dsId, newDataset.data)
             .then(() => {
-              state.dataset = newDataset
-              EventBus.$emit('datasets-changed')
-              EventBus.$emit('dataset-changed')
+              idb.getDatasetData(dsId)
+                .then(data => {
+                  const ds = JSON.parse(JSON.stringify(newDataset))
+                  ds.data = new Map()
+
+                  for (let i = 0; i < data.length; i++) {
+                    const dp = data[i]
+                    ds.data.set(`${dp.row}-${dp.col}`, dp)
+                  }
+
+                  state.dataset = ds
+                })
+                .finally(() => {
+                  EventBus.$emit('set-loading', false)
+                  EventBus.$emit('dataset-changed')
+                })
             })
+            .then(() => EventBus.$emit('datasets-changed'))
         })
     },
     ON_DATASET_DELETED_MUTATION: function (state, datasetId) {
       idb.deleteDatasetData(datasetId)
         .then(() => idb.deleteDataset(datasetId))
-        .then(() => {
-          EventBus.$emit('datasets-changed')
+        .finally(() => {
           EventBus.$emit('dataset-deleted')
+          EventBus.$emit('datasets-changed')
         })
 
       state.datasetId = null
@@ -161,29 +177,56 @@ const storeState = {
       state.serverUrl = newServerUrl
     },
     ON_DATASET_UPDATED_MUTATION: function (state, newData) {
+      EventBus.$emit('set-loading', true)
+      state.datasetId = newData.id
       idb.updateDatasetAndData(newData)
         .then(() => {
-          state.datasetId = newData.id
-          EventBus.$emit('datasets-changed')
-          EventBus.$emit('dataset-changed')
+          idb.getDataset(newData.id)
+            .then(dataset => {
+              if (dataset) {
+                idb.getDatasetData(newData.id)
+                  .then(data => {
+                    const ds = JSON.parse(JSON.stringify(dataset))
+                    ds.data = new Map()
+
+                    for (let i = 0; i < data.length; i++) {
+                      const dp = data[i]
+                      ds.data.set(`${dp.row}-${dp.col}`, dp)
+                    }
+
+                    state.dataset = ds
+                  })
+                  .finally(() => {
+                    EventBus.$emit('set-loading', false)
+                    EventBus.$emit('datasets-changed')
+                    EventBus.$emit('dataset-changed')
+                  })
+              } else {
+                EventBus.$emit('set-loading', false)
+                state.dataset = null
+                state.datasetId = null
+              }
+            })
         })
     },
     ON_DATA_POINT_CHANGED_MUTATION: function (state, dataPoint) {
       // To save time, write directly to the temporary dataset object
-      state.dataset.data[dataPoint.row][dataPoint.col].dates = dataPoint.dates
-      state.dataset.data[dataPoint.row][dataPoint.col].values = dataPoint.values
+      let temp = state.dataset.data.get(`${dataPoint.row}-${dataPoint.col}`)
+      temp.dates = dataPoint.dates
+      temp.values = dataPoint.values
       if (dataPoint.isMarked) {
-        state.dataset.data[dataPoint.row][dataPoint.col].isMarked = dataPoint.isMarked
+        temp.isMarked = dataPoint.isMarked
       } else {
-        delete state.dataset.data[dataPoint.row][dataPoint.col].isMarked
+        delete temp.isMarked
       }
 
       // Use Vue.set, because this wasn't a part of the object from the start, so needs setting to be reactive
-      Vue.set(state.dataset.data[dataPoint.row][dataPoint.col], 'comment', dataPoint.comment)
+      Vue.set(temp, 'comment', dataPoint.comment)
 
       if (dataPoint.geolocation) {
-        state.dataset.data[dataPoint.row][dataPoint.col].geolocation = dataPoint.geolocation
+        temp.geolocation = dataPoint.geolocation
       }
+      state.dataset.data.set(`${dataPoint.row}-${dataPoint.col}`, temp)
 
       // Then update the database
       idb.updateDatapoint(state.datasetId, dataPoint)
@@ -203,6 +246,9 @@ const storeState = {
     },
     ON_CONTINUOUS_INPUT_CHANGED_MUTATION: function (state, newContinuousInput) {
       state.continuousInput = newContinuousInput
+    },
+    ON_HIDE_TOGGLED_TRAITS_CHANGED_MUTATION: function (state, newHideToggledTraits) {
+      state.hideToggledTraits = newHideToggledTraits
     },
     ON_GEOLOCATION_CHANGED_MUTATION: function (state, newGeolocation) {
       if (state.geolocation && newGeolocation) {
@@ -236,6 +282,12 @@ const storeState = {
     },
     ON_SHOW_STATS_IN_TABLE_CHANGED_MUTATION: function (state, newShowStatsInTable) {
       state.showStatsInTable = newShowStatsInTable
+    },
+    ON_DATASET_UUID_CHANGED_MUTATION: function (state, newUuid) {
+      idb.updateDatasetUuid(state.datasetId, newUuid)
+    },
+    ON_VISIBLE_TRAITS_CHANGED_MUTATION: function (state, newVisibleTraits) {
+      state.visibleTraits = newVisibleTraits
     }
   },
   actions: {
@@ -249,6 +301,7 @@ const storeState = {
       commit('ON_DATASET_DELETED_MUTATION', datasetId)
     },
     resetGridScore: function ({ commit }) {
+      EventBus.$emit('set-loading', true)
       idb.deleteDatabase().then(() => {
         commit('ON_DATASET_INDEX_CHANGED_MUTATION', null)
         commit('ON_COLUMN_WIDTH_CHANGED_MUTATION', 300)
@@ -263,7 +316,8 @@ const storeState = {
         commit('ON_INVERT_NUMBERING_X_CHANGED_MUTATION', false)
         commit('ON_INVERT_NUMBERING_Y_CHANGED_MUTATION', false)
         commit('ON_DATASET_LOAD_MUTATION', null)
-
+      }).finally(() => {
+        EventBus.$emit('set-loading', false)
         EventBus.$emit('datasets-changed')
         EventBus.$emit('dataset-deleted')
       })
@@ -316,6 +370,9 @@ const storeState = {
     setContinuousInput: function ({ commit }, continuousInput) {
       commit('ON_CONTINUOUS_INPUT_CHANGED_MUTATION', continuousInput)
     },
+    setHideToggledTraits: function ({ commit }, hideToggledTraits) {
+      commit('ON_HIDE_TOGGLED_TRAITS_CHANGED_MUTATION', hideToggledTraits)
+    },
     setTraitColors: function ({ commit }, traitColors) {
       commit('ON_TRAIT_COLORS_CHANGED_MUTATION', traitColors)
     },
@@ -330,6 +387,12 @@ const storeState = {
     },
     setShowStatsInTable: function ({ commit }, showStatsInTable) {
       commit('ON_SHOW_STATS_IN_TABLE_CHANGED_MUTATION', showStatsInTable)
+    },
+    setDatasetUuid: function ({ commit }, uuid) {
+      commit('ON_DATASET_UUID_CHANGED_MUTATION', uuid)
+    },
+    setVisibleTraits: function ({ commit }, visibleTraits) {
+      commit('ON_VISIBLE_TRAITS_CHANGED_MUTATION', visibleTraits)
     }
   },
   plugins: [createPersistedState({

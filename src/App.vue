@@ -11,11 +11,12 @@
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item :to="{ name: 'home' }"><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
-          <b-nav-item :to="{ name: 'timeline' }"><BIconGraphUp /> {{ $t('menuTimeSeries') }}</b-nav-item>
-          <b-nav-item :to="{ name: 'heatmap' }"><BIconGridFill /> {{ $t('menuHeatmap') }}</b-nav-item>
-          <b-nav-item :to="{ name: 'stats' }"><BIconBarChartSteps /> {{ $t('menuStats') }}</b-nav-item>
-          <b-nav-item :to="{ name: 'location-map' }"><BIconMap /> {{ $t('menuLocationMap') }}</b-nav-item>
+          <b-nav-item active-class="active" :to="{ name: 'data' }" v-if="storeDatasetId"><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
+          <b-nav-item active-class="active" :to="{ name: 'home' }" v-else><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
+          <b-nav-item active-class="active" :to="{ name: 'timeline' }"><BIconGraphUp /> {{ $t('menuTimeSeries') }}</b-nav-item>
+          <b-nav-item active-class="active" :to="{ name: 'heatmap' }"><BIconGridFill /> {{ $t('menuHeatmap') }}</b-nav-item>
+          <b-nav-item active-class="active" :to="{ name: 'stats' }"><BIconBarChartSteps /> {{ $t('menuStats') }}</b-nav-item>
+          <b-nav-item active-class="active" :to="{ name: 'location-map' }"><BIconMap /> {{ $t('menuLocationMap') }}</b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
@@ -38,7 +39,14 @@
       <b-img fluid class="py-4 mx-auto d-block" src="img/gridscore2.svg" />
 
       <template>
-        <h2 class="px-3">{{ $t('widgetSidebarTitle') }}</h2>
+        <h2 class="px-3">{{ $t('modalTitleSettings') }}</h2>
+        <b-list-group class="rounded-0">
+          <b-list-group-item button @click="$router.push({ name: 'settings' })">
+            {{ $t('modalTitleSettings') }}
+          </b-list-group-item>
+        </b-list-group>
+
+        <h2 class="px-3 mt-3">{{ $t('widgetSidebarTitle') }}</h2>
         <b-list-group class="rounded-0">
           <b-list-group-item :variant="dataset.id === storeDatasetId ? 'primary' : 'null'" button class="d-flex justify-content-between align-items-center" v-for="dataset in datasets" :key="`dataset-${dataset.id}`" @click="onDatasetSelected(dataset.id)">
             {{ dataset.id }} - {{ dataset.name }}<b-badge variant="danger" v-b-tooltip="$t('buttonDelete')" pill @click.prevent.stop="onDatasetDeleteClicked(dataset.id)">&times;</b-badge></b-list-group-item>
@@ -53,6 +61,13 @@
     </b-container>
 
     <Tour :steps="tourSteps" :resetOnRouterNav="false" :hideBackButton="true" ref="tour" />
+
+    <b-modal ref="loadingModal" hide-header hide-footer no-close-on-backdrop no-close-on-esc hide-header-close>
+      <div class="text-center">
+        <b-spinner style="width: 3rem; height: 3rem;" variant="primary" type="grow" />
+        <p class="text-muted mt-3" v-if="$t('modalTextLoading')">{{ $t('modalTextLoading') }}</p>
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -99,8 +114,8 @@ export default {
       }, {
         title: () => this.$t('tourTitleSetup'),
         text: () => this.$t('tourTextSetup'),
-        target: () => '#settings-form',
-        position: 'top',
+        target: () => '#settings-buttons',
+        position: 'bottom',
         beforeShow: () => new Promise(resolve => this.$router.push({ name: 'setup' }).then(() => resolve()))
       }, {
         title: () => this.$t('tourTitleSetupDatasetName'),
@@ -163,10 +178,9 @@ export default {
   },
   methods: {
     onDatasetSelected: function (datasetId) {
-      if (datasetId !== this.storeDatasetId) {
-        this.$store.dispatch('loadDataset', datasetId)
-        this.$router.push({ name: 'dataset', params: { datasetId: datasetId } })
-      }
+      this.$store.dispatch('loadDataset', datasetId)
+      this.sidebarShown = false
+      // this.$router.push({ name: 'data', params: { datasetId: datasetId } })
     },
     onDatasetDeleteClicked: function (datasetId) {
       this.$bvModal.msgBoxConfirm(this.$t('modalTextDeleteDataset'), {
@@ -219,7 +233,7 @@ export default {
           lat: 56.481585,
           lng: -3.110989,
           steps: 20,
-          heading: 0
+          heading: 360
         }, {
           lat: 56.481776,
           lng: -3.111069,
@@ -286,7 +300,7 @@ export default {
             }
           }
         }, 100)
-      }, 20001)
+      }, 1000)
     },
     updateDatasets: function () {
       idb.getDatasets().then(datasets => {
@@ -294,9 +308,10 @@ export default {
       })
     },
     navigateToDataset: function () {
+      this.$store.dispatch('setVisibleTraits', null)
       const route = this.$router.currentRoute
       if (route.name !== 'dataset' || (route.params && (route.params.datasetId !== this.storeDatasetId))) {
-        this.$router.push({ name: 'dataset', params: { datasetId: this.storeDatasetId } })
+        this.$router.push({ name: 'data' })
       }
     },
     navigateHome: function () {
@@ -320,6 +335,13 @@ export default {
     },
     showIntroductionTour: function () {
       this.$refs.tour.start()
+    },
+    setLoading: function (visible) {
+      if (visible) {
+        this.$refs.loadingModal.show()
+      } else {
+        this.$refs.loadingModal.hide()
+      }
     }
   },
   mounted: function () {
@@ -330,6 +352,7 @@ export default {
     EventBus.$on('datasets-changed', this.updateDatasets)
     EventBus.$on('dataset-changed', this.navigateToDataset)
     EventBus.$on('dataset-deleted', this.navigateHome)
+    EventBus.$on('set-loading', this.setLoading)
     EventBus.$on('show-introduction-tour', this.showIntroductionTour)
     this.updateDatasets()
   },
@@ -341,6 +364,7 @@ export default {
     EventBus.$off('datasets-changed', this.updateDatasets)
     EventBus.$off('dataset-changed', this.navigateToDataset)
     EventBus.$off('dataset-deleted', this.navigateHome)
+    EventBus.$off('set-loading', this.setLoading)
     EventBus.$off('show-introduction-tour', this.showIntroductionTour)
   }
 }
@@ -382,6 +406,10 @@ export default {
 html {
   position: relative;
   min-height: 100%;
+}
+
+body {
+  overflow-y: scroll; /* Show vertical scrollbar */
 }
 
 .tooltip {

@@ -2,7 +2,7 @@
   <div>
     <h1>{{ $t('pageTimelineTitle') }}</h1>
     <p>{{ $t('pageTimelineText') }}</p>
-    <div id="timeseries-chart" class="time-chart" v-if="storeData && storeData.length > 0 && storeTraits && storeTraits.length > 0"/>
+    <div id="timeseries-chart" class="time-chart" v-if="storeData && storeData.size > 0 && storeTraits && storeTraits.length > 0"/>
     <h3 v-else>{{ $t('labelNoData') }}</h3>
   </div>
 </template>
@@ -40,7 +40,7 @@ export default {
   },
   methods: {
     plot: function () {
-      if (!this.storeData || this.storeData.length < 1 || !this.storeTraits || this.storeTraits.length < 1) {
+      if (!this.storeData || this.storeData.size < 1 || !this.storeTraits || this.storeTraits.length < 1) {
         return
       }
 
@@ -57,26 +57,23 @@ export default {
         traces.push({})
       })
       // For each field row
-      this.storeData.forEach(r => {
-        // For each column
-        r.forEach(c => {
-          c.dates.forEach((d, i) => {
-            // If it exists
-            if (d) {
-              // Get the current count for that trait and date
-              let count = mapping[i][d]
+      this.storeData.forEach((c, k) => {
+        c.dates.forEach((d, i) => {
+          // If it exists
+          if (d) {
+            // Get the current count for that trait and date
+            let count = mapping[i][d]
 
-              // Increment it
-              if (!count) {
-                count = 1
-              } else {
-                count++
-              }
-
-              // Put it back
-              mapping[i][d] = count
+            // Increment it
+            if (!count) {
+              count = 1
+            } else {
+              count++
             }
-          })
+
+            // Put it back
+            mapping[i][d] = count
+          }
         })
       })
 

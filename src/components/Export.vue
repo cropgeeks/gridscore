@@ -4,7 +4,7 @@
                   label-for="export-data">
       <b-form-textarea :rows="5" :readonly="true" id="export-data" :value="config" />
     </b-form-group>
-    <b-button @click="exportJson">{{ $t('buttonImportExportShare') }}</b-button>
+    <b-button @click="exportJson">{{ storeDataset.uuid ? $t('buttonImportExportSave') : $t('buttonImportExportShare') }}</b-button>
 
     <div v-show="serverUuid !== null">
       <p class="text-info mt-3">{{ $t('modalTextExportQR') }}</p>
@@ -33,17 +33,52 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeDataset'
+      'storeDataset',
+      'storeData',
+      'storeRows',
+      'storeCols'
     ]),
     config: function () {
-      const dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
-      // delete dataCopy.data
-      return JSON.stringify(dataCopy, undefined, 2)
+      if (!this.storeDataset || !this.storeDataset.data || this.storeDataset.data.length < 1) {
+        return
+      }
+      let dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
+      const arrayData = []
+      for (let row = 0; row < this.storeRows; row++) {
+        const rowData = []
+        for (let col = 0; col < this.storeCols; col++) {
+          rowData.push(this.storeDataset.data.get(`${row}-${col}`))
+        }
+        arrayData.push(rowData)
+      }
+      delete dataCopy.data
+      dataCopy.data = arrayData
+      if (this.serverUuid) {
+        dataCopy.uuid = this.serverUuid
+      }
+      return JSON.stringify(dataCopy)
     },
     shareUrl: function () {
       if (this.serverUuid) {
         const uuidPart = this.$router.resolve({ name: 'uuid-import', params: { uuid: this.serverUuid } }).resolved.path
-        return window.location.origin + location.pathname + '#' + uuidPart
+        let origin = window.location.origin
+        let pathname = window.location.pathname
+
+        if (origin.lastIndexOf('/') === origin.length - 1) {
+          origin = origin.substring(0, origin.length - 1)
+        }
+        if (pathname.length > 0 && pathname[0] === '/') {
+          pathname = pathname.substring(1)
+        }
+        if (pathname.lastIndexOf('/') === pathname.length - 1) {
+          pathname = pathname.substring(0, pathname.length - 1)
+        }
+
+        if (pathname.length > 0) {
+          pathname = pathname + '/'
+        }
+
+        return origin + '/' + pathname + '#' + uuidPart
       } else {
         return null
       }
@@ -88,10 +123,12 @@ export default {
       this.serverError = null
     },
     exportJson: function () {
-      this.postConfigForSharing()
+      this.postConfigForSharing(this.config)
         .then(result => {
           if (result && result.data) {
             this.serverUuid = result.data
+
+            this.$store.dispatch('setDatasetUuid', result.data)
           } else {
             this.serverUuid = null
           }

@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <h1><b-button :to="{ name: 'home' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleSettings') }}</h1>
+    <h1><b-button :to="{ name: 'data' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleSettings') }}</h1>
     <hr />
     <b-form @submit.prevent="onSubmit" class="settings-form">
       <b-row>
@@ -38,6 +38,9 @@
         </b-col>
         <b-col cols=12 md=6>
           <h2>{{ $t('pageSettingsVisualTitle') }}</h2>
+          <b-form-group :label="$t('formLabelSettingsHideToggledTraits')" label-for="hide-toggled-traits" :description="$t('formDescriptionSettingsHideToggledTraits')">
+            <b-form-checkbox v-model="tempHideToggledTraits" switch id="hide-toggled-traits">{{ $t('buttonToggleHideToggledTraits') }}</b-form-checkbox>
+          </b-form-group>
           <b-form-group :label="$t('formLabelSettingsShowStatsInTable')" label-for="stats-in-table" :description="$t('formDescriptionSettingsShowStatsInTable')">
             <b-form-checkbox v-model="tempShowStatsInTable" switch id="stats-in-table">{{ $t('buttonToggleShowStatsInTable') }}</b-form-checkbox>
           </b-form-group>
@@ -50,9 +53,9 @@
           <b-form-group :label="$t('formLabelSettingsInvertNumberingY')" label-for="invert-numbering-y" :description="$t('formDescriptionSettingsInvertNumberingY')">
             <b-form-checkbox v-model="tempInvertNumberingY" switch id="invert-numbering-y">{{ $t('buttonToggleInvertNumberingY') }}</b-form-checkbox>
           </b-form-group>
-          <b-form-group :label="$t('formLabelSettingsGridLinesEvery')" label-for="grid-lines-every">
+          <!-- <b-form-group :label="$t('formLabelSettingsGridLinesEvery')" label-for="grid-lines-every">
             <b-form-select :options="validGridLines" v-model="tempGridLinesEvery" id="grid-lines-every" />
-          </b-form-group>
+          </b-form-group> -->
           <b-form-group :label="$t('formLabelSettingsColumnWidth')" :description="$t('formDescriptionSettingsColumnWidth')" label-for="column-width">
             <b-input-group>
               <b-form-input v-model.number="tempColumnWidth" type="number" id="column-width" />
@@ -100,6 +103,7 @@ export default {
       tempInvertNumberingX: false,
       tempInvertNumberingY: false,
       tempShowStatsInTable: false,
+      tempHideToggledTraits: false,
       tempGridLinesEvery: 5,
       tempColumnWidth: null,
       tempColors: [],
@@ -112,7 +116,9 @@ export default {
     ...mapGetters([
       'storeColumnWidth',
       'storeContinuousInput',
+      'storeDatasetId',
       'storeGridLinesEvery',
+      'storeHideToggledTraits',
       'storeInvertView',
       'storeInvertNumberingX',
       'storeInvertNumberingY',
@@ -136,6 +142,7 @@ export default {
       this.tempInvertNumberingX = this.storeInvertNumberingX
       this.tempInvertNumberingY = this.storeInvertNumberingY
       this.tempShowStatsInTable = this.storeShowStatsInTable
+      this.tempHideToggledTraits = this.storeHideToggledTraits
       this.tempColors = JSON.parse(JSON.stringify(this.storeTraitColors))
     },
     resetApp: function () {
@@ -177,6 +184,9 @@ export default {
       if (this.tempShowStatsInTable !== this.storeShowStatsInTable) {
         this.$store.dispatch('setShowStatsInTable', this.tempShowStatsInTable)
       }
+      if (this.tempHideToggledTraits !== this.storeHideToggledTraits) {
+        this.$store.dispatch('setHideToggledTraits', this.tempHideToggledTraits)
+      }
       if (this.tempColumnWidth !== this.storeColumnWidth) {
         this.$store.dispatch('setColumnWidth', this.tempColumnWidth)
       }
@@ -185,7 +195,11 @@ export default {
         this.$store.dispatch('setTraitColors', this.tempColors)
       }
 
-      this.$router.push({ name: 'home' })
+      if (this.storeDatasetId) {
+        this.$router.push({ name: 'data' })
+      } else {
+        this.$router.push({ name: 'home' })
+      }
     },
     addColor: function () {
       this.tempColors.push(this.newColor)

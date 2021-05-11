@@ -1,5 +1,4 @@
 import { mapGetters } from 'vuex'
-import store from '@/store'
 
 const axios = require('axios').default
 
@@ -11,6 +10,24 @@ export default {
     ])
   },
   methods: {
+    getTouchPosition: function (e) {
+      if (e.touches) {
+        if (e.touches.length === 1) {
+          // const rect = this.$refs.dataCanvas.getBoundingClientRect()
+          return {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY
+          }
+        } else {
+          return null
+        }
+      } else {
+        return {
+          x: e.offsetX,
+          y: e.offsetY
+        }
+      }
+    },
     /**
      * For the given trait, return the i18n text
      * @param trait The trait for which to return the text
@@ -36,8 +53,8 @@ export default {
      * The server will respond with a UUID that uniquely identifies this configuration allowing to share it with other devices.
      * @returns Promise
      */
-    postConfigForSharing: function () {
-      return this.axios('config', store.getters.storeDataset, 'post')
+    postConfigForSharing: function (data) {
+      return this.axios('config', data, 'post')
     },
     /**
      * Retrieves a dataset configuration from the server using a given UUID.

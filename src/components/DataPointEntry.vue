@@ -2,15 +2,15 @@
   <div>
     <p>{{ $t('modalTextDataEntry') }}</p>
     <b-form @submit.prevent="onSubmit" :validated="formValidated">
-      <b-form-group v-for="(trait, index) in storeTraits"
+      <b-form-group v-for="(mapping, index) in visibleTraitMapping"
                     :key="`trait-${index}`"
                     :label-for="`trait-${index}`">
         <!-- Show the trait name along with the type and its color as the label -->
         <template v-slot:label>
-          <span :style="{ color: storeTraitColors[index % storeTraitColors.length] }"><BIconCircleFill /> {{ trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span>
+          <span :style="{ color: storeTraitColors[mapping.index % storeTraitColors.length] }"><BIconCircleFill /> {{ mapping.trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(mapping.trait) }}</b-badge></span>
         </template>
 
-        <b-input-group v-if="trait.type === 'date'">
+        <b-input-group v-if="mapping.trait.type === 'date'">
           <!-- For date types, show a datepicker -->
           <b-form-input :id="`trait-${index}`"
                             :ref="`trait-${index}`"
@@ -29,28 +29,28 @@
           </b-input-group-append>
         </b-input-group>
         <!-- For int types, show a number input, apply restrictions -->
-        <b-form-input      v-else-if="trait.type === 'int'"
+        <b-form-input      v-else-if="mapping.trait.type === 'int'"
                            :id="`trait-${index}`"
                            :ref="`trait-${index}`"
                            :state="formState[index]"
                            @keyup.enter="traverseForm(index + 1)"
                            v-model.number="values[index]"
                            type="number"
-                           :min="(trait.restrictions && trait.restrictions.min !== null && trait.restrictions.min !== undefined) ? trait.restrictions.min : null"
-                           :max="(trait.restrictions && trait.restrictions.max !== null && trait.restrictions.max !== undefined) ? trait.restrictions.max : null" />
+                           :min="(mapping.trait.restrictions && mapping.trait.restrictions.min !== null && mapping.trait.restrictions.min !== undefined) ? mapping.trait.restrictions.min : null"
+                           :max="(mapping.trait.restrictions && mapping.trait.restrictions.max !== null && mapping.trait.restrictions.max !== undefined) ? mapping.trait.restrictions.max : null" />
         <!-- For float types, show a number input, apply restrictions -->
-        <b-form-input      v-else-if="trait.type === 'float'"
+        <b-form-input      v-else-if="mapping.trait.type === 'float'"
                            :id="`trait-${index}`"
                            :ref="`trait-${index}`"
                            :state="formState[index]"
                            @keyup.enter="traverseForm(index + 1)"
                            v-model.number="values[index]"
                            type="number"
-                           :min="(trait.restrictions && trait.restrictions.min !== null && trait.restrictions.min !== undefined) ? trait.restrictions.min : null"
-                           :max="(trait.restrictions && trait.restrictions.max !== null && trait.restrictions.max !== undefined) ? trait.restrictions.max : null"
+                           :min="(mapping.trait.restrictions && mapping.trait.restrictions.min !== null && mapping.trait.restrictions.min !== undefined) ? mapping.trait.restrictions.min : null"
+                           :max="(mapping.trait.restrictions && mapping.trait.restrictions.max !== null && mapping.trait.restrictions.max !== undefined) ? mapping.trait.restrictions.max : null"
                            :step="0.02" />
         <!-- For text types, show a simple input field -->
-        <b-form-input      v-else-if="trait.type === 'text'"
+        <b-form-input      v-else-if="mapping.trait.type === 'text'"
                            :id="`trait-${index}`"
                            :ref="`trait-${index}`"
                            :state="formState[index]"
@@ -58,15 +58,15 @@
                            v-model="values[index]"
                            type="text" />
         <!-- For categorical traits -->
-        <template v-if="trait.type === 'categorical' && trait.restrictions && trait.restrictions.categories">
+        <template v-if="mapping.trait.type === 'categorical' && mapping.trait.restrictions && mapping.trait.restrictions.categories">
           <!-- If there are more than 3 options, show a dropdown select -->
-          <b-form-select   v-if="trait.restrictions.categories.length > 3"
+          <b-form-select   v-if="mapping.trait.restrictions.categories.length > 3"
                            :id="`trait-${index}`"
                            :ref="`trait-${index}`"
                            :state="formState[index]"
                            @keyup.enter="traverseForm(index + 1)"
                            v-model="values[index]"
-                           :options="[{ value: null, text: $t('formSelectCategory') }, ...trait.restrictions.categories]" />
+                           :options="[{ value: null, text: $t('formSelectCategory') }, ...mapping.trait.restrictions.categories]" />
           <!-- Else show a button group for easier selection -->
           <b-form-radio-group v-else
                            :id="`trait-${index}`"
@@ -76,7 +76,7 @@
                            button-variant="outline-secondary"
                            @keyup.enter="traverseForm(index + 1)"
                            v-model="values[index]"
-                           :options="[...trait.restrictions.categories, { value: null, text: '⦸' }]" />
+                           :options="[...mapping.trait.restrictions.categories, { value: null, text: '⦸' }]" />
         </template>
       </b-form-group>
 
@@ -154,13 +154,29 @@ export default {
     ...mapGetters([
       'storeData',
       'storeGeolocation',
+      'storeHideToggledTraits',
       'storeTraitColors',
       'storeTraits',
       'storeUseGps',
-      'storeUseSpeech'
+      'storeUseSpeech',
+      'storeVisibleTraits'
     ]),
     supportsSpeechRecognition: function () {
       return ('webkitSpeechRecognition' in window)
+    },
+    visibleTraitMapping: function () {
+      const result = []
+
+      this.storeTraits.forEach((t, index) => {
+        if (!this.storeHideToggledTraits || this.storeVisibleTraits[index]) {
+          result.push({
+            trait: t,
+            index: index
+          })
+        }
+      })
+
+      return result
     }
   },
   watch: {
@@ -269,25 +285,26 @@ export default {
     },
     reset: function () {
       this.formValidated = false
-      this.formState = this.storeTraits.map(t => null)
+      this.formState = this.visibleTraitMapping.map(t => null)
       this.imageFile = null
       this.imageData = null
       if (this.col !== null && this.row !== null) {
-        this.values = JSON.parse(JSON.stringify(this.storeData[this.row][this.col].values))
-        this.dates = JSON.parse(JSON.stringify(this.storeData[this.row][this.col].dates))
-        this.name = this.storeData[this.row][this.col].name
-        // this.isMarked = this.storeData[this.row][this.col].isMarked || false
-        this.comment = this.storeData[this.row][this.col].comment
+        const dp = this.storeData.get(`${this.row}-${this.col}`)
+        this.values = this.visibleTraitMapping.map(t => dp.values[t.index])
+        this.dates = this.visibleTraitMapping.map(t => dp.dates[t.index])
+        this.name = dp.name
+        // this.isMarked = dp.isMarked || false
+        this.comment = dp.comment
 
         this.speak(this.name)
-        this.speak(this.storeTraits[0].name)
+        this.speak(this.visibleTraitMapping[0].trait.name)
         this.setFocus()
       }
     },
     speak: function (text) {
       if (this.textSynth) {
         const utterance = new SpeechSynthesisUtterance(text)
-        utterance.rate = 1.5
+        utterance.rate = 1.2
         this.textSynth.speak(utterance)
       }
     },
@@ -314,7 +331,7 @@ export default {
       this.speak(this.values[oldIndex])
 
       // If the next ref exists and it has a focus method, call it
-      if (newIndex < this.values.length) {
+      if (newIndex < this.visibleTraitMapping.length) {
         if (this.$refs[`trait-${newIndex}`][0]) {
           if (this.$refs[`trait-${newIndex}`][0].focus) {
             this.$refs[`trait-${newIndex}`][0].focus()
@@ -323,7 +340,7 @@ export default {
             this.$refs[`trait-${newIndex}`][0].select()
           }
 
-          this.speak(this.storeTraits[newIndex].name)
+          this.speak(this.visibleTraitMapping[newIndex].trait.name)
         }
       } else {
         this.onSubmit()
@@ -346,7 +363,7 @@ export default {
     },
     verify: function (verifyCallback) {
       // TODO
-      this.formState = this.storeTraits.map((t, i) => {
+      this.formState = this.visibleTraitMapping.map((t, i) => {
         if (this.values[i] === '' || this.values[i] === null) {
           return true
         } else if (t.restrictions) {
@@ -380,7 +397,7 @@ export default {
           return
         }
 
-        if (this.storeTraits[i].type === 'date') {
+        if (this.visibleTraitMapping[i].trait.type === 'date') {
           // If the trait a date, simply set the date to the value
           this.dates[i] = this.values[i]
         } else if (this.values[i] !== null && this.dates[i] === null) {
@@ -392,14 +409,23 @@ export default {
       // Only store the comment if it's not empty
       const comment = (this.comment !== undefined && this.comment !== null && this.comment.length > 0) ? this.comment : null
 
+      const dp = this.storeData.get(`${this.row}-${this.col}`)
+      const finalValues = JSON.parse(JSON.stringify(dp.values))
+      const finalDates = JSON.parse(JSON.stringify(dp.dates))
+
+      this.visibleTraitMapping.forEach((t, index) => {
+        finalValues[t.index] = this.values[index]
+        finalDates[t.index] = this.dates[index]
+      })
+
       // Update the store with the newly set data point
       this.$store.commit('ON_DATA_POINT_CHANGED_MUTATION', {
         row: this.row,
         col: this.col,
         name: this.name,
         isMarked: this.isMarked,
-        values: this.values,
-        dates: this.dates,
+        values: finalValues,
+        dates: finalDates,
         geolocation: this.storeUseGps ? this.storeGeolocation : null,
         comment: comment
       })

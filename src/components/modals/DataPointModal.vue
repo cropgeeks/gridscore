@@ -24,15 +24,16 @@
 
       <button class="close ml-0" @click="close()">×</button>
     </template>
+    <DataPointEntry :isMarked="isMarked" :row="localRow" :col="localCol" :key="`${localRow}-${localCol}`" ref="dataPointEntry" />
+
     <template v-if="!isGuidedWalk">
-      <b-button v-b-toggle.data-point-guide-collapse class="mb-3"><BIconSignpost /> {{ $t('buttonStartGuidedWalkToggle') }}</b-button>
-      <b-collapse id="data-point-guide-collapse" class="mb-3">
+      <b-button @click="guidedWalkVisible = !guidedWalkVisible" class="my-3"><BIconSignpost /> {{ $t('buttonStartGuidedWalkToggle') }}</b-button>
+      <b-collapse id="data-point-guide-collapse" class="mb-3" v-model="guidedWalkVisible">
         <p class="text-info">{{ $t('widgetGuideOrderText') }}</p>
-        <GuideOrderSelector :row="localRow" :col="localCol" @order-selected="orderSelected"/>
+        <GuideOrderSelector :row="localRow" :col="localCol" :visible="guidedWalkVisible" @order-selected="orderSelected"/>
         <b-button :disabled="!selectedOrder" @click="isGuidedWalk = true"><BIconPlay /> {{ $t('buttonStartGuidedWalk') }}</b-button>
       </b-collapse>
     </template>
-    <DataPointEntry :isMarked="isMarked" :row="localRow" :col="localCol" :key="`${localRow}-${localCol}`" ref="dataPointEntry" />
 
     <template v-slot:modal-footer="{ ok, cancel }">
       <template v-if="isGuidedWalk">
@@ -72,6 +73,7 @@ export default {
   },
   data: function () {
     return {
+      guidedWalkVisible: false,
       isMarked: false,
       name: null,
       isGuidedWalk: true,
@@ -100,6 +102,7 @@ export default {
      * Shows the modal and resets it to its initial state
      */
     show: function () {
+      this.guidedWalkVisible = false
       this.isGuidedWalk = false
       this.walkingOrder = null
       this.walkingOrderIndex = 0
@@ -164,7 +167,7 @@ export default {
     },
     update: function () {
       if (this.localRow !== null && this.localCol !== null) {
-        const cell = this.$store.getters.storeData[this.localRow][this.localCol]
+        const cell = this.$store.getters.storeData.get(`${this.localRow}-${this.localCol}`)
         this.isMarked = cell.isMarked || false
         this.name = cell.name
       } else {

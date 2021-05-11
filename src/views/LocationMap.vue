@@ -105,12 +105,10 @@ export default {
       let locs = []
 
       if (this.storeData) {
-        this.storeData.forEach(row => {
-          row.forEach(c => {
-            if (c.geolocation) {
-              locs.push(L.latLng(c.geolocation.lat, c.geolocation.lng))
-            }
-          })
+        this.storeData.forEach((c, k) => {
+          if (c.geolocation) {
+            locs.push(L.latLng(c.geolocation.lat, c.geolocation.lng))
+          }
         })
       }
 
@@ -221,20 +219,18 @@ export default {
           disableClusteringAtZoom: 20
         })
 
-        this.storeData.forEach(row => {
-          row.forEach(c => {
-            if (c.geolocation) {
-              let marker = L.marker(L.latLng(c.geolocation.lat, c.geolocation.lng)).bindPopup('')
-              marker.on('click', e => {
-                let popup = e.target.getPopup()
-                this.selectedLocation = c
-                // Set the popup content on click
-                this.$nextTick(() => popup.setContent(this.$refs.popupContent))
-              })
-              markers.addLayer(marker)
-              // marker.addTo(map)
-            }
-          })
+        this.storeData.forEach((c, k) => {
+          if (c.geolocation) {
+            let marker = L.marker(L.latLng(c.geolocation.lat, c.geolocation.lng)).bindPopup('')
+            marker.on('click', e => {
+              let popup = e.target.getPopup()
+              this.selectedLocation = c
+              // Set the popup content on click
+              this.$nextTick(() => popup.setContent(this.$refs.popupContent))
+            })
+            markers.addLayer(marker)
+            // marker.addTo(map)
+          }
         })
 
         map.addLayer(markers)
@@ -249,7 +245,7 @@ export default {
 @import "~leaflet.markercluster/dist/MarkerCluster.Default.css";
 
 .location-map {
-  height: 90vh;
+  height: 80vh;
 }
 .leaflet-popup-content {
   min-width: 200px!important;

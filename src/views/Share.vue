@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <h1><b-button :to="{ name: 'home' }"><BIconArrowLeft /></b-button> {{ $t('pageShareTitle') }}</h1>
+    <h1><b-button :to="{ name: 'data' }"><BIconArrowLeft /></b-button> {{ $t('pageShareTitle') }}</h1>
     <hr/>
     <p v-html="$t('pageShareText')" />
     <b-row>

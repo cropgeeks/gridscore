@@ -2,7 +2,7 @@
   <div>
     <h1>{{ $t('pageHeatmapTitle') }}</h1>
     <p>{{ $t('pageHeatmapText') }}</p>
-    <div v-if="storeData && storeData.length > 0 && storeTraits && storeTraits.length > 0">
+    <div v-if="storeData && storeData.size > 0 && storeTraits && storeTraits.length > 0">
       <!-- Trait selection box -->
       <b-form-group :label="$t('formLabelHeatmapTrait')" label-for="trait">
         <b-form-select id="trait" :options="traits" v-model="trait" />
@@ -69,7 +69,7 @@ export default {
         outer:
         for (let row = 0; row < rows; row++) {
           for (let col = 0; col < cols; col++) {
-            if (this.storeData[row][col].dates[this.trait] !== null) {
+            if (this.storeData.get(`${row}-${col}`).dates[this.trait] !== null) {
               hasData = true
               break outer
             }
@@ -80,7 +80,7 @@ export default {
         outer:
         for (let row = 0; row < rows; row++) {
           for (let col = 0; col < cols; col++) {
-            if (this.storeData[row][col].values[this.trait] !== null) {
+            if (this.storeData.get(`${row}-${col}`).values[this.trait] !== null) {
               hasData = true
               break outer
             }
@@ -97,7 +97,7 @@ export default {
           // Find the minimum in the data
           for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-              const date = this.storeData[row][col].dates[this.trait]
+              const date = this.storeData.get(`${row}-${col}`).dates[this.trait]
 
               if (date) {
                 minDateString = date < minDateString ? date : minDateString
@@ -108,37 +108,39 @@ export default {
           // Parse it
           const minDate = Date.parse(minDateString)
 
+          const z = []
+          const text = []
+
+          for (let row = rows - 1; row >= 0; row--) {
+            const rowZ = []
+            const textZ = []
+            for (let col = 0; col < cols; col++) {
+              const cell = this.storeData.get(`${row}-${col}`)
+              textZ.push(cell.name)
+              // Get the cell date
+              const dateString = cell.dates[this.trait]
+
+              if (dateString) {
+                // If there is one, return the time difference to the minimum date in days
+                const date = Date.parse(dateString)
+
+                rowZ.push((date - minDate) / (1000 * 60 * 60 * 24))
+              } else {
+                // Else return NaN
+                rowZ.push(NaN)
+              }
+            }
+            z.push(rowZ)
+            text.push(textZ)
+          }
+
           data = [{
             // X values are the column indices
             x: Array.from({ length: cols }, (v, k) => k + 1),
             // Y Values are the row indices
             y: Array.from({ length: rows }, (v, k) => k + 1),
-            z: this.storeData.map((row, index) => {
-              let result = []
-              for (let col = 0; col < cols; col++) {
-                // Get the cell date
-                const dateString = this.storeData[rows - index - 1][col].dates[this.trait]
-
-                if (dateString) {
-                  // If there is one, return the time difference to the minimum date in days
-                  const date = Date.parse(dateString)
-
-                  result.push((date - minDate) / (1000 * 60 * 60 * 24))
-                } else {
-                  // Else return NaN
-                  result.push(NaN)
-                }
-              }
-              return result
-            }),
-            text: this.storeData.map((row, index) => {
-              // Return variety names
-              let result = []
-              for (let col = 0; col < cols; col++) {
-                result.push(this.storeData[rows - index - 1][col].name)
-              }
-              return result
-            }),
+            z: z,
+            text: text,
             type: 'heatmap',
             hoverongaps: false,
             colorscale: [[0, '#dddddd'], [1, this.storeTraitColors[this.trait % this.storeTraitColors.length]]],
@@ -152,42 +154,49 @@ export default {
         } else {
           // For all other data types use the actual data instead of the date for plotting
           const isCategorical = actualTrait.type === 'categorical' && actualTrait.restrictions && actualTrait.restrictions.categories
+
+          const z = []
+          const text = []
+
+          for (let row = rows - 1; row >= 0; row--) {
+            const rowZ = []
+            const textZ = []
+            for (let col = 0; col < cols; col++) {
+              const cell = this.storeData.get(`${row}-${col}`)
+
+              if (isCategorical) {
+                // Plot the actual category rather than just its index
+                textZ.push(`x: ${col}<br>y: ${row}<br>z: ${cell.values[this.trait]}<br>${cell.name}`)
+              } else {
+                textZ.push(cell.name)
+              }
+
+              // Get the cell date
+              const value = cell.values[this.trait]
+
+              if (value !== undefined && value !== null) {
+                if (isCategorical) {
+                  // For categorical traits use the index, because the heatmap doesn't support categorical data
+                  rowZ.push(actualTrait.restrictions.categories.indexOf(value))
+                } else {
+                  // Else just plot the value
+                  rowZ.push(value)
+                }
+              } else {
+                rowZ.push(NaN)
+              }
+            }
+            z.push(rowZ)
+            text.push(textZ)
+          }
+
           data = [{
             // X values are the column indices
             x: Array.from({ length: cols }, (v, k) => k + 1),
             // Y Values are the row indices
             y: Array.from({ length: rows }, (v, k) => k + 1),
-            z: this.storeData.map((row, index) => {
-              let result = []
-              for (let col = 0; col < cols; col++) {
-                const value = this.storeData[rows - index - 1][col].values[this.trait]
-
-                if (value) {
-                  if (isCategorical) {
-                    // For categorical traits use the index, because the heatmap doesn't support categorical data
-                    result.push(actualTrait.restrictions.categories.indexOf(value))
-                  } else {
-                    // Else just plot the value
-                    result.push(value)
-                  }
-                } else {
-                  result.push(NaN)
-                }
-              }
-              return result
-            }),
-            text: this.storeData.map((row, index) => {
-              let result = []
-              for (let col = 0; col < cols; col++) {
-                if (isCategorical) {
-                  // Plot the actual category rather than just its index
-                  result.push(`x: ${col}<br>y: ${rows - index - 1}<br>z: ${this.storeData[rows - index - 1][col].values[this.trait]}<br>${this.storeData[rows - index - 1][col].name}`)
-                } else {
-                  result.push(this.storeData[rows - index - 1][col].name)
-                }
-              }
-              return result
-            }),
+            z: z,
+            text: text,
             type: 'heatmap',
             hoverongaps: false,
             colorscale: [[0, '#dddddd'], [1, this.storeTraitColors[this.trait % this.storeTraitColors.length]]],
