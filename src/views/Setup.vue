@@ -60,7 +60,7 @@
               </div>
             </template>
             <!-- Variety names input -->
-            <b-form-textarea id="varieties" @keydown.tab.prevent="tabber($event)" :state="state.varieties" rows=6 required :placeholder="varietiesInRowFormat ? $t('formPlaceholderVarieties') : $t('formPlaceholderVarietiesGrid')" v-model="varieties" />
+            <b-form-textarea id="varieties" @keydown.tab.prevent="tabber($event)" :state="state.varieties" rows=6 wrap="off" required :placeholder="varietiesInRowFormat ? $t('formPlaceholderVarieties') : $t('formPlaceholderVarietiesGrid')" v-model="varieties" />
             <!-- Variety names file loading -->
             <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="varietiesFile" />
           </b-form-group>

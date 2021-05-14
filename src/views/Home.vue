@@ -21,7 +21,20 @@
             <b-card-text><BIconLayoutThreeColumns rotate="90" /> {{ $t('formLabelSettingsRows') }} {{ dataset.rows }}</b-card-text>
             <b-card-text><BIconLayoutThreeColumns /> {{ $t('formLabelSettingsCols') }} {{ dataset.cols }}</b-card-text>
             <b-card-text v-if="dataset.lastUpdatedOn"><BIconCalendarDate /> {{ new Date(dataset.lastUpdatedOn).toLocaleString() }}</b-card-text>
-            <b-button variant="primary" @click="onDatasetSelected(dataset.id)">{{ $t('buttonSelect') }}</b-button>
+
+            <template #footer>
+              <div class="d-flex justify-content-between">
+                <b-button variant="primary" @click="onDatasetSelected(dataset.id)">{{ $t('buttonSelect') }}</b-button>
+
+                <b-dropdown variant="outline-secondary">
+                  <template #button-content>
+                    <BIconGear />
+                  </template>
+                  <b-dropdown-item @click="onResetClicked(dataset)"><BIconArrowCounterclockwise /> {{ $t('buttonResetDataset') }}</b-dropdown-item>
+                  <b-dropdown-item @click="onDeleteClicked(dataset)" variant="danger"><BIconTrash /> {{ $t('buttonDeleteDataset') }}</b-dropdown-item>
+                </b-dropdown>
+              </div>
+            </template>
           </b-card>
         </b-col>
       </b-row>
@@ -35,7 +48,7 @@ import { EventBus } from '@/plugins/event-bus'
 
 import idb from '@/plugins/idb'
 
-import { BIconJournalPlus, BIconFileSpreadsheet, BIconPlayFill, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
+import { BIconJournalPlus, BIconFileSpreadsheet, BIconPlayFill, BIconGear, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
 
 export default {
   components: {
@@ -43,6 +56,9 @@ export default {
     BIconFileSpreadsheet,
     BIconPlayFill,
     BIconCalendarDate,
+    BIconGear,
+    BIconTrash,
+    BIconArrowCounterclockwise,
     BIconLayoutThreeColumns
   },
   data: function () {
@@ -92,6 +108,32 @@ export default {
     },
     onDatasetSelected: function (datasetId) {
       this.$store.dispatch('loadDataset', datasetId)
+    },
+    onResetClicked: function (dataset) {
+      this.$bvModal.msgBoxConfirm(this.$t('modalTextResetDataset'), {
+          title: this.$t('modalTitleResetDataset'),
+          okTitle: this.$t('buttonYes'),
+          okVariant: 'danger',
+          cancelTitle: this.$t('buttonNo')
+        })
+          .then(value => {
+            if (value) {
+              this.$store.dispatch('resetDataset', dataset.id)
+            }
+          })
+    },
+    onDeleteClicked: function (dataset) {
+      this.$bvModal.msgBoxConfirm(this.$t('modalTextDeleteDataset'), {
+          title: this.$t('modalTitleDeleteDataset'),
+          okTitle: this.$t('buttonYes'),
+          okVariant: 'danger',
+          cancelTitle: this.$t('buttonNo')
+        })
+          .then(value => {
+            if (value) {
+              this.$store.dispatch('deleteDataset', dataset.id)
+            }
+          })
     }
   },
   created: function () {

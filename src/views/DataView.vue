@@ -88,7 +88,7 @@ export default {
           this.$store.dispatch('setVisibleTraits', newValue.map(t => true))
         }
       } else {
-        this.$store.dispatch('setVisibleTraits', null)
+        // this.$store.dispatch('setVisibleTraits', null)
       }
     },
     storeContinuousInput: function (newValue) {

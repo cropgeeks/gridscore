@@ -44,6 +44,22 @@
           <BIconDownload /> <a :href="getHrefTraits" :download="getFilenameTraits"> {{ $t('linkExport') }}</a>
         </div>
       </b-tab>
+      <b-tab :title="$t('tabTitleExportFieldPlan')">
+        <p v-html="$t('modalTextExportFieldPlan')" />
+
+        <b-form-group :label="$t('formLabelExportFieldPlanTrait')" label-for="exportFieldPlanTrait">
+          <b-form-select :options="traitOptions" v-model="selectedTrait" id="exportFieldPlanTrait" />
+        </b-form-group>
+        <b-form-group :label="$t('formLabelExportFieldPlan')"
+                        label-for="exportFieldPlan">
+          <!-- The data is shown here, non-wrapped. On focus, select everything -->
+          <b-form-textarea rows="8" readonly :value="fieldPlan" id="exportFieldPlan" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
+        </b-form-group>
+        <!-- Link to actually download the data -->
+        <div v-if="fieldPlan && (fieldPlan !== $t('labelNoData'))">
+          <BIconDownload /> <a :href="getHrefFieldPlant" :download="getFilenameFieldPlan"> {{ $t('linkExport') }}</a>
+        </div>
+      </b-tab>
     </b-tabs>
   </b-container>
 </template>
@@ -58,6 +74,11 @@ export default {
     BIconDownload,
     BIconArrowLeft
   },
+  data: function () {
+    return {
+      selectedTrait: null
+    }
+  },
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
@@ -67,9 +88,41 @@ export default {
       'storeRows',
       'storeTraits'
     ]),
+    traitOptions: function () {
+      if (this.storeTraits) {
+        const result = this.storeTraits.map((t, index) => {
+          return {
+            value: index,
+            text: t.name
+          }
+        })
+        result.unshift({
+          value: 'name',
+          text: this.$t('formLabelSettingsVarieties')
+        })
+        result.unshift({
+          value: null,
+          text: this.$t('formSelectOption')
+        })
+        return result
+      } else {
+        return []
+      }
+    },
     safeFilename: function () {
       if (this.storeDatasetName) {
         return this.storeDatasetName.replace(/[^a-z0-9]/gi, '-').toLowerCase()
+      } else {
+        return ''
+      }
+    },
+    safeSelectedTraitName: function () {
+      if (this.selectedTrait !== null) {
+        if (this.selectedTrait === 'name') {
+          return 'name'
+        } else {
+          return this.storeTraits[this.selectedTrait].name.replace(/[^a-z0-9]/gi, '-').toLowerCase()
+        }
       } else {
         return ''
       }
@@ -83,6 +136,9 @@ export default {
     getFilenameTraits: function () {
       return `traits-${this.safeFilename}-${new Date().toISOString().split('T')[0]}.txt`
     },
+    getFilenameFieldPlan: function () {
+      return `field-plan-${this.safeSelectedTraitName}-${this.safeFilename}-${new Date().toISOString().split('T')[0]}.txt`
+    },
     getHrefDates: function () {
       return 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.datesText)
     },
@@ -91,6 +147,9 @@ export default {
     },
     getHrefTraits: function () {
       return 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.storeTraits)
+    },
+    getHrefFieldPlant: function () {
+      return 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.fieldPlan)
     },
     traits: function () {
       if (!this.storeTraits || this.storeTraits.length < 1) {
@@ -216,6 +275,38 @@ export default {
             }
           }
         }
+      }
+
+      return result
+    },
+    fieldPlan: function () {
+      if (!this.storeData || this.storeData.length < 1 || !this.storeTraits || this.storeTraits.length < 1 || this.selectedTrait === null) {
+        return this.$t('labelNoData')
+      }
+
+      // Header row
+      let result = ''
+
+      // For each field row
+      for (let y = 0; y < this.storeRows; y++) {
+        // And each field column
+        for (let x = 0; x < this.storeCols; x++) {
+          if (x > 0) {
+            result += '\t'
+          }
+
+          // Get the data cell
+          const cell = this.storeData.get(`${y}-${x}`)
+          // If there is data
+          if (cell) {
+            if (this.selectedTrait === 'name') {
+              result += cell.name || ''
+            } else {
+              result += cell.values[this.selectedTrait] || ''
+            }
+          }
+        }
+        result += '\n'
       }
 
       return result

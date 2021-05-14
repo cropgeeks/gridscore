@@ -45,6 +45,7 @@ const storeState = {
     hideToggledTraits: false,
     showStatsInTable: false,
     visibleTraits: null,
+    ignoreEmptyCells: true,
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
   },
   getters: {
@@ -65,6 +66,7 @@ const storeState = {
     storeLocale: (state) => state.locale,
     storeGridLinesEvery: (state) => state.gridLinesEvery,
     storeGeolocation: (state) => state.geolocation,
+    storeIgnoreEmptyCells: (state) => state.ignoreEmptyCells,
     storeInvertView: (state) => state.invertView,
     storeInvertNumberingX: (state) => state.invertNumberingX,
     storeInvertNumberingY: (state) => state.invertNumberingY,
@@ -133,6 +135,16 @@ const storeState = {
                 })
             })
             .then(() => EventBus.$emit('datasets-changed'))
+        })
+    },
+    ON_DATASET_RESET_MUTATION: function (state, datasetId) {
+      EventBus.$emit('set-loading', true)
+
+      idb.resetDatasetData(datasetId)
+        .finally(() => {
+          EventBus.$emit('set-loading', false)
+          EventBus.$emit('dataset-changed')
+          EventBus.$emit('datasets-changed')
         })
     },
     ON_DATASET_DELETED_MUTATION: function (state, datasetId) {
@@ -288,6 +300,9 @@ const storeState = {
     },
     ON_VISIBLE_TRAITS_CHANGED_MUTATION: function (state, newVisibleTraits) {
       state.visibleTraits = newVisibleTraits
+    },
+    ON_IGNORE_EMPTY_CELLS_CHANGED_MUTATION: function (state, newIgnoreEmptyCells) {
+      state.ignoreEmptyCells = newIgnoreEmptyCells
     }
   },
   actions: {
@@ -299,6 +314,11 @@ const storeState = {
     },
     deleteDataset: function ({ commit }, datasetId) {
       commit('ON_DATASET_DELETED_MUTATION', datasetId)
+    },
+    resetDataset: function ({ commit }, datasetId) {
+      EventBus.$emit('set-loading', true)
+      commit('ON_DATASET_RESET_MUTATION', datasetId)
+      commit('ON_DATASET_LOAD_MUTATION', datasetId)
     },
     resetGridScore: function ({ commit }) {
       EventBus.$emit('set-loading', true)
@@ -393,6 +413,9 @@ const storeState = {
     },
     setVisibleTraits: function ({ commit }, visibleTraits) {
       commit('ON_VISIBLE_TRAITS_CHANGED_MUTATION', visibleTraits)
+    },
+    setIgnoreEmptyCells: function ({ commit }, ignoreEmptyCells) {
+      commit('ON_IGNORE_EMPTY_CELLS_CHANGED_MUTATION', ignoreEmptyCells)
     }
   },
   plugins: [createPersistedState({

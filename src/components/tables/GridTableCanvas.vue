@@ -117,6 +117,7 @@ export default {
       'storeCols',
       'storeDatasetId',
       'storeHideToggledTraits',
+      'storeIgnoreEmptyCells',
       'storeInvertNumberingX',
       'storeInvertNumberingY',
       'storeInvertView',
@@ -331,6 +332,12 @@ export default {
         const row = Math.floor((-this.origin.y + ev.y) / this.cellHeight)
         const col = Math.floor((-this.origin.x + ev.x) / this.cellWidth)
 
+        const cell = this.$store.getters.storeData.get(`${row}-${col}`)
+
+        if (this.storeIgnoreEmptyCells === true && !cell.name) {
+          return
+        }
+
         if (row >= 0 && row < this.storeRows && col >= 0 && col < this.storeCols) {
           // Emit an event to handle user selections
           this.$emit('cell-clicked', {
@@ -539,6 +546,10 @@ export default {
 
       // Fill the background
       this.ctx.fillRect(x, y, this.cellWidth, this.cellHeight)
+
+      if (this.storeIgnoreEmptyCells === true && !cell.name) {
+        return
+      }
 
       // Add the name text
       const text = this.fittingString(cell.name || 'N/A', this.coreWidth)

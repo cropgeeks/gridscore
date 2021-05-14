@@ -67,6 +67,33 @@ export default {
       return new Promise(resolve => resolve([]))
     }
   },
+  resetDatasetData: async function (datasetId) {
+    const data = await this.getDatasetData(datasetId)
+
+    if (data) {
+      data.forEach(d => {
+        d.values = d.values.map(_ => null)
+        d.dates = d.dates.map(_ => null)
+        d.comment = null
+        d.geolocation = null
+        d.isMarked = false
+      })
+
+      const db = await this.getDb()
+
+      return new Promise(resolve => {
+        const tx = db.transaction('data', 'readwrite')
+
+        Promise.all(data.map(cell => tx.store.put(cell)))
+          .then(() => {
+            resolve()
+            return tx.done
+          })
+      })
+    } else {
+      return new Promise(resolve => resolve())
+    }
+  },
   updateDatasetUuid: async function (datasetId, uuid) {
     const db = await this.getDb()
 

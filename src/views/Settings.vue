@@ -41,6 +41,9 @@
           <b-form-group :label="$t('formLabelSettingsHideToggledTraits')" label-for="hide-toggled-traits" :description="$t('formDescriptionSettingsHideToggledTraits')">
             <b-form-checkbox v-model="tempHideToggledTraits" switch id="hide-toggled-traits">{{ $t('buttonToggleHideToggledTraits') }}</b-form-checkbox>
           </b-form-group>
+          <b-form-group :label="$t('formLabelSettingsIgnoreEmptyCells')" label-for="ignode-empty-cells" :description="$t('formDescriptionSettingsIgnoreEmptyCells')">
+            <b-form-checkbox v-model="tempIgnoreEmptyCells" switch id="ignode-empty-cells">{{ $t('buttonToggleIgnoreEmptyCells') }}</b-form-checkbox>
+          </b-form-group>
           <b-form-group :label="$t('formLabelSettingsShowStatsInTable')" label-for="stats-in-table" :description="$t('formDescriptionSettingsShowStatsInTable')">
             <b-form-checkbox v-model="tempShowStatsInTable" switch id="stats-in-table">{{ $t('buttonToggleShowStatsInTable') }}</b-form-checkbox>
           </b-form-group>
@@ -99,6 +102,7 @@ export default {
       tempUseGps: true,
       tempUseSpeech: false,
       tempContinuousInput: false,
+      tempIgnoreEmptyCells: false,
       tempInvertView: false,
       tempInvertNumberingX: false,
       tempInvertNumberingY: false,
@@ -119,6 +123,7 @@ export default {
       'storeDatasetId',
       'storeGridLinesEvery',
       'storeHideToggledTraits',
+      'storeIgnoreEmptyCells',
       'storeInvertView',
       'storeInvertNumberingX',
       'storeInvertNumberingY',
@@ -143,6 +148,7 @@ export default {
       this.tempInvertNumberingY = this.storeInvertNumberingY
       this.tempShowStatsInTable = this.storeShowStatsInTable
       this.tempHideToggledTraits = this.storeHideToggledTraits
+      this.tempIgnoreEmptyCells = this.storeIgnoreEmptyCells
       this.tempColors = JSON.parse(JSON.stringify(this.storeTraitColors))
     },
     resetApp: function () {
@@ -189,6 +195,9 @@ export default {
       }
       if (this.tempColumnWidth !== this.storeColumnWidth) {
         this.$store.dispatch('setColumnWidth', this.tempColumnWidth)
+      }
+      if (this.tempIgnoreEmptyCells !== this.storeIgnoreEmptyCells) {
+        this.$store.dispatch('setIgnoreEmptyCells', this.tempIgnoreEmptyCells)
       }
 
       if (this.tempColors.length !== this.storeTraitColors.length || !this.tempColors.every((value, index) => value === this.storeTraitColors[index])) {
