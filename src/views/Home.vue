@@ -30,6 +30,7 @@
                   <template #button-content>
                     <BIconGear />
                   </template>
+                  <b-dropdown-item @click="onAddTraitClicked(dataset)"><BIconTags /> {{ $t('buttonAddTrait') }}</b-dropdown-item>
                   <b-dropdown-item @click="onResetClicked(dataset)"><BIconArrowCounterclockwise /> {{ $t('buttonResetDataset') }}</b-dropdown-item>
                   <b-dropdown-item @click="onDeleteClicked(dataset)" variant="danger"><BIconTrash /> {{ $t('buttonDeleteDataset') }}</b-dropdown-item>
                 </b-dropdown>
@@ -39,6 +40,7 @@
         </b-col>
       </b-row>
     </div>
+    <AddTraitModal :dataset="selectedDataset" ref="addTraitModal" />
   </b-container>
 </template>
 
@@ -46,23 +48,28 @@
 import { mapGetters } from 'vuex'
 import { EventBus } from '@/plugins/event-bus'
 
+import AddTraitModal from '@/components/modals/AddTraitModal'
+
 import idb from '@/plugins/idb'
 
-import { BIconJournalPlus, BIconFileSpreadsheet, BIconPlayFill, BIconGear, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
+import { BIconJournalPlus, BIconFileSpreadsheet, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
 
 export default {
   components: {
+    AddTraitModal,
     BIconJournalPlus,
     BIconFileSpreadsheet,
     BIconPlayFill,
     BIconCalendarDate,
     BIconGear,
     BIconTrash,
+    BIconTags,
     BIconArrowCounterclockwise,
     BIconLayoutThreeColumns
   },
   data: function () {
     return {
+      selectedDataset: null,
       datasets: []
     }
   },
@@ -134,6 +141,11 @@ export default {
               this.$store.dispatch('deleteDataset', dataset.id)
             }
           })
+    },
+    onAddTraitClicked: function (dataset) {
+      this.selectedDataset = dataset
+
+      this.$nextTick(() => this.$refs.addTraitModal.show())
     }
   },
   created: function () {

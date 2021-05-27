@@ -158,6 +158,15 @@ const storeState = {
       state.datasetId = null
       state.dataset = null
     },
+    ON_ADD_TRAIT_TO_DATASET_MUTATION: function (state, config) {
+      EventBus.$emit('set-loading', true)
+
+      idb.addTraitToDataset(config.datasetId, config.trait)
+        .finally(() => {
+          EventBus.$emit('set-loading', false)
+          EventBus.$emit('datasets-changed')
+        })
+    },
     ON_DATASET_INDEX_CHANGED_MUTATION: function (state, newDatasetIndex) {
       state.datasetIndex = newDatasetIndex
     },
@@ -179,8 +188,9 @@ const storeState = {
       idb.updateDatasetCornerPoints(state.datasetId, newCornerPoints)
     },
     ON_BRAPI_CONFIG_CHANGED: function (state, newBrapiConfig) {
-      if (newBrapiConfig && newBrapiConfig.url && newBrapiConfig.url.indexOf('/', newBrapiConfig.url.length - 1) === -1) {
-        newBrapiConfig.url += '/'
+      if (newBrapiConfig && newBrapiConfig.url) {
+        // Remove trailing slashes
+        newBrapiConfig.url = newBrapiConfig.url.replace(/\/+$/, '')
       }
 
       state.dataset.brapiConfig = newBrapiConfig
@@ -319,6 +329,9 @@ const storeState = {
       EventBus.$emit('set-loading', true)
       commit('ON_DATASET_RESET_MUTATION', datasetId)
       commit('ON_DATASET_LOAD_MUTATION', datasetId)
+    },
+    addTraitToDataset: function ({ commit }, config) {
+      commit('ON_ADD_TRAIT_TO_DATASET_MUTATION', config)
     },
     resetGridScore: function ({ commit }) {
       EventBus.$emit('set-loading', true)

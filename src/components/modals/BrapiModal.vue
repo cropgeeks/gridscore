@@ -96,7 +96,8 @@ export default {
       this.$store.commit('ON_BRAPI_CONFIG_CHANGED', {
         url: this.brapiUrl
       })
-      this.$emit('brapi-url-changed', this.brapiUrl)
+
+      this.$nextTick(() => this.$emit('brapi-url-changed', this.brapiUrl))
     }
   }
 }

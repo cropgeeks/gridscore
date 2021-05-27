@@ -42,14 +42,21 @@
         <h2 class="px-3">{{ $t('modalTitleSettings') }}</h2>
         <b-list-group class="rounded-0">
           <b-list-group-item button @click="$router.push({ name: 'settings' })">
-            {{ $t('modalTitleSettings') }}
+            <BIconGearFill /> {{ $t('modalTitleSettings') }}
           </b-list-group-item>
         </b-list-group>
 
         <h2 class="px-3 mt-3">{{ $t('widgetSidebarTitle') }}</h2>
         <b-list-group class="rounded-0">
-          <b-list-group-item :variant="dataset.id === storeDatasetId ? 'primary' : 'null'" button class="d-flex justify-content-between align-items-center" v-for="dataset in datasets" :key="`dataset-${dataset.id}`" @click="onDatasetSelected(dataset.id)">
-            {{ dataset.id }} - {{ dataset.name }}<b-badge variant="danger" v-b-tooltip="$t('buttonDelete')" pill @click.prevent.stop="onDatasetDeleteClicked(dataset.id)">&times;</b-badge></b-list-group-item>
+          <b-list-group-item :variant="dataset.id === storeDatasetId ? 'primary' : 'null'" button v-for="dataset in datasets" :key="`dataset-${dataset.id}`" @click="onDatasetSelected(dataset.id)">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+              <h5>{{ dataset.id }} - {{ dataset.name }}</h5>
+              <b-btn variant="outline-danger" v-b-tooltip="$t('buttonDelete')" @click.prevent.stop="onDatasetDeleteClicked(dataset.id)"><BIconTrash /></b-btn>
+            </div>
+            <p v-if="dataset.lastUpdatedOn" class="text-muted">
+              <BIconCalendarDate /> {{ new Date(dataset.lastUpdatedOn).toLocaleString() }}
+            </p>
+          </b-list-group-item>
           <b-list-group-item variant="info" button @click="$router.push({ name: 'setup' })"><BIconPlus /> {{ $t('buttonAdd') }}</b-list-group-item>
         </b-list-group>
       </template>
@@ -75,17 +82,20 @@
 import { mapGetters } from 'vuex'
 import Tour from '@/components/Tour'
 import { loadLanguageAsync } from '@/plugins/i18n'
-import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconBarChartSteps, BIconGridFill, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
+import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconBarChartSteps, BIconGearFill, BIconCalendarDate, BIconGridFill, BIconTrash, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
 import { EventBus } from '@/plugins/event-bus'
 import idb from '@/plugins/idb'
 
 export default {
   name: 'App',
   components: {
+    BIconTrash,
     BIconMap,
     BIconUiChecksGrid,
     BIconGraphUp,
     BIconGridFill,
+    BIconGearFill,
+    BIconCalendarDate,
     BIconInfoCircle,
     BIconFlag,
     BIconBarChartSteps,
@@ -304,7 +314,21 @@ export default {
     },
     updateDatasets: function () {
       idb.getDatasets().then(datasets => {
-        this.datasets = datasets
+        const ds = JSON.parse(JSON.stringify(datasets))
+        if (ds) {
+          ds.sort((a, b) => {
+            if (a.lastUpdatedOn && b.lastUpdatedOn) {
+              return (new Date(b.lastUpdatedOn)) - (new Date(a.lastUpdatedOn))
+            } else if (a.lastUpdatedOn) {
+              return a
+            } else if (b.lastUpdatedOn) {
+              return b
+            } else {
+              return a.name - b.name
+            }
+          })
+        }
+        this.datasets = ds
       })
     },
     navigateToDataset: function () {

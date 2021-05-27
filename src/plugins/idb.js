@@ -94,6 +94,28 @@ export default {
       return new Promise(resolve => resolve())
     }
   },
+  addTraitToDataset: async function (datasetId, trait) {
+    const db = await this.getDb()
+    const dataset = await this.getDataset(datasetId)
+    const data = await this.getDatasetData(datasetId)
+
+    dataset.traits.push(trait)
+    data.forEach(d => {
+      d.values.push(null)
+      d.dates.push(null)
+    })
+
+    return new Promise(resolve => {
+      const tx = db.transaction('data', 'readwrite')
+
+      Promise.all(data.map(cell => tx.store.put(cell)))
+        .then(() => db.put('datasets', dataset))
+        .then(() => {
+          resolve()
+          return tx.done
+        })
+    })
+  },
   updateDatasetUuid: async function (datasetId, uuid) {
     const db = await this.getDb()
 

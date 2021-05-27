@@ -3,7 +3,7 @@
     <b-container class="py-3">
       <div class="text-center">
         <img src="img/gridscore2.svg" fluid  class="about-header-logo" alt="GridScore logo">
-        <h1 class="py-3">{{ $t('appTitle') }} <small>v1.4.1</small></h1>
+        <h1 class="py-3">{{ $t('appTitle') }} <small>v1.5.0</small></h1>
       </div>
       <p>{{ $t('pageAboutParagraphOne') }}</p>
       <p v-html="$t('pageAboutParagraphTwo')" />

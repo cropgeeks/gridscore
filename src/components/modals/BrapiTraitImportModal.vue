@@ -94,13 +94,13 @@ export default {
 
             if (t.scale.validValues) {
               if (t.scale.validValues.min !== undefined && t.scale.validValues.min !== null) {
-                restrictions = `<span class="badge badge-secondary ml-2">&ge;${t.scale.validValues.min}</span>`
+                restrictions += `<span class="badge badge-secondary ml-2">&ge;${t.scale.validValues.min}</span>`
               }
               if (t.scale.validValues.max !== undefined && t.scale.validValues.max !== null) {
-                restrictions = `<span class="badge badge-secondary ml-2">&le;${t.scale.validValues.max}</span>`
+                restrictions += `<span class="badge badge-secondary ml-2">&le;${t.scale.validValues.max}</span>`
               }
               if (t.scale.validValues.categories) {
-                restrictions = `<span class="badge badge-secondary ml-2">${t.scale.validValues.categories.map(tr => tr.value).join(', ')}</span>`
+                restrictions += `<span class="badge badge-secondary ml-2">${t.scale.validValues.categories.map(tr => tr.value).join(', ')}</span>`
               }
             }
           }
@@ -157,20 +157,26 @@ export default {
     getTraits: function () {
       this.loading = true
       this.brapiGetVariables()
-        .then(response => {
-          if (response && response.data && response.data.result && response.data.result.data) {
-            this.traits = response.data.result.data
-          } else {
-            this.traits = []
-          }
+        .all(variables => {
+          this.traits = variables
           this.loading = false
           this.errorMessage = null
         })
-        .catch(error => {
-          this.errorMessage = error
-          this.traits = []
-          this.loading = false
-        })
+      // this.brapiGetVariables()
+      //   .then(response => {
+      //     if (response && response.data && response.data.result && response.data.result.data) {
+      //       this.traits = response.data.result.data
+      //     } else {
+      //       this.traits = []
+      //     }
+      //     this.loading = false
+      //     this.errorMessage = null
+      //   })
+      //   .catch(error => {
+      //     this.errorMessage = error
+      //     this.traits = []
+      //     this.loading = false
+      //   })
     }
   }
 }
