@@ -19,4 +19,3 @@ There are a few sub-pages that contain specific information about how GridScore 
 - <a href="trial-setup.html">Trial setup</a>
 - <a href="collecting-data.html">Collecting data</a>
 - <a href="visualizing-data.html">Visualizing data</a>
-
