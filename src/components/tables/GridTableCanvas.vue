@@ -87,6 +87,7 @@ export default {
   },
   watch: {
     highlightPosition: function () {
+      // TODO: Only update relevant cell + directly adjacent cells
       this.update()
     },
     traitStats: function () {

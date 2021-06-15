@@ -99,13 +99,17 @@ export default {
         const ds = JSON.parse(JSON.stringify(datasets))
         if (ds) {
           ds.sort((a, b) => {
-            if (a.lastUpdatedOn && b.lastUpdatedOn) {
-              return (new Date(b.lastUpdatedOn)) - (new Date(a.lastUpdatedOn))
-            } else if (a.lastUpdatedOn) {
-              return a
-            } else if (b.lastUpdatedOn) {
-              return b
-            } else {
+            try {
+              if (a.lastUpdatedOn && b.lastUpdatedOn) {
+                return (new Date(b.lastUpdatedOn)) - (new Date(a.lastUpdatedOn))
+              } else if (a.lastUpdatedOn) {
+                return a
+              } else if (b.lastUpdatedOn) {
+                return b
+              } else {
+                return a.name - b.name
+              }
+            } catch (e) {
               return a.name - b.name
             }
           })

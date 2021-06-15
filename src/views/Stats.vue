@@ -106,7 +106,8 @@ export default {
             automargin: true
           },
           xaxis: {
-            zeroline: false
+            zeroline: false,
+            type: 'category'
           },
           hovermode: 'closest'
         }
