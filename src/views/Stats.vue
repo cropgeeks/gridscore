@@ -106,10 +106,13 @@ export default {
             automargin: true
           },
           xaxis: {
-            zeroline: false,
-            type: 'category'
+            zeroline: false
           },
           hovermode: 'closest'
+        }
+
+        if (trait.type === 'categorical' || trait.type === 'text') {
+          layout.xaxis.type = 'category'
         }
 
         const filename = trait.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()
