@@ -224,6 +224,7 @@
   "tourTextSetupMap": "Falls GridScore deine Position im Versuchsfeld anzeigen soll, gib die Eckpunkte des Feldes an.",
   "tourTitleConclusion": "Ende",
   "tourTextConclusion": "Dies war eine kurze Einleitung zu GridScore. Experimentier mit den Einstellungen um zu verstehen was möglich ist. Vielleicht wären die Beispieldaten ein guter Startpunkt!",
+  "widgetChartAxisCount": "Anzahl",
   "widgetSidebarTitle": "Datensätze",
   "widgetGuideOrderText": "Ein gelenkter Ablauf führt durch den Versuch Beet bei Beet auf einer spezifischen Route. Nachfolgend kann die Route beginnend beim aktuellen Beet ausgewählt werden. Danach kann der Ablauf gestartet werden. Mit Hilfe der 'Zurück' und 'Weiter' Knöpfe am unteren Rand kann zwischen den Beeten navigiert werden.",
   "widgetGuideOrderUpLeft": "Hoch, links, runter, links",

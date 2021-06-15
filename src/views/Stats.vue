@@ -113,6 +113,10 @@ export default {
 
         if (trait.type === 'categorical' || trait.type === 'text') {
           layout.xaxis.type = 'category'
+          layout.xaxis.title = trait.name
+          layout.yaxis.title = this.$t('widgetChartAxisCount')
+        } else {
+          layout.xaxis.title = trait.name
         }
 
         const filename = trait.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()

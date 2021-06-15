@@ -225,6 +225,7 @@
   "tourTextSetupMap": "If you want GridScore to highlight your current location within the trial, define the corner points of the field.",
   "tourTitleConclusion": "The End",
   "tourTextConclusion": "This was a short introduction to GridScore. Play around and experiment with it to see how it works. Maybe start by loading the example trial!",
+  "widgetChartAxisCount": "Count",
   "widgetSidebarTitle": "Datasets",
   "widgetGuideOrderText": "A guided walk will take you through the trial plot by plot on a specific route. Select the order in which to navigate from the current plot below, then start the walk. You can navigate between plots using the 'Next' and 'Back' buttons at the bottom.",
   "widgetGuideOrderUpLeft": "Up, left, down, left",
