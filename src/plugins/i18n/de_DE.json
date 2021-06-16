@@ -154,6 +154,8 @@
   "modalTitleSettings": "Einstellungen",
   "modalTitleSetup": "Einrichtung",
   "modalTitleGuidedWalkExit": "Beenden",
+  "modalTitleSaveToServerWarning": "Auf Server speichern",
+  "modalTextSaveToServerWarning": "Sieht so aus als arbeitest du an einem geteilten Feldversuch. Sicher, dass die Daten auf dem Server gespeichert werden sollen?",
   "modalTextGuidedWalkExit": "Gelenkten Ablauf stoppen und Dateneingabe beenden?",
   "pageAboutGitHubLink": "Der Quellcode von GridScore is auf <a href='https://github.com/cropgeeks/gridscore/'>GitHub</a> verfügbar.",
   "pageAboutParagraphOne": "GridScore ist eine Feldversuch-Phänotypisierungs-App für Merkmalsdaten. Mit ihm kann man festhalten was im Feld auf einem Beet-Level passiert. Dies könnten zum Beispiel das Hervortreten der Pflanze, die Blütezeit, Pflanzenhöhe, Blütenfarbe usw. sein.",

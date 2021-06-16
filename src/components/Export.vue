@@ -109,6 +109,22 @@ export default {
         return
       }
 
+      if (this.storeDataset.uuid) {
+        // Ask for confirmation, because this will overwrite what's on the server
+        this.$bvModal.msgBoxConfirm(this.$t('modalTextSaveToServerWarning'), {
+          title: this.$t('modalTitleSaveToServerWarning'),
+          okTitle: this.$t('buttonSave'),
+          cancelTitle: this.$t('buttonCancel')
+        }).then(value => {
+          if (value) {
+            this.sendData()
+          }
+        })
+      } else {
+        this.sendData()
+      }
+    },
+    sendData: function () {
       EventBus.$emit('set-loading', true)
       let dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
       const arrayData = []

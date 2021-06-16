@@ -320,9 +320,9 @@ export default {
             if (a.lastUpdatedOn && b.lastUpdatedOn) {
               return (new Date(b.lastUpdatedOn)) - (new Date(a.lastUpdatedOn))
             } else if (a.lastUpdatedOn) {
-              return a
+              return -1
             } else if (b.lastUpdatedOn) {
-              return b
+              return 1
             } else {
               return a.name - b.name
             }
