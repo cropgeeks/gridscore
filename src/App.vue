@@ -452,4 +452,11 @@ body {
 #dataset-selector {
   display: block;
 }
+
+form input.form-control,
+form input[type="radio"],
+form textarea.form-control,
+form select.custom-select {
+  font-size: 16px;
+}
 </style>

@@ -9,11 +9,13 @@
       <!-- Tab for the data -->
       <b-tab :title="$t('tabTitleExportData')" active>
         <p>{{ $t('modalTextExportData') }}</p>
-        <b-form-group :label="$t('formLabelExportText')"
-                        label-for="exportText">
-          <!-- The data is shown here, non-wrapped. On focus, select everything -->
-          <b-form-textarea rows="8" readonly :value="text" id="exportText" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
-        </b-form-group>
+        <b-form @submit.prevent>
+          <b-form-group :label="$t('formLabelExportText')"
+                          label-for="exportText">
+            <!-- The data is shown here, non-wrapped. On focus, select everything -->
+            <b-form-textarea rows="8" readonly :value="text" id="exportText" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
+          </b-form-group>
+        </b-form>
         <!-- Link to actually download the data -->
         <div v-if="text && (text !== $t('labelNoData'))">
           <BIconDownload /> <a :href="getHrefData" :download="getFilenameData"> {{ $t('linkExport') }}</a>
@@ -21,11 +23,13 @@
 
         <hr />
 
-        <b-form-group :label="$t('formLabelExportDatesText')"
-                        label-for="exportDatesText">
-          <!-- The data is shown here, non-wrapped. On focus, select everything -->
-          <b-form-textarea rows="8" readonly :value="datesText" id="exportDatesText" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
-        </b-form-group>
+        <b-form @submit.prevent>
+          <b-form-group :label="$t('formLabelExportDatesText')"
+                          label-for="exportDatesText">
+            <!-- The data is shown here, non-wrapped. On focus, select everything -->
+            <b-form-textarea rows="8" readonly :value="datesText" id="exportDatesText" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
+          </b-form-group>
+        </b-form>
         <!-- Link to actually download the data -->
         <div v-if="datesText && (datesText !== $t('labelNoData'))">
           <BIconDownload /> <a :href="getHrefDates" :download="getFilenameDates"> {{ $t('linkExport') }}</a>
@@ -34,11 +38,13 @@
       <!-- Tab for the trait definitions -->
       <b-tab :title="$t('tabTitleExportTraits')">
         <p v-html="$t('modalTextExportTraits')" />
-        <b-form-group :label="$t('formLabelExportTraits')"
-                        label-for="exportTraits">
-          <!-- The data is shown here, non-wrapped. On focus, select everything -->
-          <b-form-textarea rows="8" readonly :value="traits" id="exportTraits" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
-        </b-form-group>
+        <b-form @submit.prevent>
+          <b-form-group :label="$t('formLabelExportTraits')"
+                          label-for="exportTraits">
+            <!-- The data is shown here, non-wrapped. On focus, select everything -->
+            <b-form-textarea rows="8" readonly :value="traits" id="exportTraits" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
+          </b-form-group>
+        </b-form>
         <!-- Link to actually download the data -->
         <div v-if="traits && (traits !== $t('labelNoData'))">
           <BIconDownload /> <a :href="getHrefTraits" :download="getFilenameTraits"> {{ $t('linkExport') }}</a>
@@ -47,14 +53,16 @@
       <b-tab :title="$t('tabTitleExportFieldPlan')">
         <p v-html="$t('modalTextExportFieldPlan')" />
 
-        <b-form-group :label="$t('formLabelExportFieldPlanTrait')" label-for="exportFieldPlanTrait">
-          <b-form-select :options="traitOptions" v-model="selectedTrait" id="exportFieldPlanTrait" />
-        </b-form-group>
-        <b-form-group :label="$t('formLabelExportFieldPlan')"
-                        label-for="exportFieldPlan">
-          <!-- The data is shown here, non-wrapped. On focus, select everything -->
-          <b-form-textarea rows="8" readonly :value="fieldPlan" id="exportFieldPlan" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
-        </b-form-group>
+        <b-form @submit.prevent>
+          <b-form-group :label="$t('formLabelExportFieldPlanTrait')" label-for="exportFieldPlanTrait">
+            <b-form-select :options="traitOptions" v-model="selectedTrait" id="exportFieldPlanTrait" />
+          </b-form-group>
+          <b-form-group :label="$t('formLabelExportFieldPlan')"
+                          label-for="exportFieldPlan">
+            <!-- The data is shown here, non-wrapped. On focus, select everything -->
+            <b-form-textarea rows="8" readonly :value="fieldPlan" id="exportFieldPlan" :placeholder="$t('formPlaceholderExportLoading')" wrap="off" @focus="$event.target.select()"/>
+          </b-form-group>
+        </b-form>
         <!-- Link to actually download the data -->
         <div v-if="fieldPlan && (fieldPlan !== $t('labelNoData'))">
           <BIconDownload /> <a :href="getHrefFieldPlant" :download="getFilenameFieldPlan"> {{ $t('linkExport') }}</a>

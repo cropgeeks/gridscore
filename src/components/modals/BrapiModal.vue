@@ -7,19 +7,21 @@
            scrollable
            no-fade
            ref="brapiModal">
-    <b-form-group label-for="brapiUrl">
-      <template v-slot:label>
-        <span v-html="$t('formLabelBrapiUrl')" />
-      </template>
-      <b-input-group>
-        <!-- BrAPI URL input field -->
-        <b-form-input v-model="brapiUrl" id="brapiUrl" />
-        <b-input-group-append>
-          <!-- Button to update the BrAPI URL in the store -->
-          <b-button @click="updateBrapiUrl"><BIconArrowClockwise /></b-button>
-        </b-input-group-append>
-      </b-input-group>
-    </b-form-group>
+    <b-form @submit.prevent="updateBrapiUrl">
+      <b-form-group label-for="brapiUrl">
+        <template v-slot:label>
+          <span v-html="$t('formLabelBrapiUrl')" />
+        </template>
+        <b-input-group>
+          <!-- BrAPI URL input field -->
+          <b-form-input v-model="brapiUrl" id="brapiUrl" />
+          <b-input-group-append>
+            <!-- Button to update the BrAPI URL in the store -->
+            <b-button @click="updateBrapiUrl"><BIconArrowClockwise /></b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form-group>
+    </b-form>
 
     <!-- Slot that wrapping components can use to fill in their content -->
     <slot name="content" />
