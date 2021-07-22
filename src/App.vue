@@ -85,6 +85,7 @@ import { loadLanguageAsync } from '@/plugins/i18n'
 import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconBarChartSteps, BIconGearFill, BIconCalendarDate, BIconGridFill, BIconTrash, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
 import { EventBus } from '@/plugins/event-bus'
 import idb from '@/plugins/idb'
+import { Detector } from '@/plugins/browser-detect.js'
 
 export default {
   name: 'App',
@@ -183,10 +184,14 @@ export default {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
       'storeDatasetId',
-      'storeLocale'
+      'storeLocale',
+      'storeUniqueClientId'
     ])
   },
   methods: {
+    isLocalhost: function () {
+      return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === ''
+    },
     onDatasetSelected: function (datasetId) {
       this.$store.dispatch('loadDataset', datasetId)
       this.sidebarShown = false
@@ -366,6 +371,40 @@ export default {
       } else {
         this.$refs.loadingModal.hide()
       }
+    },
+    /**
+     * Generates a v4 UUID
+     */
+    uuidv4: function () {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0
+        const v = c === 'x' ? r : (r & 0x3 | 0x8)
+        return v.toString(16)
+      })
+    },
+    toggleWakeLock: async function (acquire) {
+      if (this.wakeLock === null && acquire) {
+        try {
+          // Get the lock
+          this.wakeLock = await navigator.wakeLock.request()
+          // Listen for changes to it
+          this.wakeLock.addEventListener('release', () => {
+            this.wakeLock = null
+          })
+        } catch (err) {
+          this.wakeLock = null
+        }
+      } else if (this.wakeLock !== null && !acquire) {
+        // Release it
+        this.wakeLock.release()
+        this.wakeLock = null
+      }
+    },
+    handleVisibilityChange: async function () {
+      // If the apps visibility changed (tab changed or window minimized), reaquire the lock after return
+      if (this.wakeLock !== null && document.visibilityState === 'visible') {
+        await this.toggleWakeLock(true)
+      }
     }
   },
   mounted: function () {
@@ -379,6 +418,31 @@ export default {
     EventBus.$on('set-loading', this.setLoading)
     EventBus.$on('show-introduction-tour', this.showIntroductionTour)
     this.updateDatasets()
+
+    if ('wakeLock' in navigator) {
+      this.toggleWakeLock(true)
+      document.addEventListener('visibilitychange', this.handleVisibilityChange)
+    }
+
+    // Log the run
+    if (!this.isLocalhost()) {
+      let id = this.storeUniqueClientId
+      if (!id) {
+        id = this.uuidv4()
+
+        this.$store.dispatch('setUniqueClientId', id)
+      }
+
+      const config = new Detector().detect()
+      const data = {
+        application: 'GridScore',
+        id: id,
+        version: `${this.gridScoreVersion}`,
+        locale: this.storeLocale,
+        os: `${config.os} ${config.osVersion}`
+      }
+      this.axios('https://ics.hutton.ac.uk/app-logger/log', data, 'get')
+    }
   },
   destroyed: function () {
     if (this.geolocationWatchId && navigator.geolocation) {
@@ -390,6 +454,11 @@ export default {
     EventBus.$off('dataset-deleted', this.navigateHome)
     EventBus.$off('set-loading', this.setLoading)
     EventBus.$off('show-introduction-tour', this.showIntroductionTour)
+
+    if ('wakeLock' in navigator) {
+      this.toggleWakeLock(false)
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange)
+    }
   }
 }
 </script>

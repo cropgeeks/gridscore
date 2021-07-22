@@ -20,7 +20,7 @@
       <!-- Popup content -->
       <div v-if="selectedLocation" ref="popupContent">
         <h4>{{ selectedLocation.name }}</h4>
-        <b-badge class="text-white" target="_blank" :href="`https://www.google.com/maps/place/${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng}/@${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng},14z`" v-if="selectedLocation.geolocation"><BIconGeoAlt /> {{ selectedLocation.geolocation.lat.toFixed(4) }}; {{ selectedLocation.geolocation.lng.toFixed(4) }}</b-badge>
+        <b-badge class="text-white" target="_blank" rel="noopener noreferrer" :href="`https://www.google.com/maps/place/${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng}/@${selectedLocation.geolocation.lat},${selectedLocation.geolocation.lng},14z`" v-if="selectedLocation.geolocation"><BIconGeoAlt /> {{ selectedLocation.geolocation.lat.toFixed(4) }}; {{ selectedLocation.geolocation.lng.toFixed(4) }}</b-badge>
         <hr />
         <div v-for="(trait, index) in Object.keys(selectedLocationData)" :key="`selected-location-trait-${index}`">
           <h5>{{ trait }}</h5>

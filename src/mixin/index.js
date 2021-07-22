@@ -3,6 +3,11 @@ import { mapGetters } from 'vuex'
 const axios = require('axios').default
 
 export default {
+  data: function () {
+    return {
+      gridScoreVersion: '1.6.0'
+    }
+  },
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([

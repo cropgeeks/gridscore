@@ -20,6 +20,7 @@ let store
 
 const storeState = {
   state: {
+    uniqueClientId: null,
     locale: 'en_GB',
     datasetId: null,
     dataset: {
@@ -49,6 +50,7 @@ const storeState = {
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
   },
   getters: {
+    storeUniqueClientId: (state) => state.uniqueClientId,
     storeBrapiConfig: (state) => state.dataset ? state.dataset.brapiConfig : null,
     storeColumnWidth: (state) => state.columnWidth,
     storeData: (state) => state.dataset ? state.dataset.data : null,
@@ -181,6 +183,9 @@ const storeState = {
     },
     ON_TRAITS_CHANGED_MUTATION: function (state, newTraits) {
       state.dataset.traits = newTraits
+    },
+    ON_UNIQUE_CLIENT_ID_CHANGED_MUTATION: function (state, newUniqueClientId) {
+      state.uniqueClientId = newUniqueClientId
     },
     ON_CORNER_POINTS_CHANGED_MUTATION: function (state, newCornerPoints) {
       state.dataset.cornerPoints = newCornerPoints
@@ -316,6 +321,9 @@ const storeState = {
     }
   },
   actions: {
+    setUniqueClientId: function ({ commit }, uniqueClientId) {
+      commit('ON_UNIQUE_CLIENT_ID_CHANGED_MUTATION', uniqueClientId)
+    },
     loadDataset: function ({ commit }, datasetId) {
       commit('ON_DATASET_LOAD_MUTATION', datasetId)
     },

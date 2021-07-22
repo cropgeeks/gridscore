@@ -14,7 +14,7 @@
     <!-- Show image date if available -->
     <b-badge v-if="imageDate"><BIconCalendar3 /> {{ imageDate.toLocaleString() }}</b-badge><br/>
     <!-- Show geolocation if available -->
-    <b-badge target="_blank" :href="`https://www.google.com/maps/place/${imageGps.latitude},${imageGps.longitude}/@${imageGps.latitude},${imageGps.longitude},9z`" v-if="imageGps && imageGps.latitude && imageGps.longitude">📍 {{ imageGps.latitude.toFixed(4) }}; {{ imageGps.longitude.toFixed(4) }}</b-badge>
+    <b-badge target="_blank" rel="noopener noreferrer" :href="`https://www.google.com/maps/place/${imageGps.latitude},${imageGps.longitude}/@${imageGps.latitude},${imageGps.longitude},9z`" v-if="imageGps && imageGps.latitude && imageGps.longitude">📍 {{ imageGps.latitude.toFixed(4) }}; {{ imageGps.longitude.toFixed(4) }}</b-badge>
   </b-modal>
 </template>
 
@@ -31,7 +31,8 @@ export default {
       imageFile: null,
       imageData: null,
       imageDate: null,
-      imageGps: null
+      imageGps: null,
+      supportsSaving: false
     }
   },
   props: {
@@ -103,12 +104,32 @@ export default {
     /**
      * Downloads the image as a file attachment
      */
-    downloadImage: function () {
+    downloadImage: async function () {
       if (this.imageFile) {
-        let dl = document.createElement('a')
-        dl.setAttribute('href', this.imageData)
-        dl.setAttribute('download', `${this.getDateTime(this.imageDate)}_${this.name}.${this.imageFile.name.split('.').pop()}`)
-        dl.click()
+        if (this.supportsSaving) {
+          // create a new handle
+          const newHandle = await window.showSaveFilePicker({
+            suggestedName: `${this.getDateTime(this.imageDate)}_${this.name}.${this.imageFile.name.split('.').pop()}`,
+            excludeAcceptAllOption: true,
+            types: [{
+              description: 'Image file',
+              accept: {
+                'image/*': ['.jpg']
+              }
+            }]
+          })
+          // create a FileSystemWritableFileStream to write to
+          const writableStream = await newHandle.createWritable()
+          // write our file
+          await writableStream.write(this.imageFile)
+          // close the file and write the contents to disk.
+          await writableStream.close()
+        } else {
+          let dl = document.createElement('a')
+          dl.setAttribute('href', this.imageData)
+          dl.setAttribute('download', `${this.getDateTime(this.imageDate)}_${this.name}.${this.imageFile.name.split('.').pop()}`)
+          dl.click()
+        }
       }
 
       this.$nextTick(() => this.hide())
@@ -121,6 +142,7 @@ export default {
       this.imageData = null
       this.imageDate = null
       this.imageGps = null
+      this.supportsSaving = window.showSaveFilePicker !== undefined
       this.$nextTick(() => this.$refs.imageModal.show())
     },
     /**
