@@ -21,6 +21,7 @@ let store
 const storeState = {
   state: {
     uniqueClientId: null,
+    runCount: 0,
     locale: 'en_GB',
     datasetId: null,
     dataset: {
@@ -50,6 +51,7 @@ const storeState = {
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
   },
   getters: {
+    storeRunCount: (state) => state.runCount,
     storeUniqueClientId: (state) => state.uniqueClientId,
     storeBrapiConfig: (state) => state.dataset ? state.dataset.brapiConfig : null,
     storeColumnWidth: (state) => state.columnWidth,
@@ -78,6 +80,9 @@ const storeState = {
     storeVisibleTraits: (state) => state.visibleTraits
   },
   mutations: {
+    ON_RUN_COUNT_CHANGED_MUTATION: function (state, newRunCount) {
+      state.runCount = newRunCount
+    },
     ON_DATASET_LOAD_MUTATION: function (state, datasetId) {
       state.datasetId = datasetId
       if (datasetId) {
@@ -321,6 +326,9 @@ const storeState = {
     }
   },
   actions: {
+    setRunCount: function ({ commit }, runCount) {
+      commit('ON_RUN_COUNT_CHANGED_MUTATION', runCount)
+    },
     setUniqueClientId: function ({ commit }, uniqueClientId) {
       commit('ON_UNIQUE_CLIENT_ID_CHANGED_MUTATION', uniqueClientId)
     },
