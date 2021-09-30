@@ -42,7 +42,7 @@ jobs:
         with:
           images: cropgeeks/gridscore
           tags: |
-            type=match,pattern=master,value=development-amd64
+            type=raw,enable=${{ github.ref == 'refs/heads/master' }},value=development-amd64
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
