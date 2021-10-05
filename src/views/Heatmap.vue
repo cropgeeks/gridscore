@@ -4,7 +4,7 @@
     <p>{{ $t('pageHeatmapText') }}</p>
     <div v-if="storeData && storeData.size > 0 && storeTraits && storeTraits.length > 0">
       <!-- Trait selection box -->
-      <b-form-group :label="$t('formLabelHeatmapTrait')" label-for="trait">
+      <b-form-group :label="$t('formLabelTrait')" label-for="trait">
         <b-form-select id="trait" :options="traits" v-model="trait" />
       </b-form-group>
       <!-- Heatmap element -->

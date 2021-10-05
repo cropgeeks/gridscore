@@ -15,6 +15,7 @@
           <b-nav-item active-class="active" :to="{ name: 'home' }" v-else><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
           <b-nav-item active-class="active" :to="{ name: 'timeline' }"><BIconGraphUp /> {{ $t('menuTimeSeries') }}</b-nav-item>
           <b-nav-item active-class="active" :to="{ name: 'heatmap' }"><BIconGridFill /> {{ $t('menuHeatmap') }}</b-nav-item>
+          <b-nav-item active-class="active" :to="{ name: 'scatter' }"><BIconDice3 flip-h /> {{ $t('menuScatter') }}</b-nav-item>
           <b-nav-item active-class="active" :to="{ name: 'stats' }"><BIconBarChartSteps /> {{ $t('menuStats') }}</b-nav-item>
           <b-nav-item active-class="active" :to="{ name: 'location-map' }"><BIconMap /> {{ $t('menuLocationMap') }}</b-nav-item>
         </b-navbar-nav>
@@ -82,7 +83,7 @@
 import { mapGetters } from 'vuex'
 import Tour from '@/components/Tour'
 import { loadLanguageAsync } from '@/plugins/i18n'
-import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconBarChartSteps, BIconGearFill, BIconCalendarDate, BIconGridFill, BIconTrash, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
+import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconDice3, BIconBarChartSteps, BIconGearFill, BIconCalendarDate, BIconGridFill, BIconTrash, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
 import { EventBus } from '@/plugins/event-bus'
 import idb from '@/plugins/idb'
 import { Detector } from '@/plugins/browser-detect.js'
@@ -96,6 +97,7 @@ export default {
     BIconGraphUp,
     BIconGridFill,
     BIconGearFill,
+    BIconDice3,
     BIconCalendarDate,
     BIconInfoCircle,
     BIconFlag,

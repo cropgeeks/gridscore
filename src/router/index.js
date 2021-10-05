@@ -33,6 +33,11 @@ const router = new Router({
       component: () => import('@/views/Heatmap')
     },
     {
+      path: '/scatter',
+      name: 'scatter',
+      component: () => import('@/views/ScatterChart')
+    },
+    {
       path: '/stats',
       name: 'stats',
       component: () => import('@/views/Stats')

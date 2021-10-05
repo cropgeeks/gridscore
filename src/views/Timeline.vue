@@ -130,7 +130,9 @@ export default {
         responsive: true,
         toImageButtonOptions: {
           format: 'png',
-          filename: `timeline-${this.safeDatasetName}-${new Date().toISOString().split('T')[0]}`
+          filename: `timeline-${this.safeDatasetName}-${new Date().toISOString().split('T')[0]}`,
+          width: 1280,
+          height: 720
         }
       }
 
