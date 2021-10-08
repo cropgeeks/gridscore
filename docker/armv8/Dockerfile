@@ -1,4 +1,4 @@
-FROM node:12-alpine3.10 AS build
+FROM node:12-alpine3.10 AS builder
 
 LABEL maintainer="sebastian.raubach@hutton.ac.uk"
 
@@ -42,6 +42,6 @@ COPY qemu-arm-static /usr/bin/qemu-arm-static
 RUN mkdir -p /usr/local/tomcat/webapps && \
     rm -rf /usr/local/tomcat/webapps/ROOT
 
-COPY --from=build /opt/gridscore-server/build/libs/gridscore-*.war /usr/local/tomcat/webapps/ROOT.war
+COPY --from=builder /opt/gridscore-server/build/libs/gridscore-*.war /usr/local/tomcat/webapps/ROOT.war
 
 WORKDIR /usr/local/tomcat/
