@@ -6,12 +6,9 @@ name: Docker
 # documentation.
 
 on:
-#  schedule:
-#    - cron: '45 15 * * *'
   push:
-    branches: [ master ]
-#  pull_request:
-#    branches: [ master ]
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
 
 jobs:
   build:
@@ -46,7 +43,7 @@ jobs:
         with:
           images: cropgeeks/gridscore
           tags: |
-            type=raw,enable=${{ github.ref == 'refs/heads/master' }},value=development
+            type=semver,pattern=release-{{version}}
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
