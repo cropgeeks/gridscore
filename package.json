@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@solgenomics/brapijs": "^1.0.1",
-    "axios": "~0.21.1",
+    "axios": "^0.21.4",
     "bootstrap": "~4.5.3",
     "bootstrap-vue": "^2.21.2",
     "bootswatch": "~4.5.0",
