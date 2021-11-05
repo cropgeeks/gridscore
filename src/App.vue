@@ -22,12 +22,11 @@
 
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
-          <b-nav-form>
-            <b-nav-item active-class="active" href="#" @click.prevent="darkMode = !darkMode" v-b-tooltip="$t('tooltipToggleDarkMode')">
-              <BIconMoon v-if="storeDarkMode" />
-              <BIconSun v-else />
-            </b-nav-item>
-          </b-nav-form>
+          <b-nav-item active-class="active" href="#" @click.prevent="darkMode = !darkMode" v-b-tooltip="$t('tooltipToggleDarkMode')">
+            <BIconMoon v-if="storeDarkMode" />
+            <BIconSun v-else />
+            <span class="d-lg-none">{{ $t('tooltipToggleDarkMode') }}</span>
+          </b-nav-item>
           <b-nav-item-dropdown right>
             <template #button-content>
               <BIconFlag /><span> {{ $t('menuLocale') }}</span>
