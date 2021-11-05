@@ -33,6 +33,7 @@ export default {
       'storeCols',
       'storeData',
       'storeDatasetName',
+      'storeDarkMode',
       'storeLocale',
       'storeRows',
       'storeTraitColors',
@@ -51,6 +52,9 @@ export default {
       this.update()
     },
     storeLocale: function () {
+      this.update()
+    },
+    storeDarkMode: function () {
       this.update()
     }
   },
@@ -147,8 +151,10 @@ export default {
             colorbar: {
               title: {
                 text: this.$t('plotLegendDaysSinceFirstRecording'),
-                side: 'right'
-              }
+                side: 'right',
+                font: { color: this.storeDarkMode ? 'white' : 'black' }
+              },
+              tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
             }
           }]
         } else {
@@ -213,11 +219,14 @@ export default {
           margin: { autoexpand: true },
           autosize: true,
           height: (25 * rows) + 200,
+          paper_bgcolor: 'transparent',
+          plot_bgcolor: 'transparent',
           xaxis: {
             showgrid: false,
             tickmode: 'array',
             tickvals: Array.from(Array(cols).keys()).map(i => i + 1),
-            title: this.$t('chartLabelHeatmapCol'),
+            title: { text: this.$t('chartLabelHeatmapCol'), font: { color: this.storeDarkMode ? 'white' : 'black' } },
+            tickfont: { color: this.storeDarkMode ? 'white' : 'black' },
             range: [0, cols + 1]
           },
           yaxis: {
@@ -225,7 +234,8 @@ export default {
             tickmode: 'array',
             tickvals: Array.from(Array(rows).keys()).map(i => i + 1),
             ticktext: Array.from(Array(rows).keys()).map(i => '' + (rows - i)),
-            title: this.$t('chartLabelHeatmapRow'),
+            title: { text: this.$t('chartLabelHeatmapRow'), font: { color: this.storeDarkMode ? 'white' : 'black' } },
+            tickfont: { color: this.storeDarkMode ? 'white' : 'black' },
             range: [0, rows + 1]
           },
           annotations: []

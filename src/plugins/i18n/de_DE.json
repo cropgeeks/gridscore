@@ -201,6 +201,7 @@
   "tooltipSettingsResetColors": "Farben zurücksetzen",
   "tooltipSettingsVarieties": "Sortennamen müssen einzeln pro Textfeldzeile angegeben werden. Angefangen mit Feld-Zeile 1 von links nach rechts gefolgt von den verbleibenden Feld-Zeilen.",
   "tooltipSettingsVarietiesGrid": "Sortennamen müssen in einem Gitter angegeben werden, genauso wie im Feld-Plan. Dieses kann von Excel oder Ähnlichem kopiert werden.",
+  "tooltipToggleDarkMode": "Dark Mode umschalten",
   "tooltipTraitToggle": "Klicken um die Sichtbarkeit des Merkmals umzuschalten.",
   "traitTypeCategorical": "Kategorie",
   "traitTypeDate": "Datum",

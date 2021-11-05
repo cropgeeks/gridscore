@@ -37,6 +37,7 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
+      'storeDarkMode',
       'storeData',
       'storeDatasetName',
       'storeTraits'
@@ -54,6 +55,9 @@ export default {
       this.update()
     },
     traitTwo: function () {
+      this.update()
+    },
+    storeDarkMode: function () {
       this.update()
     }
   },
@@ -84,22 +88,26 @@ export default {
       })
 
       const layout = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
         xaxis: {
           automargin: true,
-          showgrid: true,
+          showgrid: false,
           zeroline: true,
           showline: true,
-          title: this.traits[this.traitOne].text
+          title: { text: this.traits[this.traitOne].text, font: { color: this.storeDarkMode ? 'white' : 'black' } },
+          tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
         },
         yaxis: {
           automargin: true,
-          showgrid: true,
+          showgrid: false,
           zeroline: true,
           showline: true,
-          title: this.traits[this.traitTwo].text
+          title: { text: this.traits[this.traitTwo].text, font: { color: this.storeDarkMode ? 'white' : 'black' } },
+          tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
         },
         hovermode: 'closest',
-        legend: { orientation: 'h' }
+        legend: { orientation: 'h', font: { color: this.storeDarkMode ? 'white' : 'black' } }
       }
 
       const filename = `${this.traits[this.traitOne].text.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${this.traits[this.traitTwo].text.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`

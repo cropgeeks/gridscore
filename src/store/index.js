@@ -34,6 +34,7 @@ const storeState = {
       data: [],
       brapiConfig: null
     },
+    darkMode: false,
     columnWidth: 120,
     serverUrl: null,
     useGps: true,
@@ -51,6 +52,7 @@ const storeState = {
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
   },
   getters: {
+    storeDarkMode: (state) => state.darkMode,
     storeRunCount: (state) => state.runCount,
     storeUniqueClientId: (state) => state.uniqueClientId,
     storeBrapiConfig: (state) => state.dataset ? state.dataset.brapiConfig : null,
@@ -323,6 +325,9 @@ const storeState = {
     },
     ON_IGNORE_EMPTY_CELLS_CHANGED_MUTATION: function (state, newIgnoreEmptyCells) {
       state.ignoreEmptyCells = newIgnoreEmptyCells
+    },
+    ON_DARK_MODE_CHANGED_MUTATION: function (state, newDarkMode) {
+      state.darkMode = newDarkMode
     }
   },
   actions: {
@@ -445,6 +450,9 @@ const storeState = {
     },
     setIgnoreEmptyCells: function ({ commit }, ignoreEmptyCells) {
       commit('ON_IGNORE_EMPTY_CELLS_CHANGED_MUTATION', ignoreEmptyCells)
+    },
+    setDarkMode: function ({ commit }, darkMode) {
+      commit('ON_DARK_MODE_CHANGED_MUTATION', darkMode)
     }
   },
   plugins: [createPersistedState({

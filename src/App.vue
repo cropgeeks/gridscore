@@ -22,6 +22,12 @@
 
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
+          <b-nav-form>
+            <b-nav-item active-class="active" href="#" @click.prevent="darkMode = !darkMode" v-b-tooltip="$t('tooltipToggleDarkMode')">
+              <BIconMoon v-if="storeDarkMode" />
+              <BIconSun v-else />
+            </b-nav-item>
+          </b-nav-form>
           <b-nav-item-dropdown right>
             <template #button-content>
               <BIconFlag /><span> {{ $t('menuLocale') }}</span>
@@ -36,7 +42,7 @@
       </b-collapse>
     </b-navbar>
 
-    <b-sidebar id="sidebar" title="GridScore" shadow backdrop v-model="sidebarShown" @shown="notifyCaller" @hidden="notifyCaller">
+    <b-sidebar id="sidebar" title="GridScore" shadow backdrop v-model="sidebarShown" :bg-variant="storeDarkMode ? 'primary' : 'light'" @shown="notifyCaller" @hidden="notifyCaller">
       <b-img fluid class="py-4 mx-auto d-block" src="img/gridscore2.svg" />
 
       <template>
@@ -64,7 +70,7 @@
     </b-sidebar>
 
     <!-- The main content -->
-    <b-container fluid class="mt-3">
+    <b-container fluid :class="$route.name === 'about' ? '' : 'mt-3'">
       <router-view :key="$route.path" />
     </b-container>
 
@@ -83,7 +89,7 @@
 import { mapGetters } from 'vuex'
 import Tour from '@/components/Tour'
 import { loadLanguageAsync } from '@/plugins/i18n'
-import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconDice3, BIconBarChartSteps, BIconGearFill, BIconCalendarDate, BIconGridFill, BIconTrash, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
+import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconMoon, BIconSun, BIconDice3, BIconBarChartSteps, BIconGearFill, BIconCalendarDate, BIconGridFill, BIconTrash, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
 import { EventBus } from '@/plugins/event-bus'
 import idb from '@/plugins/idb'
 import { Detector } from '@/plugins/browser-detect.js'
@@ -103,6 +109,8 @@ export default {
     BIconFlag,
     BIconBarChartSteps,
     BIconPlus,
+    BIconMoon,
+    BIconSun,
     Tour
   },
   data: function () {
@@ -179,12 +187,22 @@ export default {
       geolocationWatchId: null,
       datasets: [],
       sidebarShown: false,
-      sidebarCaller: null
+      sidebarCaller: null,
+      darkMode: false
+    }
+  },
+  watch: {
+    darkMode: function (newValue) {
+      this.$store.dispatch('setDarkMode', newValue)
+    },
+    storeDarkMode: function (newValue) {
+      document.documentElement.className = newValue ? 'dark-mode' : 'light-mode'
     }
   },
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
+      'storeDarkMode',
       'storeDatasetId',
       'storeLocale',
       'storeUniqueClientId',
@@ -415,6 +433,10 @@ export default {
     this.startGeoTracking()
     // this.fakeGpsMovement()
 
+    this.darkMode = this.storeDarkMode
+
+    document.documentElement.className = this.darkMode ? 'dark-mode' : 'light-mode'
+
     EventBus.$on('datasets-changed', this.updateDatasets)
     EventBus.$on('dataset-changed', this.navigateToDataset)
     EventBus.$on('dataset-deleted', this.navigateHome)
@@ -476,8 +498,73 @@ export default {
 </script>
 
 <style lang="scss">
-// Import the bootswatch theme
-@import '~bootswatch/dist/sandstone/variables';
+// .light-mode {
+//   @import '@/assets/css/light-mode.scss';
+//   @import '~bootstrap/scss/bootstrap';
+//   @import '~bootstrap-vue/src/index.scss';
+//   @import '~bootswatch/dist/sandstone/bootswatch';
+
+//   @each $breakpoint in map-keys($grid-breakpoints) {
+//     @include media-breakpoint-up($breakpoint) {
+//       $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+//       .border#{$infix}-top {      border-top: $border-width solid $border-color !important; }
+//       .border#{$infix}-right {    border-right: $border-width solid $border-color !important; }
+//       .border#{$infix}-bottom {   border-bottom: $border-width solid $border-color !important; }
+//       .border#{$infix}-left {     border-left: $border-width solid $border-color !important; }
+
+//       .border#{$infix}-top-0 {    border-top: 0 !important; }
+//       .border#{$infix}-right-0 {  border-right: 0 !important; }
+//       .border#{$infix}-bottom-0 { border-bottom: 0 !important; }
+//       .border#{$infix}-left-0 {   border-left: 0 !important; }
+
+//       .border#{$infix}-x {
+//         border-left: $border-width solid $border-color !important;
+//         border-right: $border-width solid $border-color !important;
+//       }
+
+//       .border#{$infix}-y {
+//         border-top: $border-width solid $border-color !important;
+//         border-bottom: $border-width solid $border-color !important;
+//       }
+//     }
+//   }
+// }
+
+// .dark-mode {
+//   @import '@/assets/css/dark-mode-ol.scss';
+//   @import '~bootstrap/scss/bootstrap';
+//   @import '~bootstrap-vue/src/index.scss';
+//   @import '~bootswatch/dist/sandstone/bootswatch';
+
+//   @each $breakpoint in map-keys($grid-breakpoints) {
+//     @include media-breakpoint-up($breakpoint) {
+//       $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+//       .border#{$infix}-top {      border-top: $border-width solid $border-color !important; }
+//       .border#{$infix}-right {    border-right: $border-width solid $border-color !important; }
+//       .border#{$infix}-bottom {   border-bottom: $border-width solid $border-color !important; }
+//       .border#{$infix}-left {     border-left: $border-width solid $border-color !important; }
+
+//       .border#{$infix}-top-0 {    border-top: 0 !important; }
+//       .border#{$infix}-right-0 {  border-right: 0 !important; }
+//       .border#{$infix}-bottom-0 { border-bottom: 0 !important; }
+//       .border#{$infix}-left-0 {   border-left: 0 !important; }
+
+//       .border#{$infix}-x {
+//         border-left: $border-width solid $border-color !important;
+//         border-right: $border-width solid $border-color !important;
+//       }
+
+//       .border#{$infix}-y {
+//         border-top: $border-width solid $border-color !important;
+//         border-bottom: $border-width solid $border-color !important;
+//       }
+//     }
+//   }
+// }
+
+@import '@/assets/css/light-mode.scss';
 @import '~bootstrap/scss/bootstrap';
 @import '~bootstrap-vue/src/index.scss';
 @import '~bootswatch/dist/sandstone/bootswatch';
@@ -508,13 +595,16 @@ export default {
   }
 }
 
+@import './assets/css/dark-mode';
+
 html {
-  position: relative;
-  min-height: 100%;
+  position: relative !important;
+  min-height: 100vh !important;
 }
 
 body {
-  overflow-y: scroll; /* Show vertical scrollbar */
+  overflow-y: scroll !important; /* Show vertical scrollbar */
+  min-height: 100vh !important;
 }
 
 .tooltip {

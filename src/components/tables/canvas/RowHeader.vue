@@ -53,11 +53,27 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
+      'storeDarkMode',
       'storeRows',
       'storeInvertNumberingY',
       'storeTraits',
       'storeTraitColors'
-    ])
+    ]),
+    fillStyleMarked: function () {
+      return this.storeDarkMode ? '#392d21' : '#c6d2de'
+    },
+    fillStyleLightGray: function () {
+      return this.storeDarkMode ? '#0d0d0d' : '#f2f2f2'
+    },
+    fillStyleWhite: function () {
+      return this.storeDarkMode ? '#000000' : '#ffffff'
+    },
+    fillStyleHiddenTrait: function () {
+      return this.storeDarkMode ? '#2c2c2c' : '#d3d3d3'
+    },
+    fillStyleText: function () {
+      return this.storeDarkMode ? '#ffffff' : '#000000'
+    }
   },
   watch: {
     y: function () {
@@ -83,6 +99,9 @@ export default {
     },
     statsSize: function () {
       this.reset()
+    },
+    storeDarkMode: function () {
+      this.reset()
     }
   },
   methods: {
@@ -102,18 +121,18 @@ export default {
     },
     updateRowHeader: function (row) {
       if (this.markedRows && this.markedRows[row]) {
-        this.ctx.fillStyle = '#c6d2de'
+        this.ctx.fillStyle = this.fillStyleMarked
       } else if (row % 2 === 0) {
-        this.ctx.fillStyle = '#f2f2f2'
+        this.ctx.fillStyle = this.fillStyleLightGray
       } else {
-        this.ctx.fillStyle = '#ffffff'
+        this.ctx.fillStyle = this.fillStyleWhite
       }
 
       const x = 0
       const y = this.y + this.cellHeight * row
 
       this.ctx.fillRect(x, y, this.width, this.cellHeight)
-      this.ctx.fillStyle = '#000000'
+      this.ctx.fillStyle = this.fillStyleText
       this.ctx.fillText(this.storeInvertNumberingY ? (this.storeRows - row) : (row + 1), x + this.padding, y + this.cellHeight / 2)
 
       if (this.traitStats) {
@@ -124,7 +143,7 @@ export default {
         for (let trait = 0; trait < this.storeTraits.length; trait++) {
           const by = padding + y + trait * (barHeight + padding / 2)
           const value = this.traitStats[this.storeTraits[trait].name].rows[row].count / this.traitStats[this.storeTraits[trait].name].rows[row].total * this.statsSize
-          this.ctx.fillStyle = this.storeTraitColors ? this.storeTraitColors[trait % this.storeTraitColors.length] : 'gray'
+          this.ctx.fillStyle = this.storeTraitColors ? this.storeTraitColors[trait % this.storeTraitColors.length] : this.fillStyleHiddenTrait
           this.ctx.fillRect(this.width - value, by, this.width, barHeight)
         }
       }

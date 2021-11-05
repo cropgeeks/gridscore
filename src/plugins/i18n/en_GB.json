@@ -202,6 +202,7 @@
   "tooltipSettingsResetColors": "Reset to default",
   "tooltipSettingsVarieties": "Variety names must be provided one per text line. Starting with field row 1 from left to right and continuing with the remaining field rows.",
   "tooltipSettingsVarietiesGrid": "Variety names must be provided in a grid, same as the field plan. This can be copied from Excel or similar.",
+  "tooltipToggleDarkMode": "Toggle dark mode",
   "tooltipTraitToggle": "Click to toggle visibility of this trait.",
   "traitTypeCategorical": "Category",
   "traitTypeDate": "Date",

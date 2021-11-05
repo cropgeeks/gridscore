@@ -1,26 +1,7 @@
 <template>
   <div class="about-content">
-    <b-container class="py-3">
-      <div class="text-center">
-        <img src="img/gridscore2.svg" fluid  class="about-header-logo" alt="GridScore logo">
-        <h1 class="py-3">{{ $t('appTitle') }} <small>v{{ gridScoreVersion }}</small></h1>
-      </div>
-      <p>{{ $t('pageAboutParagraphOne') }}</p>
-      <p v-html="$t('pageAboutParagraphTwo')" />
-      <p><BIconGithub/> <span v-html="$t('pageAboutGitHubLink')" /></p>
-    </b-container>
-
     <!-- Hutton banner -->
-    <b-container fluid class="footer">
-      <b-row class="about-footer bg-primary px-3">
-        <b-col cols=12 sm=6 class="about-logo">
-          <b-img src="./img/ics-sdg.svg" fluid class="my-5" alt="ICS logo" />
-        </b-col>
-        <b-col cols=12 sm=6 class="about-logo">
-          <b-img src="./img/hutton.svg" fluid class="my-5" alt="Hutton logo" />
-        </b-col>
-      </b-row>
-
+    <b-container fluid class="footer px-0">
       <b-row class="hutton-header">
         <b-col id="hutton-banner-hunger" />
         <b-col id="hutton-banner-education" />
@@ -34,16 +15,40 @@
         <b-col id="hutton-banner-land" />
         <b-col id="hutton-banner-partnership" />
       </b-row>
+      <b-row :class="`about-footer ${storeDarkMode ? 'bg-dark' : 'bg-primary'} px-3`">
+        <b-col cols=12 sm=6 class="about-logo">
+          <b-img src="./img/ics-sdg.svg" fluid class="my-5" alt="ICS logo" />
+        </b-col>
+        <b-col cols=12 sm=6 class="about-logo">
+          <b-img src="./img/hutton.svg" fluid class="my-5" alt="Hutton logo" />
+        </b-col>
+      </b-row>
+    </b-container>
+    <b-container class="py-5">
+      <div class="text-center">
+        <img src="img/gridscore2.svg" fluid  class="about-header-logo" alt="GridScore logo">
+        <h1 class="py-3">{{ $t('appTitle') }} <small>v{{ gridScoreVersion }}</small></h1>
+      </div>
+      <p>{{ $t('pageAboutParagraphOne') }}</p>
+      <p v-html="$t('pageAboutParagraphTwo')" />
+      <p><BIconGithub/> <span v-html="$t('pageAboutGitHubLink')" /></p>
     </b-container>
   </div>
 </template>
 
 <script>
 import { BIconGithub } from 'bootstrap-vue'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
     BIconGithub
+  },
+  computed: {
+    /** Mapgetters exposing the store configuration */
+    ...mapGetters([
+      'storeDarkMode'
+    ])
   }
 }
 </script>
@@ -102,12 +107,10 @@ export default {
   color: #c25baf;
 }
 
-.about-content {
-  margin-bottom: 296px;
-}
-
-.about-footer img {
-  max-height: 100px;
+.about-footer img.img-fluid {
+  height: 100px;
+  width: auto;
+  object-fit: contain;
 }
 .about-logo {
   display: inline-block;
@@ -121,15 +124,6 @@ export default {
   object-fit: contain;
 }
 
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 296px;
-  line-height: 60px;
-  margin-left: -15px;
-  margin-right: -15px;
-}
 .hutton-header.row .col {
   min-height: 100px;
   background-repeat: no-repeat;

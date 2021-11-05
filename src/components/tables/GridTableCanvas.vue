@@ -109,6 +109,9 @@ export default {
     },
     storeVisibleTraits: function () {
       this.update()
+    },
+    storeDarkMode: function () {
+      this.update()
     }
   },
   computed: {
@@ -116,6 +119,7 @@ export default {
     ...mapGetters([
       'storeColumnWidth',
       'storeCols',
+      'storeDarkMode',
       'storeDatasetId',
       'storeHideToggledTraits',
       'storeIgnoreEmptyCells',
@@ -215,6 +219,33 @@ export default {
       const minReq = Math.max(this.storeColumnWidth, 120)
 
       return Math.max(minReq, this.canvasWidth / this.storeCols)
+    },
+    fillStyleWhite: function () {
+      return this.storeDarkMode ? '#000000' : '#ffffff'
+    },
+    fillStyleLightGray: function () {
+      return this.storeDarkMode ? '#0d0d0d' : '#f2f2f2'
+    },
+    fillStyleDarkGray: function () {
+      return this.storeDarkMode ? '#1f1f1f' : '#e0e0e0'
+    },
+    fillStyleHighlight: function () {
+      return this.storeDarkMode ? '#1e1032' : '#e1efcd'
+    },
+    fillStyleMarked: function () {
+      return this.storeDarkMode ? '#392d21' : '#c6d2de'
+    },
+    fillStyleUserPosition: function () {
+      return this.storeDarkMode ? '#71737b' : '#8e8c84'
+    },
+    fillStyleBookmark: function () {
+      return this.storeDarkMode ? '#71737b' : '#8e8c84'
+    },
+    fillStyleHiddenTrait: function () {
+      return this.storeDarkMode ? '#2c2c2c' : '#d3d3d3'
+    },
+    fillStyleText: function () {
+      return this.storeDarkMode ? '#ffffff' : '#000000'
     }
   },
   methods: {
@@ -458,7 +489,7 @@ export default {
       this.isDrawing = false
     },
     updateUserPosition: function () {
-      this.ctx.fillStyle = '#8e8c84'
+      this.ctx.fillStyle = this.fillStyleUserPosition
       this.ctx.save()
       this.ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, this.highlightX * window.devicePixelRatio, this.highlightY * window.devicePixelRatio)
       if (this.highlightPosition && this.highlightPosition.heading) {
@@ -492,7 +523,7 @@ export default {
       this.ctx.drawImage(this.commentImg, x, y)
     },
     drawBookmark: function (x, y, w, h) {
-      this.ctx.fillStyle = '#8e8c84'
+      this.ctx.fillStyle = this.fillStyleBookmark
       this.ctx.beginPath()
       this.ctx.moveTo(x, y)
       this.ctx.lineTo(x, y + h)
@@ -515,9 +546,9 @@ export default {
       }
 
       if (row === this.highlightRow && col === this.highlightCol) {
-        this.ctx.fillStyle = '#e1efcd'
+        this.ctx.fillStyle = this.fillStyleHighlight
       } else if ((this.markedRows && this.markedRows[row]) || (this.markedColumns && this.markedColumns[col])) {
-        this.ctx.fillStyle = '#c6d2de'
+        this.ctx.fillStyle = this.fillStyleMarked
       } else {
         // Determine the background color
         let count = 0
@@ -529,14 +560,14 @@ export default {
         }
         switch (count) {
           case 0:
-            this.ctx.fillStyle = '#ffffff'
+            this.ctx.fillStyle = this.fillStyleWhite
             break
           case 1:
-            this.ctx.fillStyle = '#f2f2f2'
+            this.ctx.fillStyle = this.fillStyleLightGray
             break
           case 2:
           default:
-            this.ctx.fillStyle = '#e0e0e0'
+            this.ctx.fillStyle = this.fillStyleDarkGray
             break
         }
       }
@@ -554,7 +585,7 @@ export default {
 
       // Add the name text
       const text = this.fittingString(cell.name || 'N/A', this.coreWidth)
-      this.ctx.fillStyle = '#000000'
+      this.ctx.fillStyle = this.fillStyleText
       this.ctx.fillText(text, x + this.cellWidth / 2, y + this.padding + this.fontSize / 2)
 
       // How many circle rows do we need?
@@ -568,8 +599,8 @@ export default {
         for (let t = 0; t < circlesInThisRow; t++) {
           const realIndex = this.positionToIndex[traitCounter]
           const hidden = !this.storeHideToggledTraits && !this.storeVisibleTraits[realIndex]
-          this.ctx.fillStyle = (!hidden && this.storeTraitColors) ? this.storeTraitColors[realIndex % this.storeTraitColors.length] : 'lightgray'
-          this.ctx.strokeStyle = (!hidden && this.storeTraitColors) ? this.storeTraitColors[realIndex % this.storeTraitColors.length] : 'lightgray'
+          this.ctx.fillStyle = (!hidden && this.storeTraitColors) ? this.storeTraitColors[realIndex % this.storeTraitColors.length] : this.fillStyleHiddenTrait
+          this.ctx.strokeStyle = (!hidden && this.storeTraitColors) ? this.storeTraitColors[realIndex % this.storeTraitColors.length] : this.fillStyleHiddenTrait
 
           this.ctx.beginPath()
           // Draw the arc (circle)

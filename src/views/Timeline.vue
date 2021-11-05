@@ -17,12 +17,16 @@ export default {
   watch: {
     storeLocale: function () {
       this.plot()
+    },
+    storeDarkMode: function () {
+      this.plot()
     }
   },
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
       'storeCols',
+      'storeDarkMode',
       'storeData',
       'storeDatasetName',
       'storeLocale',
@@ -108,22 +112,26 @@ export default {
       })
 
       const layout = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
         xaxis: {
           automargin: true,
-          showgrid: true,
+          showgrid: false,
           zeroline: true,
           showline: true,
-          title: this.$t('chartLabelTimeseriesTime')
+          title: { text: this.$t('chartLabelTimeseriesTime'), font: { color: this.storeDarkMode ? 'white' : 'black' } },
+          tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
         },
         yaxis: {
           automargin: true,
-          showgrid: true,
+          showgrid: false,
           zeroline: true,
           showline: true,
           rangemode: 'tozero',
-          title: this.$t('chartLabelTimeseriesPlotsScores')
+          title: { text: this.$t('chartLabelTimeseriesPlotsScores'), font: { color: this.storeDarkMode ? 'white' : 'black' } },
+          tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
         },
-        legend: { orientation: 'h' }
+        legend: { orientation: 'h', font: { color: this.storeDarkMode ? 'white' : 'black' } }
       }
 
       const config = {

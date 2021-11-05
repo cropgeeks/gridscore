@@ -24,6 +24,7 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
+      'storeDarkMode',
       'storeData',
       'storeDatasetName',
       'storeTraitColors',
@@ -35,6 +36,11 @@ export default {
       } else {
         return ''
       }
+    }
+  },
+  watch: {
+    storeDarkMode: function () {
+      this.update()
     }
   },
   methods: {
@@ -97,26 +103,32 @@ export default {
         }
 
         const layout = {
+          paper_bgcolor: 'transparent',
+          plot_bgcolor: 'transparent',
           margin: {
             l: 30,
             r: 30
           },
           autosize: true,
           yaxis: {
-            automargin: true
+            automargin: true,
+            title: { text: '', font: { color: this.storeDarkMode ? 'white' : 'black' } },
+            tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
           },
           xaxis: {
-            zeroline: false
+            zeroline: false,
+            title: { text: '', font: { color: this.storeDarkMode ? 'white' : 'black' } },
+            tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
           },
           hovermode: 'closest'
         }
 
         if (trait.type === 'categorical' || trait.type === 'text') {
           layout.xaxis.type = 'category'
-          layout.xaxis.title = trait.name
-          layout.yaxis.title = this.$t('widgetChartAxisCount')
+          layout.xaxis.title.text = trait.name
+          layout.yaxis.title.text = this.$t('widgetChartAxisCount')
         } else {
-          layout.xaxis.title = trait.name
+          layout.xaxis.title.text = trait.name
         }
 
         const filename = trait.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()
