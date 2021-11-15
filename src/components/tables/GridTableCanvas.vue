@@ -82,13 +82,18 @@ export default {
       },
       markedColumns: null,
       markedRows: null,
-      flingInterval: null
+      flingInterval: null,
+      followUser: false
     }
   },
   watch: {
     highlightPosition: function () {
       // TODO: Only update relevant cell + directly adjacent cells
-      this.update()
+      if (this.followUser) {
+        this.scrollTo(this.highlightPosition.x, 100 - this.highlightPosition.y)
+      } else {
+        this.update()
+      }
     },
     traitStats: function () {
       this.reset()

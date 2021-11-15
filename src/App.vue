@@ -262,22 +262,22 @@ export default {
         {
           lat: 56.481678,
           lng: -3.107542,
-          steps: 200,
+          steps: 600,
           heading: 270
         }, {
           lat: 56.481585,
           lng: -3.110989,
-          steps: 20,
+          steps: 60,
           heading: 360
         }, {
           lat: 56.481776,
           lng: -3.111069,
-          steps: 200,
+          steps: 600,
           heading: 90
         }, {
           lat: 56.481824,
           lng: -3.107601,
-          steps: 20,
+          steps: 60,
           heading: 180
         }
       ]
@@ -287,13 +287,6 @@ export default {
       let heading = points[0].heading
       let pointIndex = 0
       setTimeout(() => {
-        const wrapper = document.querySelector('#grid-table')
-        const table = document.querySelector('#grid-table .table')
-        if (wrapper && table) {
-          wrapper.scrollTop = table.offsetHeight
-          wrapper.scrollLeft = table.offsetWidth * 0.25
-        }
-
         const id = setInterval(() => {
           counter++
           if (counter === steps) {
@@ -316,26 +309,9 @@ export default {
               elv: 100,
               heading: heading
             })
-
-            if (wrapper && (heading === 270 || heading === 90)) {
-              const bottom = table.offsetHeight
-              const wrapperHeight = wrapper.offsetHeight
-              let scrollTop
-
-              if (heading === 270) {
-                scrollTop = bottom - (counter / steps) * bottom - wrapperHeight / 2
-              } else if (heading === 90) {
-                scrollTop = bottom - ((steps - counter) / steps) * bottom - wrapperHeight / 2
-              }
-
-              wrapper.scroll({
-                top: scrollTop,
-                behavior: 'smooth'
-              })
-            }
           }
         }, 100)
-      }, 1000)
+      }, 20000)
     },
     updateDatasets: function () {
       idb.getDatasets().then(datasets => {
@@ -497,72 +473,6 @@ export default {
 </script>
 
 <style lang="scss">
-// .light-mode {
-//   @import '@/assets/css/light-mode.scss';
-//   @import '~bootstrap/scss/bootstrap';
-//   @import '~bootstrap-vue/src/index.scss';
-//   @import '~bootswatch/dist/sandstone/bootswatch';
-
-//   @each $breakpoint in map-keys($grid-breakpoints) {
-//     @include media-breakpoint-up($breakpoint) {
-//       $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-
-//       .border#{$infix}-top {      border-top: $border-width solid $border-color !important; }
-//       .border#{$infix}-right {    border-right: $border-width solid $border-color !important; }
-//       .border#{$infix}-bottom {   border-bottom: $border-width solid $border-color !important; }
-//       .border#{$infix}-left {     border-left: $border-width solid $border-color !important; }
-
-//       .border#{$infix}-top-0 {    border-top: 0 !important; }
-//       .border#{$infix}-right-0 {  border-right: 0 !important; }
-//       .border#{$infix}-bottom-0 { border-bottom: 0 !important; }
-//       .border#{$infix}-left-0 {   border-left: 0 !important; }
-
-//       .border#{$infix}-x {
-//         border-left: $border-width solid $border-color !important;
-//         border-right: $border-width solid $border-color !important;
-//       }
-
-//       .border#{$infix}-y {
-//         border-top: $border-width solid $border-color !important;
-//         border-bottom: $border-width solid $border-color !important;
-//       }
-//     }
-//   }
-// }
-
-// .dark-mode {
-//   @import '@/assets/css/dark-mode-ol.scss';
-//   @import '~bootstrap/scss/bootstrap';
-//   @import '~bootstrap-vue/src/index.scss';
-//   @import '~bootswatch/dist/sandstone/bootswatch';
-
-//   @each $breakpoint in map-keys($grid-breakpoints) {
-//     @include media-breakpoint-up($breakpoint) {
-//       $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-
-//       .border#{$infix}-top {      border-top: $border-width solid $border-color !important; }
-//       .border#{$infix}-right {    border-right: $border-width solid $border-color !important; }
-//       .border#{$infix}-bottom {   border-bottom: $border-width solid $border-color !important; }
-//       .border#{$infix}-left {     border-left: $border-width solid $border-color !important; }
-
-//       .border#{$infix}-top-0 {    border-top: 0 !important; }
-//       .border#{$infix}-right-0 {  border-right: 0 !important; }
-//       .border#{$infix}-bottom-0 { border-bottom: 0 !important; }
-//       .border#{$infix}-left-0 {   border-left: 0 !important; }
-
-//       .border#{$infix}-x {
-//         border-left: $border-width solid $border-color !important;
-//         border-right: $border-width solid $border-color !important;
-//       }
-
-//       .border#{$infix}-y {
-//         border-top: $border-width solid $border-color !important;
-//         border-bottom: $border-width solid $border-color !important;
-//       }
-//     }
-//   }
-// }
-
 @import '@/assets/css/light-mode.scss';
 @import '~bootstrap/scss/bootstrap';
 @import '~bootstrap-vue/src/index.scss';
