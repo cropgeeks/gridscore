@@ -118,7 +118,8 @@ export default {
           filename: `scatter-${this.safeDatasetName}-${filename}-${new Date().toISOString().split('T')[0]}`,
           width: 1280,
           height: 720
-        }
+        },
+        displaylogo: false
       }
 
       this.$plotly.newPlot('scatter-chart', data, layout, config)

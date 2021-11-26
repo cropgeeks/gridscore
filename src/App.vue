@@ -539,4 +539,8 @@ form textarea.form-control,
 form select.custom-select {
   font-size: 16px;
 }
+
+.plotly .modebar .modebar-group {
+  padding-bottom: 5px;
+}
 </style>

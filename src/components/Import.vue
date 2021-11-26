@@ -15,9 +15,9 @@
       <b-button @click="onImportClicked">{{ uuid === storeDataset.uuid ? $t('buttonImportLoadDataset') : $t('formLabelImportDataServerUuid') }}</b-button>
       <template v-if="showCamera">
         <p class="text-muted mt-3">{{ $t('formDescriptionImportDataServerUuid') }}</p>
-        <p class="text-danger mt-3" v-if="serverError">{{ serverError }}</p>
         <QrcodeStream @decode="onDecode" @init="scrollToCamera" ref="cameraInput" />
       </template>
+      <p class="text-danger mt-3" v-if="serverError">{{ serverError }}</p>
     </b-form>
     <YesNoCancelModal :title="$t('modalTitleReplaceDatasets')" :message="$t('modalTextReplaceDatasets')" :yesTitle="$t('buttonReplace')" :noTitle="$t('buttonImportAsNew')" :cancelTitle="$t('buttonCancel')" ref="yesNoCancelModal" @yes="yes" @no="no" />
   </div>

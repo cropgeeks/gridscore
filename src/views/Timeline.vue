@@ -141,7 +141,8 @@ export default {
           filename: `timeline-${this.safeDatasetName}-${new Date().toISOString().split('T')[0]}`,
           width: 1280,
           height: 720
-        }
+        },
+        displaylogo: false
       }
 
       this.$plotly.newPlot('timeseries-chart', traces, layout, config)

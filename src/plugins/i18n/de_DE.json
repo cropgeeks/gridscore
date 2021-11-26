@@ -1,6 +1,6 @@
 {
   "appTitle": "GridScore",
-  "axiosErrorConfigNotFound": "Konfiguration nicht gefunden. Jeder QR Code kann nur einmal benutzt werden. Exportiere die Konfiguration erneut auf dem Ursprungsgerät.",
+  "axiosErrorConfigNotFound": "Konfiguration nicht gefunden. Exportiere die Konfiguration erneut auf dem Ursprungsgerät.",
   "axiosErrorGeneric500": "Die Anfrage ist auf dem Server fehlgeschlagen. Bitte später erneut versuchen.",
   "axiosErrorNoInternet": "Keine Internetverbindung vorhanden. Die angeforderte Funktion benötigt eine Internetverbindung.",
   "buttonAdd": "Hinzufügen",

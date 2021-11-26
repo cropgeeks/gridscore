@@ -15,7 +15,7 @@
         <b-col id="hutton-banner-land" />
         <b-col id="hutton-banner-partnership" />
       </b-row>
-      <b-row :class="`about-footer ${storeDarkMode ? 'bg-dark' : 'bg-primary'} px-3`">
+      <b-row class="about-footer bg-primary px-3">
         <b-col cols=12 sm=6 class="about-logo">
           <b-img src="./img/ics-sdg.svg" fluid class="my-5" alt="ICS logo" />
         </b-col>

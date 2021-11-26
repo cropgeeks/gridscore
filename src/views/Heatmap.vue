@@ -247,7 +247,8 @@ export default {
           toImageButtonOptions: {
             format: 'png',
             filename: `heatmap-${this.safeDatasetName}-${filename}-${new Date().toISOString().split('T')[0]}`
-          }
+          },
+          displaylogo: false
         }
 
         this.$plotly.newPlot('heatmap-chart', data, layout, config)

@@ -50,11 +50,13 @@ export default {
         this.$plotly.purge(div)
 
         const data = []
+        let chartType
 
         switch (trait.type) {
           case 'float':
           case 'int':
           case 'date': {
+            chartType = 'box'
             const datapoints = []
             this.storeData.forEach((c, k) => datapoints.push({ value: c.values[index], name: c.name }))
             data.push({
@@ -64,7 +66,7 @@ export default {
                 color: this.storeTraitColors[index % this.storeTraitColors.length]
               },
               name: '',
-              type: 'box',
+              type: chartType,
               jitter: 0.5,
               pointpos: 2,
               boxpoints: 'all'
@@ -73,6 +75,7 @@ export default {
           }
           case 'text':
           case 'categorical':
+            chartType = 'bar'
             const map = {}
             const datapoints = []
             this.storeData.forEach((c, k) => datapoints.push(c.values[index]))
@@ -94,7 +97,7 @@ export default {
             data.push({
               x: keys,
               y: keys.map(k => map[k]),
-              type: 'bar',
+              type: chartType,
               marker: {
                 color: this.storeTraitColors[index % this.storeTraitColors.length]
               }
@@ -113,12 +116,16 @@ export default {
           yaxis: {
             automargin: true,
             title: { text: '', font: { color: this.storeDarkMode ? 'white' : 'black' } },
-            tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
+            tickfont: { color: this.storeDarkMode ? 'white' : 'black' },
+            gridcolor: this.storeDarkMode ? '#111111' : '#eeeeee',
+            showgrid: chartType === 'bar'
           },
           xaxis: {
             zeroline: false,
             title: { text: '', font: { color: this.storeDarkMode ? 'white' : 'black' } },
-            tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
+            tickfont: { color: this.storeDarkMode ? 'white' : 'black' },
+            gridcolor: this.storeDarkMode ? '#111111' : '#eeeeee',
+            showgrid: chartType === 'box'
           },
           hovermode: 'closest'
         }
@@ -139,7 +146,8 @@ export default {
             filename: `stats-${this.safeDatasetName}-${filename}-${new Date().toISOString().split('T')[0]}`,
             width: 1280,
             height: 720
-          }
+          },
+          displaylogo: false
         }
 
         this.$plotly.newPlot(div, data, layout, config)
