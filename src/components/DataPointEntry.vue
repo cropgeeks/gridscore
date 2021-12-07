@@ -90,19 +90,27 @@
         </b-input-group>
       </b-form-group>
     </b-form>
-    <!-- Show a button for image tagging -->
-    <b-button @click="$refs.imageModal.show()"><BIconCameraFill/> {{ $t('buttonTakePhoto') }}</b-button>
+
+    <b-button-group>
+      <!-- Show a button for image tagging -->
+      <b-button @click="$refs.imageModal.show()"><BIconCameraFill/> {{ $t('buttonTakePhoto') }}</b-button>
+      <!-- Show a button for video tagging -->
+      <b-button @click="$refs.videoModal.show()"><BIconCameraVideoFill/> {{ $t('buttonTakeVideo') }}</b-button>
+    </b-button-group>
     <!-- Image tagging modal -->
     <ImageModal :name="name" ref="imageModal" />
+    <!-- Video tagging modal -->
+    <VideoModal :name="name" ref="videoModal" />
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
 import ImageModal from '@/components/modals/ImageModal'
+import VideoModal from '@/components/modals/VideoModal'
 import { mapGetters } from 'vuex'
 import { EventBus } from '@/plugins/event-bus.js'
-import { BIconCameraFill, BIconCircleFill, BIconMic, BIconCaretLeftFill, BIconCaretRightFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
+import { BIconCameraFill, BIconCircleFill, BIconMic, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
 
 export default {
   components: {
@@ -113,7 +121,9 @@ export default {
     BIconCalendar3,
     BIconMic,
     BIconSlashCircle,
-    ImageModal
+    BIconCameraVideoFill,
+    ImageModal,
+    VideoModal
   },
   props: {
     /** The row of the current data point */

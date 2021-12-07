@@ -36,7 +36,7 @@ export default {
               datasets.createIndex('lastUpdatedOn', 'lastUpdatedOn', { unique: false })
             }
             if (oldVersion < 3) {
-              // Add a last updated on column to the datasets
+              // Add a uuid column to the datasets
               datasets = transaction.objectStore('datasets')
               datasets.createIndex('uuid', 'uuid', { unique: false })
             }

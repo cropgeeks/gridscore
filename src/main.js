@@ -31,7 +31,8 @@ import {
   SpinnerPlugin,
   ProgressPlugin,
   JumbotronPlugin,
-  SidebarPlugin
+  SidebarPlugin,
+  EmbedPlugin
 } from 'bootstrap-vue'
 
 import router from '@/router'
@@ -65,6 +66,7 @@ Vue.use(CollapsePlugin)
 Vue.use(NavbarPlugin)
 Vue.use(TableLitePlugin)
 Vue.use(TableSimplePlugin)
+Vue.use(EmbedPlugin)
 Vue.use(ButtonPlugin)
 Vue.use(ButtonGroupPlugin)
 Vue.use(FormPlugin)
