@@ -1,16 +1,7 @@
 <template>
   <div>
+    <p>{{ $t('widgetImportDataText') }}</p>
     <b-form @submit.prevent="importExport" id="import-export-form">
-      <b-form-group :label="$t('formLabelImportExportData')"
-                    label-for="import-data">
-        <b-form-textarea :rows="5" :readonly="false" id="import-data" v-model="config" />
-        <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="application/json" v-model="dataFile" />
-        <template v-slot:description>
-          <b-form-text text-variant="warning">{{ $t('formDescriptionImportExportData') }}</b-form-text>
-        </template>
-      </b-form-group>
-
-      <p class="font-weight-bold">{{ $t('modalTextImportOr') }}</p>
       <b-input class="mb-3" v-model="uuid" :placeholder="$t('formPlaceholderUuid')" />
       <b-button @click="onImportClicked">{{ uuid === storeDataset.uuid ? $t('buttonImportLoadDataset') : $t('formLabelImportDataServerUuid') }}</b-button>
       <template v-if="showCamera">
@@ -40,7 +31,6 @@ export default {
   data: function () {
     return {
       config: null,
-      dataFile: null,
       serverError: null,
       showCamera: false,
       uuid: null
@@ -53,11 +43,6 @@ export default {
     ])
   },
   watch: {
-    dataFile: function (newValue) {
-      if (newValue) {
-        this.loadDataFile()
-      }
-    },
     'storeDataset.uuid': function () {
       this.reset()
     }
@@ -112,16 +97,7 @@ export default {
           }
         })
     },
-    loadDataFile: function () {
-      const reader = new FileReader()
-      reader.onload = event => {
-        this.config = event.target.result.replace(/\r/g, '')
-        this.dataFile = null
-      }
-      reader.readAsText(this.dataFile)
-    },
     reset: function () {
-      this.dataFile = null
       this.serverError = null
       this.showCamera = false
 
@@ -179,13 +155,4 @@ export default {
 </script>
 
 <style>
-#import-export-form .form-group textarea {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-#import-export-form .form-group textarea + .b-form-file * {
-  border-top: 0;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
 </style>

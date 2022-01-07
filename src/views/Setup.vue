@@ -2,12 +2,6 @@
   <b-container>
     <h1><b-button :to="{ name: 'home' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleSetup') }}</h1>
     <hr />
-    <!-- Import and export buttons for json -->
-    <b-button-group class="mb-3 d-block" id="settings-buttons">
-      <b-button @click="loadExampleData">{{ $t('buttonLoadExample') }}</b-button>
-      <b-button @click="$refs.importModal.show()">{{ $t('buttonImport') }}</b-button>
-      <b-button @click="$refs.exportModal.show()">{{ $t('buttonExport') }}</b-button>
-    </b-button-group>
 
     <b-form @submit.prevent="onSubmit" id="settings-form">
       <b-row>
@@ -125,8 +119,6 @@
 <script>
 import FieldMap from '@/components/FieldMap'
 import BrapiTraitImportModal from '@/components/modals/BrapiTraitImportModal'
-import JsonImportModal from '@/components/modals/JsonImportModal'
-import JsonExportModal from '@/components/modals/JsonExportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
 import IconBrapi from '@/components/IconBrapi'
 
@@ -209,8 +201,6 @@ export default {
     IconBrapi,
     FieldMap,
     BrapiTraitImportModal,
-    JsonImportModal,
-    JsonExportModal,
     TraitConfigurationModal
   },
   methods: {
@@ -371,19 +361,6 @@ export default {
       this.trait = null
       this.varietiesFile = null
       this.mapVisible = false
-    },
-    loadExampleData: function () {
-      // Ask for confirmation
-      this.$bvModal.msgBoxConfirm(this.$t('modalTextSetupWarning'), {
-        title: this.$t('modalTitleSetupWarning'),
-        okTitle: this.$t('buttonOk'),
-        cancelTitle: this.$t('buttonCancel')
-      }).then(value => {
-        if (value === true) {
-          this.$store.dispatch('addDataset', require('@/example-data.json'))
-          // this.$router.push({ name: 'home' })
-        }
-      })
     },
     /**
      * Submit the result and re-create the current dataset with the new configuration.

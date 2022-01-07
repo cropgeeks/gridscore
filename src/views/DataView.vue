@@ -14,7 +14,13 @@
     <div class="d-flex flex-row align-items-end top-banner">
       <b-button @click="$router.push({ name: 'settings' })" class="mr-1" v-if="storeTraits && storeTraits.length > 0"><BIconGearFill /></b-button>
 
-      <b-button @click="$router.push({ name: 'share' })" class="mr-1" v-b-tooltip="$t('tooltipShare')"><BIconShareFill /></b-button>
+      <!-- If it's a dataset that has been shared, show save and load buttons -->
+      <template v-if="storeDataset && storeDataset.uuid">
+        <b-button @click="onLoad" class="mr-1" v-b-tooltip="$t('tooltipLoad')"><BIconCloudDownloadFill /></b-button>
+        <b-button @click="onSave" class="mr-1" v-b-tooltip="$t('tooltipSave')"><BIconCloudUploadFill /></b-button>
+      </template>
+      <!-- Else, show the share button -->
+      <b-button v-else @click="$router.push({ name: 'share' })" class="mr-1" v-b-tooltip="$t('tooltipShare')"><BIconShareFill /></b-button>
 
       <b-dropdown class="mr-1" v-b-tooltip="$t('tooltipJumpTo')" ref="cornerDropdown">
         <template v-slot:button-content><BIconArrowsFullscreen /></template>
@@ -61,7 +67,7 @@
 // import GridTableIndividualCell from '@/components/tables/GridTableIndividualCell'
 import GridTableCanvas from '@/components/tables/GridTableCanvas'
 import DataPointModal from '@/components/modals/DataPointModal'
-import { BIconCircleFill, BIconGearFill, BIconSearch, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
+import { BIconCircleFill, BIconGearFill, BIconSearch, BIconCloudDownloadFill, BIconCloudUploadFill, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
 
 import { EventBus } from '@/plugins/event-bus'
 
@@ -118,6 +124,8 @@ export default {
     BIconArrowDown,
     BIconArrowDownRight,
     BIconGeoAltFill,
+    BIconCloudDownloadFill,
+    BIconCloudUploadFill,
     // GridTableIndividualCell,
     GridTableCanvas,
     DataPointModal
@@ -130,6 +138,7 @@ export default {
       'storeCornerPoints',
       'storeData',
       'storeDatasetId',
+      'storeDataset',
       'storeGeolocation',
       'storeRows',
       'storeShowStatsInTable',

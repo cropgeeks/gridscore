@@ -223,10 +223,7 @@ const storeState = {
                     const ds = JSON.parse(JSON.stringify(dataset))
                     ds.data = new Map()
 
-                    for (let i = 0; i < data.length; i++) {
-                      const dp = data[i]
-                      ds.data.set(`${dp.row}-${dp.col}`, dp)
-                    }
+                    data.forEach(dp => ds.data.set(`${dp.row}-${dp.col}`, dp))
 
                     state.dataset = ds
                   })

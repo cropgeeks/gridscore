@@ -68,6 +68,11 @@ const router = new Router({
       component: () => import('@/views/Export')
     },
     {
+      path: '/import',
+      name: 'import',
+      component: () => import('@/views/DataImport')
+    },
+    {
       path: '/about',
       name: 'about',
       component: () => import('@/views/About')

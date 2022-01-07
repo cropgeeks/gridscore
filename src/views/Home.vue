@@ -9,6 +9,7 @@
 
     <div class="text-center">
       <b-button class="mx-2 mb-3" :to="{ name: 'setup' }"><BIconJournalPlus /> {{ $t('buttonSetupTrial') }}</b-button>
+      <b-button class="mx-2 mb-3" :to="{ name: 'import' }"><BIconCloudDownloadFill /> {{ $t('buttonImportTrial') }}</b-button>
       <b-button class="mx-2 mb-3" @click="loadExampleData"><BIconFileSpreadsheet /> {{ $t('buttonLoadExampleData') }}</b-button>
       <b-button class="mx-2 mb-3" @click="startTour"><BIconPlayFill /> {{ $t('buttonStartIntroductionTour') }}</b-button>
     </div>
@@ -20,6 +21,7 @@
           <b-card :title="`${dataset.id} - ${dataset.name}`" class="h-100" :bg-variant="dataset.id === storeDatasetId ? 'light' : null">
             <b-card-text><BIconLayoutThreeColumns rotate="90" /> {{ $t('formLabelSettingsRows') }} {{ dataset.rows }}</b-card-text>
             <b-card-text><BIconLayoutThreeColumns /> {{ $t('formLabelSettingsCols') }} {{ dataset.cols }}</b-card-text>
+            <b-card-text><BIconTags /> {{ $t('formLabelTraits') }} {{ dataset.traits.length }}</b-card-text>
             <b-card-text v-if="dataset.lastUpdatedOn"><BIconCalendarDate /> {{ new Date(dataset.lastUpdatedOn).toLocaleString() }}</b-card-text>
 
             <template #footer>
@@ -52,7 +54,7 @@ import AddTraitModal from '@/components/modals/AddTraitModal'
 
 import idb from '@/plugins/idb'
 
-import { BIconJournalPlus, BIconFileSpreadsheet, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
+import { BIconJournalPlus, BIconFileSpreadsheet, BIconCloudDownloadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
 
 export default {
   components: {
@@ -60,6 +62,7 @@ export default {
     BIconJournalPlus,
     BIconFileSpreadsheet,
     BIconPlayFill,
+    BIconCloudDownloadFill,
     BIconCalendarDate,
     BIconGear,
     BIconTrash,
