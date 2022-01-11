@@ -47,8 +47,8 @@
                 </b-tooltip>
               </template>
               <b-form-radio-group buttons v-model="varietyFormat">
-                <b-form-radio value="tab">{{ $t('formLabelSettingsTabMode') }}</b-form-radio>
-                <b-form-radio value="row">{{ $t('formLabelSettingsRowMode') }}</b-form-radio>
+                <b-form-radio value="tab"><BIconGrid3x3 /> {{ $t('formLabelSettingsTabMode') }}</b-form-radio>
+                <b-form-radio value="row"><BIconLayoutThreeColumns rotate="90" /> {{ $t('formLabelSettingsRowMode') }}</b-form-radio>
               </b-form-radio-group>
             </template>
             <!-- Variety names input -->
@@ -118,7 +118,7 @@ import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal
 import IconBrapi from '@/components/IconBrapi'
 
 import { mapGetters } from 'vuex'
-import { BIconGear, BIconArrowLeft, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconJournalPlus, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
+import { BIconGear, BIconArrowLeft, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconGrid3x3, BIconJournalPlus, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
 
 /**
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
@@ -189,6 +189,7 @@ export default {
     BIconX,
     BIconLayoutThreeColumns,
     BIconTextLeft,
+    BIconGrid3x3,
     BIconBoundingBox,
     BIconTags,
     BIconInfoCircle,

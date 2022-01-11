@@ -12,7 +12,7 @@
       </b-form>
     </div>
     <div class="d-flex flex-row align-items-end top-banner">
-      <b-button @click="$router.push({ name: 'settings' })" class="mr-1" v-if="storeTraits && storeTraits.length > 0"><BIconGearFill /></b-button>
+      <b-button @click="$router.push({ name: 'settings' })" class="mr-1" v-b-tooltip="$t('tooltipSettings')" v-if="storeTraits && storeTraits.length > 0"><BIconGearFill /></b-button>
 
       <!-- If it's a dataset that has been shared, show save and load buttons -->
       <template v-if="storeDataset && storeDataset.uuid">
@@ -40,25 +40,27 @@
       </b-dropdown>
 
       <b-dropdown :text="$t('widgetTraitSelectorTitle')" class="trait-dropdown">
+        <template #button-content>
+          <BIconCircleHalf /> {{ $t('widgetTraitSelectorTitle') }}
+        </template>
         <b-dropdown-form>
           <b-button-group>
-            <b-button @click="toggleVisibilityAll(true)">{{ $t('buttonSelectAll') }}</b-button>
-            <b-button @click="toggleVisibilityAll(false)">{{ $t('buttonDeselectAll') }}</b-button>
+            <b-button @click="toggleVisibilityAll(true)"><BIconCircleFill /> {{ $t('buttonSelectAll') }}</b-button>
+            <b-button @click="toggleVisibilityAll(false)"><BIconCircle /> {{ $t('buttonDeselectAll') }}</b-button>
           </b-button-group>
         </b-dropdown-form>
         <b-dropdown-item v-for="(trait, index) in storeTraits" :key="`trait-${index}`" @click.native.capture.stop="toggleVisibility(index)">
           <span :style="{ color: (storeVisibleTraits && storeVisibleTraits[index] === true) ? storeTraitColors[index % storeTraitColors.length] : 'lightgray' }"><BIconCircleFill /> {{ trait.name }}</span>
           <b-progress class="trait-progress" height="3px" v-if="traitStats && traitStats[trait.name]">
-            <b-progress-bar :value="traitStats[trait.name].count / traitStats[trait.name].total * 100" :style="{ backgroundColor: storeTraitColors[index % storeTraitColors.length] }"/>
+            <b-progress-bar :value="traitStats[trait.name].count / traitStats[trait.name].total * 100" :style="{ backgroundColor: (storeVisibleTraits && storeVisibleTraits[index] === true) ? storeTraitColors[index % storeTraitColors.length] : 'dimgray' }"/>
           </b-progress>
         </b-dropdown-item>
       </b-dropdown>
 
-      <b-button @click="$router.push({ name: 'export' })" class="ml-auto">{{ $t('buttonExport') }}</b-button>
+      <b-button @click="$router.push({ name: 'export' })" class="ml-auto"><BIconDownload /> {{ $t('buttonExport') }}</b-button>
     </div>
 
     <GridTableCanvas @cell-clicked="onCellClicked" :traitStats="storeShowStatsInTable ? traitStats : null" v-if="storeTraits && storeTraits.length > 0" :highlightPosition="userPosition" ref="canvas" />
-    <!-- <GridTableIndividualCell @cell-clicked="onCellClicked" :traitStats="storeShowStatsInTable ? traitStats : null" :highlightPosition="userPosition" v-if="storeTraits && storeTraits.length > 0" /> -->
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
   </div>
 </template>
@@ -67,7 +69,7 @@
 // import GridTableIndividualCell from '@/components/tables/GridTableIndividualCell'
 import GridTableCanvas from '@/components/tables/GridTableCanvas'
 import DataPointModal from '@/components/modals/DataPointModal'
-import { BIconCircleFill, BIconGearFill, BIconSearch, BIconCloudDownloadFill, BIconCloudUploadFill, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
+import { BIconCircleFill, BIconGearFill, BIconSearch, BIconCloudDownloadFill, BIconCircleHalf, BIconCircle, BIconCloudUploadFill, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
 
 import { EventBus } from '@/plugins/event-bus'
 
@@ -112,9 +114,12 @@ export default {
   components: {
     BIconCircleFill,
     BIconGearFill,
+    BIconCircleHalf,
+    BIconCircle,
     BIconSearch,
     BIconShareFill,
     BIconArrowsFullscreen,
+    BIconDownload,
     BIconArrowUpLeft,
     BIconArrowUp,
     BIconArrowUpRight,

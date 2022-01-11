@@ -4,21 +4,21 @@
     <hr />
     <b-form @submit.prevent="onSubmit" class="settings-form">
       <b-row>
-        <b-col cols=12 md=6>
+        <b-col cols=12 lg=6>
           <h2>{{ $t('pageSettingsGeneralTitle') }}</h2>
-          <b-form-group :label="$t('formLabelSettingsGps')" label-for="use-gps">
+          <b-form-group :label="$t('formLabelSettingsGps')" label-for="use-gps" :description="$t('forlgescriptionSettingsGps')">
             <b-form-checkbox v-model="tempUseGps" switch id="use-gps">{{ $t('buttonToggleGps') }}</b-form-checkbox>
           </b-form-group>
-          <b-form-group :label="$t('formLabelSettingsSpeech')" label-for="use-speech">
+          <b-form-group :label="$t('formLabelSettingsSpeech')" label-for="use-speech" :description="$t('formDescriptionSettingsSpeech')">
             <b-form-checkbox v-model="tempUseSpeech" switch id="use-speech">{{ $t('buttonToggleSpeech') }}</b-form-checkbox>
           </b-form-group>
-          <b-form-group :label="$t('formLabelSettingsContinuousInput')" label-for="continuous-input">
+          <b-form-group :label="$t('formLabelSettingsContinuousInput')" label-for="continuous-input" :description="$t('formDescriptionSettingsContinuousInput')">
             <b-form-checkbox v-model="tempContinuousInput" switch id="continuous-input">{{ $t('buttonToggleContinuousInput') }}</b-form-checkbox>
           </b-form-group>
 
           <div class="settings-colors">
             <h2>{{ $t('pageSettingsColorsTitle') }} <b-button size="sm" variant="light" v-b-tooltip="$t('tooltipSettingsResetColors')" @click="resetColors"><BIconArrowClockwise /></b-button></h2>
-            <b-form-group :label="$t('formLabelSettingsColors')">
+            <b-form-group :label="$t('formLabelSettingsColors')" :description="$t('formDescriptionSettingsColors')">
               <b-input-group v-for="(color, index) in tempColors" :key="`color-${index}`" class="mr-2 mb-2">
                 <b-form-input type="color"  v-model="tempColors[index]"  />
                 <b-input-group-append>
@@ -26,7 +26,7 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group :label="$t('formLabelSettingsColorsAdd')" label-for="add-color">
+            <b-form-group :label="$t('formLabelSettingsColorsAdd')" label-for="add-color" :description="$t('formDescriptionSettingsColorAdd')">
               <b-input-group>
                 <b-form-input type="color" id="add-color" v-model="newColor" />
                 <b-input-group-append>

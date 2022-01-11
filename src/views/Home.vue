@@ -28,7 +28,7 @@
               <div class="d-flex justify-content-between">
                 <b-button variant="primary" @click="onDatasetSelected(dataset.id)">{{ $t('buttonSelect') }}</b-button>
 
-                <b-dropdown variant="outline-secondary">
+                <b-dropdown variant="outline-secondary" right>
                   <template #button-content>
                     <BIconGear />
                   </template>

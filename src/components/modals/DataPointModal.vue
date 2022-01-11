@@ -1,15 +1,13 @@
 <template>
-  <b-modal :ok-title="$t('buttonOk')"
-          :cancel-title="$t('buttonCancel')"
-          :no-close-on-backdrop="isGuidedWalk"
-          :no-close-on-esc="isGuidedWalk"
-          @close="beforeClose"
-          @ok.prevent="onSubmit"
-          @hide="onHide"
-          @shown="onShown"
-          size="lg"
-          no-fade
-          ref="dataPointModal">
+  <b-modal :no-close-on-backdrop="isGuidedWalk"
+           :no-close-on-esc="isGuidedWalk"
+           @close="beforeClose"
+           @ok.prevent="onSubmit"
+           @hide="onHide"
+           @shown="onShown"
+           size="lg"
+           no-fade
+           ref="dataPointModal">
     <template v-slot:modal-header="{ close }">
       <h5 class="modal-title">{{ name }}</h5>
 
@@ -43,7 +41,7 @@
       </template>
       <template v-else>
         <b-button variant="secondary" @click="cancel">{{ $t('buttonCancel') }}</b-button>
-        <b-button variant="primary" @click="ok">{{ $t('buttonOk') }}</b-button>
+        <b-button variant="primary" @click="ok">{{ $t('buttonSave') }}</b-button>
       </template>
     </template>
   </b-modal>

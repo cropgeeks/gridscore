@@ -207,3 +207,49 @@
     border-color: #495057 #495057 #212529;
 }
 
+.dark-mode .b-popover.popover {
+    background-color: rgb(40, 43, 44);
+    border-color: rgb(59, 64, 66);
+}
+
+.dark-mode .b-popover .popover-body {
+    color: rgb(194, 188, 180);
+}
+
+.dark-mode .b-popover .popover-header {
+    color: rgb(209, 205, 199);
+    background-color: rgb(44, 47, 49);
+    border-bottom-color: rgb(62, 67, 69);
+}
+
+.dark-mode .b-popover.bs-popover-auto[x-placement^="top"] > .arrow::before,
+.dark-mode .b-popover.bs-popover-top > .arrow::before {
+    border-top-color: rgb(59, 64, 66);
+}
+
+.dark-mode .b-popover.bs-popover-auto[x-placement^="top"] > .arrow::after,
+.dark-mode .b-popover.bs-popover-top > .arrow::after {
+    border-top-color: rgb(56, 60, 63);
+}
+
+.dark-mode .bs-popover-right > .arrow::before,
+.dark-mode .bs-popover-auto[x-placement^="right"] > .arrow::before {
+    border-right-color: rgb(56, 60, 63);
+}
+
+.dark-mode .bs-popover-right > .arrow::after,
+.dark-mode .bs-popover-auto[x-placement^="right"] > .arrow::after {
+    border-right-color: rgb(44, 47, 49);
+}
+
+.dark-mode .b-popover.bs-popover-auto[x-placement^="bottom"] > .arrow::before,
+.dark-mode .b-popover.bs-popover-bottom > .arrow::before {
+    border-bottom-color: rgb(59, 64, 66);
+}
+
+.dark-mode .b-popover.bs-popover-auto[x-placement^="bottom"] .popover-header::before,
+.dark-mode .b-popover.bs-popover-auto[x-placement^="bottom"] > .arrow::after,
+.dark-mode .b-popover.bs-popover-bottom .popover-header::before,
+.dark-mode .b-popover.bs-popover-bottom > .arrow::after {
+    border-bottom-color: rgb(58, 63, 65);
+}
