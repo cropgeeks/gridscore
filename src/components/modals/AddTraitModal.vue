@@ -4,12 +4,13 @@
            :cancel-title="$t('buttonCancel')"
            no-fade
            @ok.prevent="onSubmit"
+           @shown="$refs.traitName.focus()"
            ref="addTraitModal">
     <p>{{ $t('modalTextAddTrait') }}</p>
     <b-form @submit.prevent="onSubmit">
       <!-- Trait name -->
       <b-form-group :label="$t('formLabelAddTraitName')" label-for="trait-name" :description="$t('formDescriptionSettingsTraits')">
-        <b-form-input id="trait-name" v-model="trait.name" required :state="state.name" />
+        <b-form-input id="trait-name" v-model="trait.name" required :state="state.name" ref="traitName" />
       </b-form-group>
 
       <!-- Trait data type selection -->

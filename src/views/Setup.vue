@@ -31,30 +31,28 @@
           <b-form-group label-for="varieties">
             <!-- Variety label -->
             <template v-slot:label>
-              <div class="d-flex justify-content-between">
-                <div>
-                  <template v-if="varietiesInRowFormat">
-                    <BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span>
-                    <!-- Tooltip for the variety label info icon -->
-                    <b-tooltip target="variety-label">
-                      <div>{{ $t('tooltipSettingsVarieties') }}</div>
-                      <div><b-img fluid src="img/variety-order.svg" width=75 height=75 /></div>
-                    </b-tooltip>
-                  </template>
-                  <template v-else>
-                    <BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span>
-                    <!-- Tooltip for the variety label info icon -->
-                    <b-tooltip target="variety-label">
-                      <div>{{ $t('tooltipSettingsVarietiesGrid') }}</div>
-                      <div><b-img fluid src="img/variety-order-grid.svg" width=75 height=75 /></div>
-                    </b-tooltip>
-                  </template>
-                </div>
-                <span><b-form-checkbox v-model="varietiesInRowFormat" switch>{{ varietiesInRowFormat ? $t('formLabelSettingsRowMode') : $t('formLabelSettingsTabMode') }}</b-form-checkbox></span>
-              </div>
+              <div><BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span></div>
+              <template v-if="varietyFormat === 'row'">
+                <!-- Tooltip for the variety label info icon -->
+                <b-tooltip target="variety-label">
+                  <div>{{ $t('tooltipSettingsVarieties') }}</div>
+                  <div><b-img fluid src="img/variety-order.svg" width=75 height=75 /></div>
+                </b-tooltip>
+              </template>
+              <template v-else>
+                <!-- Tooltip for the variety label info icon -->
+                <b-tooltip target="variety-label">
+                  <div>{{ $t('tooltipSettingsVarietiesGrid') }}</div>
+                  <div><b-img fluid src="img/variety-order-grid.svg" width=75 height=75 /></div>
+                </b-tooltip>
+              </template>
+              <b-form-radio-group buttons v-model="varietyFormat">
+                <b-form-radio value="tab">{{ $t('formLabelSettingsTabMode') }}</b-form-radio>
+                <b-form-radio value="row">{{ $t('formLabelSettingsRowMode') }}</b-form-radio>
+              </b-form-radio-group>
             </template>
             <!-- Variety names input -->
-            <b-form-textarea id="varieties" @keydown.tab.prevent="tabber($event)" :state="state.varieties" rows=6 wrap="off" required :placeholder="varietiesInRowFormat ? $t('formPlaceholderVarieties') : $t('formPlaceholderVarietiesGrid')" v-model="varieties" />
+            <b-form-textarea id="varieties" @keydown.tab.prevent="tabber($event)" :state="state.varieties" rows=6 wrap="off" required :placeholder="(varietyFormat === 'row') ? $t('formPlaceholderVarieties') : $t('formPlaceholderVarietiesGrid')" v-model="varieties" />
             <!-- Variety names file loading -->
             <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="varietiesFile" />
           </b-form-group>
@@ -104,11 +102,8 @@
       </b-collapse>
     </b-form>
 
-    <b-button @click="onSubmit" variant="primary" class="mt-3"><BIconPlus /> {{ $t('buttonAdd') }}</b-button>
+    <b-button @click="onSubmit" variant="primary" class="mt-3"><BIconJournalPlus /> {{ $t('buttonCreateTrial') }}</b-button>
 
-    <!-- Modal to show json import/export -->
-    <JsonExportModal ref="exportModal" />
-    <JsonImportModal ref="importModal" />
     <!-- Modal to show configuration options for a selected trait -->
     <TraitConfigurationModal :trait="traitToConfigure" v-on:config-changed="updateTraitConfig" ref="traitConfigModal" />
     <!-- Modal for trait import via BrAPI -->
@@ -123,7 +118,7 @@ import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal
 import IconBrapi from '@/components/IconBrapi'
 
 import { mapGetters } from 'vuex'
-import { BIconGear, BIconArrowLeft, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
+import { BIconGear, BIconArrowLeft, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconJournalPlus, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
 
 /**
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
@@ -140,7 +135,7 @@ export default {
       varieties: null,
       formValidated: false,
       mapVisible: false,
-      varietiesInRowFormat: false,
+      varietyFormat: 'tab',
       traitTypes: [{
         value: 'date',
         text: this.$t('traitTypeDate')
@@ -197,6 +192,7 @@ export default {
     BIconBoundingBox,
     BIconTags,
     BIconInfoCircle,
+    BIconJournalPlus,
     BIconTextareaT,
     IconBrapi,
     FieldMap,
@@ -395,7 +391,7 @@ export default {
               rows: parseInt(this.rows),
               cols: parseInt(this.cols),
               traits: this.newTraits,
-              varieties: this.varietiesInRowFormat ? this.varieties.split('\n') : this.varieties.split('\n').map(r => r.split('\t')).reduce((a, b) => a.concat(b), []),
+              varieties: this.varietyFormat === 'row' ? this.varieties.split('\n') : this.varieties.split('\n').map(r => r.split('\t')).reduce((a, b) => a.concat(b), []),
               cornerPoints: this.$refs.map.getCornerPoints()
             }
 
