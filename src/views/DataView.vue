@@ -282,6 +282,72 @@ export default {
 
         this.traitStats = tempStats
       }
+    },
+    onLoad: function () {
+      this.$bvModal.msgBoxConfirm(this.$t('modalTextReplaceDatasets'), {
+          title: this.$t('modalTitleReplaceDatasets'),
+          okTitle: this.$t('buttonReplace'),
+          cancelTitle: this.$t('buttonCancel')
+        }).then(value => {
+          if (value) {
+            this.loadData()
+          }
+        })
+    },
+    onSave: function () {
+      this.$bvModal.msgBoxConfirm(this.$t('modalTextSaveToServerWarning'), {
+          title: this.$t('modalTitleSaveToServerWarning'),
+          okTitle: this.$t('buttonSave'),
+          cancelTitle: this.$t('buttonCancel')
+        }).then(value => {
+          if (value) {
+            this.sendData()
+          }
+        })
+    },
+    loadData: function () {
+      EventBus.$emit('set-loading', true)
+      this.getConfigFromSharing(this.storeDataset.uuid)
+        .then(result => {
+          if (result && result.data) {
+            result.data.id = this.storeDataset.id
+            this.$store.dispatch('updateDataset', result.data)
+          }
+        })
+        .catch(err => {
+          if (err && err.response && err.response.status) {
+            switch (err.response.status) {
+              case 404:
+                this.serverError = this.$t('axiosErrorConfigNotFound')
+                break
+              case 500:
+                this.serverError = this.$t('axiosErrorGeneric500')
+                break
+              default:
+                this.serverError = err
+                break
+            }
+          } else {
+            this.serverError = this.$t('axiosErrorNoInternet')
+          }
+        })
+        .finally(() => EventBus.$emit('set-loading', false))
+    },
+    sendData: function () {
+      EventBus.$emit('set-loading', true)
+      let dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
+      const arrayData = []
+      for (let row = 0; row < this.storeRows; row++) {
+        const rowData = []
+        for (let col = 0; col < this.storeCols; col++) {
+          rowData.push(this.storeDataset.data.get(`${row}-${col}`))
+        }
+        arrayData.push(rowData)
+      }
+      delete dataCopy.data
+      dataCopy.data = arrayData
+      this.postConfigForSharing(dataCopy)
+        .finally(() => EventBus.$emit('set-loading', false))
     }
   },
   mounted: function () {
