@@ -21,6 +21,7 @@
                           @handleDateInputChar="event => handleDateInputChar(index, event)"
                           @onDateChanged="event => onDateChanged(event, index)"
                           @onValueChanged="event => onValueChanged(event, index)"
+                          :id="`data-entry-field-${index}`"
                           :ref="`dataEntryInput-${index}`" />
 
           <b-input-group-append v-if="mapping.trait.type === 'date' || mapping.trait.mType === 'multi' || mapping.trait.type === 'int'">
@@ -47,7 +48,7 @@
       </b-form-group>
     </b-form>
 
-    <b-button-group>
+    <b-button-group id="tag-buttons">
       <!-- Show a button for image tagging -->
       <b-button @click="$refs.imageModal.show()"><BIconCameraFill/> {{ $t('buttonTakePhoto') }}</b-button>
       <!-- Show a button for video tagging -->
@@ -59,11 +60,14 @@
     <VideoModal :name="name" ref="videoModal" />
     <!-- Modal showing all previously recorded values of a multi trait -->
     <MultiTraitValueModal :traitIndex="multiTraitIndex" :row="row" :col="col" ref="multiTraitValueModal" v-if="multiTraitIndex !== null" @data-changed="multiTraitDataChanged" />
+
+    <Tour :steps="tourSteps" :resetOnRouterNav="true" :hideBackButton="false" ref="dataEntryTour" />
   </div>
 </template>
 
 <script>
 import Vue from 'vue'
+import Tour from '@/components/Tour'
 import ImageModal from '@/components/modals/ImageModal'
 import VideoModal from '@/components/modals/VideoModal'
 import DataEntryInput from '@/components/DataEntryInput'
@@ -86,7 +90,8 @@ export default {
     DataEntryInput,
     ImageModal,
     MultiTraitValueModal,
-    VideoModal
+    VideoModal,
+    Tour
   },
   props: {
     /** The row of the current data point */
@@ -119,7 +124,38 @@ export default {
       speechRecognition: null,
       dateInput: '',
       dateInputIndex: null,
-      multiTraitIndex: null
+      multiTraitIndex: null,
+      tourSteps: [{
+        title: () => this.$t('tourTitleDataEntryStart'),
+        text: () => this.$t('tourTextDataEntryStart'),
+        target: () => '#data-entry-modal',
+        position: 'bottom'
+      }, {
+        title: () => this.$t('tourTitleDataEntryInput'),
+        text: () => this.$t('tourTextDataEntryInput'),
+        target: () => '#data-entry-field-0',
+        position: 'bottom'
+      }, {
+        title: () => this.$t('tourTitleDataEntryComment'),
+        text: () => this.$t('tourTextDataEntryComment'),
+        target: () => '#comment',
+        position: 'top'
+      }, {
+        title: () => this.$t('tourTitleDataEntryTagImageVideo'),
+        text: () => this.$t('tourTextDataEntryTagImageVideo'),
+        target: () => '#tag-buttons',
+        position: 'top'
+      }, {
+        title: () => this.$t('tourTitleDataEntryGuidedWalk'),
+        text: () => this.$t('tourTextDataEntryGuidedWalk'),
+        target: () => '#guided-walk-toggle',
+        position: 'top'
+      }, {
+        title: () => this.$t('tourTitleDataEntryBookmark'),
+        text: () => this.$t('tourTextDataEntryBookmark'),
+        target: () => '#data-entry-header',
+        position: 'bottom'
+      }]
     }
   },
   computed: {
@@ -162,6 +198,9 @@ export default {
     }
   },
   methods: {
+    showTour: function () {
+      this.$refs.dataEntryTour.start()
+    },
     updateFormDescriptions: function () {
       if (this.visibleTraitMapping && this.storeData && this.row !== null && this.col !== null) {
         const dp = this.storeData.get(`${this.row}-${this.col}`)
@@ -505,6 +544,11 @@ export default {
   },
   mounted: function () {
     this.reset()
+
+    EventBus.$on('show-data-entry-tour', this.showTour)
+  },
+  beforeDestroy: function () {
+    EventBus.$off('show-data-entry-tour', this.showTour)
   }
 }
 </script>

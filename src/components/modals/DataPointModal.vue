@@ -7,25 +7,29 @@
            @shown="onShown"
            size="lg"
            no-fade
+           id="data-entry-modal"
            ref="dataPointModal">
     <template v-slot:modal-header="{ close }">
       <h5 class="modal-title">{{ name }}</h5>
 
-      <b-button :pressed.sync="isMarked">
-        <template v-if="isMarked">
-          <BIconBookmarkCheckFill /> {{ $t('buttonUnbookmarkCell') }}
-        </template>
-        <template v-else>
-          <BIconBookmark /> {{ $t('buttonBookmarkCell') }}
-        </template>
-      </b-button>
+      <b-button-group id="data-entry-header">
+        <b-button @click="startTour()"><BIconQuestionCircle /></b-button>
+        <b-button :pressed.sync="isMarked">
+          <template v-if="isMarked">
+            <BIconBookmarkCheckFill /> {{ $t('buttonUnbookmarkCell') }}
+          </template>
+          <template v-else>
+            <BIconBookmark /> {{ $t('buttonBookmarkCell') }}
+          </template>
+        </b-button>
+      </b-button-group>
 
       <button class="close ml-0" @click="close()">×</button>
     </template>
     <DataPointEntry :isMarked="isMarked" :row="localRow" :col="localCol" :key="`${localRow}-${localCol}`" @submit="onSubmit" ref="dataPointEntry" />
 
     <template v-if="!isGuidedWalk">
-      <b-button @click="guidedWalkVisible = !guidedWalkVisible" class="my-3"><BIconSignpost /> {{ $t('buttonStartGuidedWalkToggle') }}</b-button>
+      <b-button @click="guidedWalkVisible = !guidedWalkVisible" class="my-3" id="guided-walk-toggle"><BIconSignpost /> {{ $t('buttonStartGuidedWalkToggle') }}</b-button>
       <b-collapse id="data-point-guide-collapse" class="mb-3" v-model="guidedWalkVisible">
         <p class="text-info">{{ $t('widgetGuideOrderText') }}</p>
         <GuideOrderSelector :row="localRow" :col="localCol" :visible="guidedWalkVisible" @order-selected="orderSelected"/>
@@ -50,7 +54,8 @@
 <script>
 import DataPointEntry from '@/components/DataPointEntry'
 import GuideOrderSelector from '@/components/GuideOrderSelector'
-import { BIconBookmarkCheckFill, BIconBookmark, BIconCheck2All, BIconPlay, BIconSignpost, BIconChevronLeft, BIconChevronRight } from 'bootstrap-vue'
+import { BIconBookmarkCheckFill, BIconBookmark, BIconQuestionCircle, BIconCheck2All, BIconPlay, BIconSignpost, BIconChevronLeft, BIconChevronRight } from 'bootstrap-vue'
+import { EventBus } from '@/plugins/event-bus.js'
 import types from '@/mixin/types'
 
 /**
@@ -91,11 +96,15 @@ export default {
     BIconCheck2All,
     BIconChevronLeft,
     BIconChevronRight,
+    BIconQuestionCircle,
     DataPointEntry,
     GuideOrderSelector
   },
   mixins: [ types ],
   methods: {
+    startTour: function () {
+      EventBus.$emit('show-data-entry-tour')
+    },
     /**
      * Shows the modal and resets it to its initial state
      */
