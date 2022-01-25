@@ -22,7 +22,7 @@
 
       <button class="close ml-0" @click="close()">×</button>
     </template>
-    <DataPointEntry :isMarked="isMarked" :row="localRow" :col="localCol" :key="`${localRow}-${localCol}`" ref="dataPointEntry" />
+    <DataPointEntry :isMarked="isMarked" :row="localRow" :col="localCol" :key="`${localRow}-${localCol}`" @submit="onSubmit" ref="dataPointEntry" />
 
     <template v-if="!isGuidedWalk">
       <b-button @click="guidedWalkVisible = !guidedWalkVisible" class="my-3"><BIconSignpost /> {{ $t('buttonStartGuidedWalkToggle') }}</b-button>
@@ -202,7 +202,7 @@ export default {
       this.localCol = this.col
       this.$nextTick(() => {
         this.update()
-        this.$refs.dataPointEntry.setFocus()
+        // this.$refs.dataPointEntry.setFocus()
       })
     },
     beforeClose: function (event) {

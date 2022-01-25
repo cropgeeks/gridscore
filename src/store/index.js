@@ -240,11 +240,51 @@ const storeState = {
             })
         })
     },
+    ON_DATA_POINT_TRAIT_DATA_CHANGED_MUTATION: function (state, config) {
+      // To save time, write directly to the temporary dataset object
+      let temp = state.dataset.data.get(`${config.row}-${config.col}`)
+      temp.dates[config.traitIndex] = JSON.parse(JSON.stringify(config.dates))
+      temp.values[config.traitIndex] = JSON.parse(JSON.stringify(config.values))
+      state.dataset.data.set(`${config.row}-${config.col}`, temp)
+
+      // Then update the database
+      idb.updateDatapoint(state.datasetId, temp)
+        .then(() => EventBus.$emit('data-point-changed', config.row, config.col))
+    },
     ON_DATA_POINT_CHANGED_MUTATION: function (state, dataPoint) {
       // To save time, write directly to the temporary dataset object
       let temp = state.dataset.data.get(`${dataPoint.row}-${dataPoint.col}`)
-      temp.dates = dataPoint.dates
-      temp.values = dataPoint.values
+      const traits = state.dataset.traits
+      temp.dates = dataPoint.dates.map((dp, i) => {
+        if (traits[i].mType === 'multi') {
+          if (dp === null) {
+            return temp.dates[i]
+          } else {
+            if (!temp.dates[i]) {
+              return [dp]
+            } else {
+              return temp.dates[i].concat([dp])
+            }
+          }
+        } else {
+          return dp
+        }
+      })
+      temp.values = dataPoint.values.map((dp, i) => {
+        if (traits[i].mType === 'multi') {
+          if (dp === null) {
+            return temp.values[i]
+          } else {
+            if (!temp.values[i]) {
+              return [dp]
+            } else {
+              return temp.values[i].concat([dp])
+            }
+          }
+        } else {
+          return dp
+        }
+      })
       if (dataPoint.isMarked) {
         temp.isMarked = dataPoint.isMarked
       } else {
@@ -260,7 +300,7 @@ const storeState = {
       state.dataset.data.set(`${dataPoint.row}-${dataPoint.col}`, temp)
 
       // Then update the database
-      idb.updateDatapoint(state.datasetId, dataPoint)
+      idb.updateDatapoint(state.datasetId, temp)
         .then(() => EventBus.$emit('data-point-changed', dataPoint.row, dataPoint.col))
     },
     ON_USE_GPS_CHANGED_MUTATION: function (state, newUseGps) {
@@ -402,6 +442,9 @@ const storeState = {
     },
     setDataPoint: function ({ commit }, dataPoint) {
       commit('ON_DATA_POINT_CHANGED_MUTATION', dataPoint)
+    },
+    setDataPointTraitData: function ({ commit }, config) {
+      commit('ON_DATA_POINT_TRAIT_DATA_CHANGED_MUTATION', config)
     },
     setUseGps: function ({ commit }, useGps) {
       commit('ON_USE_GPS_CHANGED_MUTATION', useGps)

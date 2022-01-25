@@ -26,7 +26,7 @@
           <h5>{{ trait }}</h5>
           <dl class="row">
             <dt class="col-6 text-muted"><span>{{ selectedLocationData[trait].value }}</span></dt>
-            <dd class="col-6 text-right"><b-badge><BIconCalendar3 /> {{ selectedLocationData[trait].date }}</b-badge></dd>
+            <dd class="col-6 text-right"><b-badge class="wrap-badge"><BIconCalendar3 /> {{ selectedLocationData[trait].date }}</b-badge></dd>
           </dl>
         </div>
       </div>
@@ -249,5 +249,10 @@ export default {
 }
 .leaflet-popup-content {
   min-width: 200px!important;
+}
+
+.wrap-badge {
+  white-space: normal;
+  line-height: 1.3em;
 }
 </style>

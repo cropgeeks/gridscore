@@ -6,6 +6,9 @@
     <template v-if="storeTraits && storeTraits.length > 0">
       <div v-for="(trait, index) in storeTraits" :key="`trait-stats-${index}`">
         <h2><span :style="{ color: storeTraitColors[index % storeTraitColors.length] }"><BIconCircleFill /> {{ trait.name }} <b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span></h2>
+        <b-form-group :label="$t('formLabelMultiTraitVizType')" :label-for="`trait-viz-type-${index}`" v-if="trait.mType === 'multi'">
+          <b-form-select :id="`trait-viz-type-${index}`" :options="multiTraitOptions[index]" v-model="selectedMultiTraitMethods[index]" />
+        </b-form-group>
         <div class="stats-chart" :ref="`trait-chart-${index}`" />
       </div>
     </template>
@@ -38,9 +41,25 @@ export default {
       }
     }
   },
+  data: function () {
+    return {
+      selectedMultiTraitMethods: [],
+      multiTraitOptions: []
+    }
+  },
   watch: {
     storeDarkMode: function () {
       this.update()
+    },
+    storeTraits: function (newValue) {
+      this.selectedMultiTraitMethods = newValue.map(t => 'last')
+      this.multiTraitOptions = newValue.map(t => this.getMultiTraitMethods(t))
+    },
+    selectedMultiTraitMethods: {
+      deep: true,
+      handler: function () {
+        this.update()
+      }
     }
   },
   methods: {
@@ -58,7 +77,7 @@ export default {
           case 'date': {
             chartType = 'box'
             const datapoints = []
-            this.storeData.forEach((c, k) => datapoints.push({ value: c.values[index], name: c.name }))
+            this.storeData.forEach((c, k) => datapoints.push({ value: this.extractMultiTraitDatum(index, trait.mType, this.selectedMultiTraitMethods[index], c, true), name: c.name }))
             data.push({
               x: datapoints.map(d => d.value),
               text: datapoints.map(d => d.name),
@@ -78,7 +97,7 @@ export default {
             chartType = 'bar'
             const map = {}
             const datapoints = []
-            this.storeData.forEach((c, k) => datapoints.push(c.values[index]))
+            this.storeData.forEach((c, k) => datapoints.push(this.extractMultiTraitDatum(index, trait.mType, this.selectedMultiTraitMethods[index], c, true)))
             datapoints.forEach(c => {
               if (map[c]) {
                 map[c] += 1
@@ -151,15 +170,12 @@ export default {
         }
 
         this.$plotly.newPlot(div, data, layout, config)
-        // div.on('plotly_click', data => {
-        //   // One point was clicked
-        //   if (data.points && data.points.length === 1) {
-        //   }
-        // })
       })
     }
   },
   mounted: function () {
+    this.selectedMultiTraitMethods = this.storeTraits.map(t => 'last')
+    this.multiTraitOptions = this.storeTraits.map(t => this.getMultiTraitMethods(t))
     this.update()
   }
 }

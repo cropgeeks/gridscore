@@ -1,83 +1,39 @@
 <template>
   <div>
     <p>{{ $t('modalTextDataEntry') }}</p>
-    <b-form @submit.prevent="onSubmit" :validated="formValidated">
+    <b-form @submit.prevent="$emit('submit')" :validated="formValidated">
       <b-form-group v-for="(mapping, index) in visibleTraitMapping"
                     :key="`trait-${index}`"
-                    :label-for="`trait-${index}`">
+                    :label-for="`trait-${index}`"
+                    :description="formDescriptions ? formDescriptions[index] : null">
         <!-- Show the trait name along with the type and its color as the label -->
         <template v-slot:label>
           <span :style="{ color: storeTraitColors[mapping.index % storeTraitColors.length] }"><BIconCircleFill /> {{ mapping.trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(mapping.trait) }}</b-badge></span>
         </template>
 
-        <b-input-group v-if="mapping.trait.type === 'date'">
-          <!-- For date types, show a datepicker -->
-          <b-form-input :id="`trait-${index}`"
-                            :ref="`trait-${index}`"
-                            :state="formState[index]"
-                            @keyup.enter="handleDateInput(index)"
-                            :value="values[index]"
-                            type="date"
-                            :key="values[index]"
-                            @keyup.exact="(event) => handleDateInputChar(index, event)"
-                            @change="(event) => onDateChanged(event, index)" />
-          <b-input-group-append>
-            <b-button v-b-tooltip="$t('tooltipDataEntryDateMinusOne')" @click="setDateMinusOne(index)"><BIconCaretLeftFill /></b-button>
-            <b-button v-b-tooltip="$t('tooltipDataEntryDateToday')" @click="setDateToday(index)"><BIconCalendar3 /></b-button>
-            <b-button v-b-tooltip="$t('tooltipDataEntryDatePlusOne')" @click="setDatePlusOne(index)"><BIconCaretRightFill /></b-button>
-            <b-button v-b-tooltip="$t('tooltipDataEntryDateReset')" variant="danger" @click="resetDate(index)"><BIconSlashCircle /></b-button>
+        <b-input-group>
+          <b-input-group-prepend v-if="mapping.trait.type === 'int'">
+            <b-button @click="decrease(index)">-</b-button>
+          </b-input-group-prepend>
+          <DataEntryInput :index="index" :values="values" :trait="mapping.trait" :formState="formState"
+                          @enter="traverseForm(index + 1)"
+                          @handleDateInput="handleDateInput(index)"
+                          @handleDateInputChar="event => handleDateInputChar(index, event)"
+                          @onDateChanged="event => onDateChanged(event, index)"
+                          @onValueChanged="event => onValueChanged(event, index)"
+                          :ref="`dataEntryInput-${index}`" />
+
+          <b-input-group-append v-if="mapping.trait.type === 'date' || mapping.trait.mType === 'multi' || mapping.trait.type === 'int'">
+            <template v-if="mapping.trait.type === 'date'">
+              <b-button v-b-tooltip="$t('tooltipDataEntryDateMinusOne')" @click="setDateMinusOne(index)"><BIconCaretLeftFill /></b-button>
+              <b-button v-b-tooltip="$t('tooltipDataEntryDateToday')" @click="setDateToday(index)"><BIconCalendar3 /></b-button>
+              <b-button v-b-tooltip="$t('tooltipDataEntryDatePlusOne')" @click="setDatePlusOne(index)"><BIconCaretRightFill /></b-button>
+              <b-button v-b-tooltip="$t('tooltipDataEntryDateReset')" variant="danger" @click="resetDate(index)"><BIconSlashCircle /></b-button>
+            </template>
+            <b-button v-if="mapping.trait.mType === 'multi' && formDescriptions && formDescriptions[index]" v-b-tooltip="$t('tooltipDataEntryMultiTraitShowValues')" variant="secondary" @click="showMultiTraitModal(index)"><BIconInfoCircle /></b-button>
+            <b-button v-if="mapping.trait.type === 'int'" @click="increment(index)">+</b-button>
           </b-input-group-append>
         </b-input-group>
-        <!-- For int types, show a number input, apply restrictions -->
-        <b-form-input      v-else-if="mapping.trait.type === 'int'"
-                           :id="`trait-${index}`"
-                           :ref="`trait-${index}`"
-                           :state="formState[index]"
-                           @keyup.enter="traverseForm(index + 1)"
-                           v-model.number="values[index]"
-                           type="number"
-                           :min="(mapping.trait.restrictions && mapping.trait.restrictions.min !== null && mapping.trait.restrictions.min !== undefined) ? mapping.trait.restrictions.min : null"
-                           :max="(mapping.trait.restrictions && mapping.trait.restrictions.max !== null && mapping.trait.restrictions.max !== undefined) ? mapping.trait.restrictions.max : null" />
-        <!-- For float types, show a number input, apply restrictions -->
-        <b-form-input      v-else-if="mapping.trait.type === 'float'"
-                           :id="`trait-${index}`"
-                           :ref="`trait-${index}`"
-                           :state="formState[index]"
-                           @keyup.enter="traverseForm(index + 1)"
-                           v-model.number="values[index]"
-                           type="number"
-                           :min="(mapping.trait.restrictions && mapping.trait.restrictions.min !== null && mapping.trait.restrictions.min !== undefined) ? mapping.trait.restrictions.min : null"
-                           :max="(mapping.trait.restrictions && mapping.trait.restrictions.max !== null && mapping.trait.restrictions.max !== undefined) ? mapping.trait.restrictions.max : null"
-                           :step="0.02" />
-        <!-- For text types, show a simple input field -->
-        <b-form-input      v-else-if="mapping.trait.type === 'text'"
-                           :id="`trait-${index}`"
-                           :ref="`trait-${index}`"
-                           :state="formState[index]"
-                           @keyup.enter="traverseForm(index + 1)"
-                           v-model="values[index]"
-                           type="text" />
-        <!-- For categorical traits -->
-        <template v-if="mapping.trait.type === 'categorical' && mapping.trait.restrictions && mapping.trait.restrictions.categories">
-          <!-- If there are more than 3 options, show a dropdown select -->
-          <b-form-select   v-if="mapping.trait.restrictions.categories.length > 3"
-                           :id="`trait-${index}`"
-                           :ref="`trait-${index}`"
-                           :state="formState[index]"
-                           @keyup.enter="traverseForm(index + 1)"
-                           v-model="values[index]"
-                           :options="[{ value: null, text: $t('formSelectCategory') }, ...mapping.trait.restrictions.categories]" />
-          <!-- Else show a button group for easier selection -->
-          <b-form-radio-group v-else
-                           :id="`trait-${index}`"
-                           :ref="`trait-${index}`"
-                           :state="formState[index]"
-                           buttons
-                           button-variant="outline-secondary"
-                           @keyup.enter="traverseForm(index + 1)"
-                           v-model="values[index]"
-                           :options="[...mapping.trait.restrictions.categories, { value: null, text: '⦸' }]" />
-        </template>
       </b-form-group>
 
       <!-- User comments -->
@@ -101,6 +57,8 @@
     <ImageModal :name="name" ref="imageModal" />
     <!-- Video tagging modal -->
     <VideoModal :name="name" ref="videoModal" />
+    <!-- Modal showing all previously recorded values of a multi trait -->
+    <MultiTraitValueModal :traitIndex="multiTraitIndex" :row="row" :col="col" ref="multiTraitValueModal" v-if="multiTraitIndex !== null" @data-changed="multiTraitDataChanged" />
   </div>
 </template>
 
@@ -108,9 +66,11 @@
 import Vue from 'vue'
 import ImageModal from '@/components/modals/ImageModal'
 import VideoModal from '@/components/modals/VideoModal'
+import DataEntryInput from '@/components/DataEntryInput'
+import MultiTraitValueModal from '@/components/modals/MultiTraitValueModal'
 import { mapGetters } from 'vuex'
 import { EventBus } from '@/plugins/event-bus.js'
-import { BIconCameraFill, BIconCircleFill, BIconMic, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
+import { BIconCameraFill, BIconCircleFill, BIconMic, BIconInfoCircle, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
 
 export default {
   components: {
@@ -118,11 +78,14 @@ export default {
     BIconCircleFill,
     BIconCaretLeftFill,
     BIconCaretRightFill,
+    BIconInfoCircle,
     BIconCalendar3,
     BIconMic,
     BIconSlashCircle,
     BIconCameraVideoFill,
+    DataEntryInput,
     ImageModal,
+    MultiTraitValueModal,
     VideoModal
   },
   props: {
@@ -143,20 +106,20 @@ export default {
   },
   data: function () {
     return {
-      values: {
-      },
-      dates: {
-      },
+      values: [],
+      dates: [],
       name: null,
       comment: null,
       imageFile: null,
       imageData: null,
       formValidated: false,
       formState: [],
+      formDescriptions: [],
       textSynth: null,
       speechRecognition: null,
       dateInput: '',
-      dateInputIndex: null
+      dateInputIndex: null,
+      multiTraitIndex: null
     }
   },
   computed: {
@@ -199,6 +162,43 @@ export default {
     }
   },
   methods: {
+    updateFormDescriptions: function () {
+      if (this.visibleTraitMapping && this.storeData && this.row !== null && this.col !== null) {
+        const dp = this.storeData.get(`${this.row}-${this.col}`)
+        this.formDescriptions = this.visibleTraitMapping.map(t => {
+          if (t.trait.mType === 'multi') {
+            const values = dp.values[t.index]
+            const dates = dp.dates[t.index]
+            const prevValue = (values && values.length > 0) ? values[values.length - 1] : null
+            const prevDate = (dates && dates.length > 0) ? new Date(dates[dates.length - 1]).toLocaleDateString() : null
+            if (prevValue !== null) {
+              return this.$t('formDescriptionDataEntryMultiPrevValue', { prevValue: t.trait.type === 'date' ? new Date(prevValue).toLocaleDateString() : prevValue, date: prevDate })
+            } else {
+              return null
+            }
+          } else {
+            return null
+          }
+        })
+      } else {
+        this.formDescriptions = null
+      }
+    },
+    multiTraitDataChanged: function (values, dates) {
+      this.$store.commit('ON_DATA_POINT_TRAIT_DATA_CHANGED_MUTATION', {
+        traitIndex: this.multiTraitIndex,
+        values: values,
+        dates: dates,
+        row: this.row,
+        col: this.col
+      })
+      this.updateFormDescriptions()
+    },
+    showMultiTraitModal: function (index) {
+      this.multiTraitIndex = this.visibleTraitMapping[index].index
+
+      this.$nextTick(() => this.$refs.multiTraitValueModal.show())
+    },
     toggleRecording: function () {
       if (this.supportsSpeechRecognition) {
         if (this.speechRecognition) {
@@ -219,6 +219,42 @@ export default {
             this.comment = result
           }
         }
+      }
+    },
+    decrease: function (index) {
+      if (this.values && this.values[index] !== null && this.values[index] !== '') {
+        let newValue = this.values[index] - 1
+        if (this.storeTraits[index].restrictions) {
+          const min = this.storeTraits[index].restrictions.min
+          const max = this.storeTraits[index].restrictions.max
+          if (min !== undefined && min !== null) {
+            newValue = Math.max(min, newValue)
+          }
+          if (max !== undefined && max !== null) {
+            newValue = Math.min(max, newValue)
+          }
+        }
+        Vue.set(this.values, index, newValue)
+      } else {
+        Vue.set(this.values, index, -1)
+      }
+    },
+    increment: function (index) {
+      if (this.values && this.values[index] !== null && this.values[index] !== '') {
+        let newValue = this.values[index] + 1
+        if (this.storeTraits[index].restrictions) {
+          const min = this.storeTraits[index].restrictions.min
+          const max = this.storeTraits[index].restrictions.max
+          if (min !== undefined && min !== null) {
+            newValue = Math.max(min, newValue)
+          }
+          if (max !== undefined && max !== null) {
+            newValue = Math.min(max, newValue)
+          }
+        }
+        Vue.set(this.values, index, newValue)
+      } else {
+        Vue.set(this.values, index, 1)
       }
     },
     handleDateInput: function (index) {
@@ -300,12 +336,13 @@ export default {
       this.imageData = null
       if (this.col !== null && this.row !== null) {
         const dp = this.storeData.get(`${this.row}-${this.col}`)
-        this.values = this.visibleTraitMapping.map(t => dp.values[t.index])
-        this.dates = this.visibleTraitMapping.map(t => dp.dates[t.index])
+        this.values = this.visibleTraitMapping.map(t => t.trait.mType === 'multi' ? null : dp.values[t.index])
+        this.dates = this.visibleTraitMapping.map(t => t.trait.mType === 'multi' ? null : dp.dates[t.index])
         this.name = dp.name
         // this.isMarked = dp.isMarked || false
         this.comment = dp.comment
 
+        this.updateFormDescriptions()
         this.speak(this.name)
         this.speak(this.visibleTraitMapping[0].trait.name)
         this.setFocus()
@@ -323,11 +360,11 @@ export default {
      */
     setFocus: function () {
       this.$nextTick(() => {
-        if (this.$refs['trait-0'][0] && this.$refs['trait-0'][0].focus) {
-          this.$refs['trait-0'][0].focus()
+        if (this.$refs['dataEntryInput-0'][0].$refs.traitInput && this.$refs['dataEntryInput-0'][0].$refs.traitInput.focus) {
+          this.$refs['dataEntryInput-0'][0].$refs.traitInput.focus()
         }
-        if (this.$refs['trait-0'][0] && this.$refs['trait-0'][0].select) {
-          this.$refs['trait-0'][0].select()
+        if (this.$refs['dataEntryInput-0'][0].$refs.traitInput && this.$refs['dataEntryInput-0'][0].$refs.traitInput.select) {
+          this.$refs['dataEntryInput-0'][0].$refs.traitInput.select()
         }
       })
     },
@@ -342,18 +379,35 @@ export default {
 
       // If the next ref exists and it has a focus method, call it
       if (newIndex < this.visibleTraitMapping.length) {
-        if (this.$refs[`trait-${newIndex}`][0]) {
-          if (this.$refs[`trait-${newIndex}`][0].focus) {
-            this.$refs[`trait-${newIndex}`][0].focus()
+        if (this.$refs[`dataEntryInput-${newIndex}`][0].$refs.traitInput) {
+          if (this.$refs[`dataEntryInput-${newIndex}`][0].$refs.traitInput.focus) {
+            this.$refs[`dataEntryInput-${newIndex}`][0].$refs.traitInput.focus()
           }
-          if (this.$refs[`trait-${newIndex}`][0].select) {
-            this.$refs[`trait-${newIndex}`][0].select()
+          if (this.$refs[`dataEntryInput-${newIndex}`][0].$refs.traitInput.select) {
+            this.$refs[`dataEntryInput-${newIndex}`][0].$refs.traitInput.select()
           }
 
           this.speak(this.visibleTraitMapping[newIndex].trait.name)
         }
       } else {
-        this.onSubmit()
+        this.$emit('submit')
+      }
+    },
+    onValueChanged: function (event, index) {
+      if (event === null || event === undefined || event === '') {
+        this.values[index] = null
+        this.dates[index] = null
+      } else {
+        let dp
+
+        if (this.visibleTraitMapping[index].trait.type === 'int' || this.visibleTraitMapping[index].trait.type === 'float') {
+          dp = +event
+        } else {
+          dp = event
+        }
+
+        Vue.set(this.values, index, dp)
+        this.traverseForm(index + 1)
       }
     },
     /**
@@ -376,13 +430,13 @@ export default {
       this.formState = this.visibleTraitMapping.map((t, i) => {
         if (this.values[i] === '' || this.values[i] === null) {
           return true
-        } else if (t.restrictions) {
-          if (t.type === 'categorical') {
+        } else if (t.trait.restrictions) {
+          if (t.trait.type === 'categorical') {
             // Check whether the value is one of the pre-defined categories
-            return t.restrictions.categories.indexOf(this.values[i]) !== -1
-          } else if (t.type === 'int' || t.type === 'float') {
+            return t.trait.restrictions.categories.indexOf(this.values[i]) !== -1
+          } else if (t.trait.type === 'int' || t.trait.type === 'float') {
             // Check whether the value lies between the required min and max
-            return t.restrictions.min <= this.values[i] && this.values[i] <= t.restrictions.max
+            return t.trait.restrictions.min <= this.values[i] && this.values[i] <= t.trait.restrictions.max
           }
         } else {
           return true
@@ -448,12 +502,20 @@ export default {
     if (this.storeUseSpeech && window.speechSynthesis) {
       this.textSynth = window.speechSynthesis
     }
-
+  },
+  mounted: function () {
     this.reset()
   }
 }
 </script>
 
 <style>
+.input-group .btn-group:not(:last-child) > .btn:last-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
 
+.category-options .btn {
+  text-transform: none;
+}
 </style>

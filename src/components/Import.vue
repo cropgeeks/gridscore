@@ -74,8 +74,8 @@ export default {
       }
       this.getConfigFromSharing(uuid)
         .then(result => {
-          if (result && result.data) {
-            this.config = JSON.stringify(result.data)
+          if (result) {
+            this.config = result
             this.importExport()
           }
         })
@@ -106,46 +106,40 @@ export default {
       }
     },
     importExport: async function () {
-      let newData = JSON.parse(this.config)
-
-      if (newData) {
-        if (!newData.data) {
-          newData.data = []
-        }
-
+      if (this.config) {
         // If the dataset has a name
-        if (newData.name) {
+        if (this.config.name) {
           // Get all existing datasets
           const datasets = await idb.getDatasets()
 
           // If there are any
           if (datasets) {
             // Check if one exists that matches
-            const match = datasets.filter(d => d.name === newData.name && d.rows === newData.rows && d.cols === newData.cols) ||
-              datasets.filter(d => d.uuid === newData.uuid)
+            const match = datasets.filter(d => d.name === this.config.name && d.rows === this.config.rows && d.cols === this.config.cols) ||
+              datasets.filter(d => d.uuid === this.config.uuid)
 
             // If so, ask if user wants to overwrite it
             if (match && match.length > 0) {
-              this.newData = newData
-              newData.id = match[0].id
+              this.config = this.config
+              this.config.id = match[0].id
               this.$refs.yesNoCancelModal.show()
               return
             }
           }
         } else {
-          newData.name = `Imported data: ${new Date().toISOString().split('T')[0]}`
+          this.config.name = `Imported data: ${new Date().toISOString().split('T')[0]}`
         }
       }
 
-      this.$store.dispatch('addDataset', newData)
+      this.$store.dispatch('addDataset', this.config)
     },
     yes: function () {
-      this.$store.dispatch('updateDataset', this.newData)
+      this.$store.dispatch('updateDataset', this.config)
       // this.$router.push({ name: 'home' })
     },
     no: function () {
-      delete this.newData.id
-      this.$store.dispatch('addDataset', this.newData)
+      delete this.config.id
+      this.$store.dispatch('addDataset', this.config)
     }
   },
   mounted: function () {

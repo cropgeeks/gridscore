@@ -5,7 +5,25 @@ const axios = require('axios').default
 export default {
   data: function () {
     return {
-      gridScoreVersion: '1.6.0'
+      gridScoreVersion: '1.7.0',
+      multiTraitMethods: {
+        // TODO: Handle dates!
+        last: {
+          text: this.$t('formSelectMultiTraitVizTypeLast'),
+          value: 'last',
+          call: (values) => (values && values.length > 0) ? values[values.length - 1] : null
+        },
+        avg: {
+          text: this.$t('formSelectMultiTraitVizTypeAvg'),
+          value: 'avg',
+          call: (values) => (values && values.length > 0) ? (values.reduce((a, b) => a + b) / values.length) : null
+        },
+        sum: {
+          text: this.$t('formSelectMultiTraitVizTypeSum'),
+          value: 'sum',
+          call: (values) => (values && values.length > 0) ? values.reduce((a, b) => a + b) : null
+        }
+      }
     }
   },
   computed: {
@@ -15,6 +33,13 @@ export default {
     ])
   },
   methods: {
+    getMultiTraitMethods: function (trait) {
+      if (trait.type === 'int' || trait.type === 'float') {
+        return Object.keys(this.multiTraitMethods).map(k => this.multiTraitMethods[k])
+      } else {
+        return [this.multiTraitMethods.last]
+      }
+    },
     getTouchPosition: function (e) {
       if (e.touches) {
         if (e.touches.length === 1) {
@@ -53,13 +78,61 @@ export default {
           return null
       }
     },
+    extractMultiTraitDatum: function (traitIndex, traitMType, multiTraitMethod, cell, isValue) {
+      if (!cell) {
+        return null
+      }
+
+      const data = isValue ? cell.values : cell.dates
+
+      if (traitMType === 'multi') {
+        return this.multiTraitMethods[multiTraitMethod].call(data[traitIndex])
+      } else {
+        return data[traitIndex] || null
+      }
+    },
     /**
      * Sends the currently selected dataset configuration to the server.
      * The server will respond with a UUID that uniquely identifies this configuration allowing to share it with other devices.
      * @returns Promise
      */
-    postConfigForSharing: function (data) {
-      return this.axios('config', data, 'post')
+    postConfigForSharing: function (dataset, data, serverUuid, rows, cols) {
+      let dataCopy = JSON.parse(JSON.stringify(dataset))
+      const arrayData = []
+      for (let row = 0; row < rows; row++) {
+        const rowData = []
+        for (let col = 0; col < cols; col++) {
+          const cellCopy = JSON.parse(JSON.stringify(data.get(`${row}-${col}`)))
+          // Stringify them so that both individual values and arrays are accepted by the backend
+          if (cellCopy.dates) {
+            cellCopy.dates = cellCopy.dates.map((dp, i) => {
+              if (dataCopy.traits[i].mType === 'multi') {
+                return dp !== null ? JSON.stringify(dp) : null
+              } else {
+                return dp
+              }
+            })
+          }
+          if (cellCopy.values) {
+            cellCopy.values = cellCopy.values.map((dp, i) => {
+              if (dataCopy.traits[i].mType === 'multi') {
+                return dp !== null ? JSON.stringify(dp) : null
+              } else {
+                return dp
+              }
+            })
+          }
+          rowData.push(cellCopy)
+        }
+        arrayData.push(rowData)
+      }
+      delete dataset.data
+      dataset.data = arrayData
+      if (serverUuid) {
+        dataset.uuid = serverUuid
+      }
+
+      return this.axios('config', dataset, 'post')
     },
     /**
      * Retrieves a dataset configuration from the server using a given UUID.
@@ -68,6 +141,39 @@ export default {
      */
     getConfigFromSharing: function (uuid) {
       return this.axios(`config/${uuid}`)
+        .then(result => {
+          if (result && result.data) {
+            if (result.data.data) {
+              result.data.data.forEach(r => {
+                r.forEach(c => {
+                  if (c.values) {
+                    c.values = c.values.map(dp => {
+                      if (dp !== null && dp.indexOf('[') === 0 && dp.indexOf(']') === dp.length - 1) {
+                        return JSON.parse(dp)
+                      } else {
+                        return dp
+                      }
+                    })
+                  }
+                  if (c.dates) {
+                    c.dates = c.dates.map(dp => {
+                      if (dp !== null && dp.indexOf('[') === 0 && dp.indexOf(']') === dp.length - 1) {
+                        return JSON.parse(dp)
+                      } else {
+                        return dp
+                      }
+                    })
+                  }
+                })
+              })
+            } else {
+              result.data.data = []
+            }
+            return result.data
+          } else {
+            return null
+          }
+        })
     },
     /**
      * Sends an axios REST request to the server with the given parameter configuration

@@ -4,6 +4,18 @@
       <p>{{ $t('pageHomeText') }}</p>
       <b-form inline @submit.prevent.stop>
         <b-input-group>
+          <b-input-group-prepend>
+            <b-button @click="$refs.barcodeScannerModal.show()" v-b-tooltip="$t('tooltipScanQRCodeFindPlot')">
+              <!-- TODO: Replace with bootstrap-vue icon once new version is released -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-qr-code-scan" viewBox="0 0 16 16">
+                <path d="M0 .5A.5.5 0 0 1 .5 0h3a.5.5 0 0 1 0 1H1v2.5a.5.5 0 0 1-1 0v-3Zm12 0a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V1h-2.5a.5.5 0 0 1-.5-.5ZM.5 12a.5.5 0 0 1 .5.5V15h2.5a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5Zm15 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1H15v-2.5a.5.5 0 0 1 .5-.5ZM4 4h1v1H4V4Z"/>
+                <path d="M7 2H2v5h5V2ZM3 3h3v3H3V3Zm2 8H4v1h1v-1Z"/>
+                <path d="M7 9H2v5h5V9Zm-4 1h3v3H3v-3Zm8-6h1v1h-1V4Z"/>
+                <path d="M9 2h5v5H9V2Zm1 1v3h3V3h-3ZM8 8v2h1v1H8v1h2v-2h1v2h1v-1h2v-1h-3V8H8Zm2 2H9V9h1v1Zm4 2h-1v1h-2v1h3v-2Zm-4 2v-1H8v1h2Z"/>
+                <path d="M12 9h2V8h-2v1Z"/>
+              </svg>
+            </b-button>
+          </b-input-group-prepend>
           <b-input v-model="searchTerm" ref="searchInput" @keyup.enter.prevent="openDataInput" />
           <b-input-group-append>
             <b-button @click="openDataInput"><BIconSearch /></b-button>
@@ -15,10 +27,23 @@
       <b-button @click="$router.push({ name: 'settings' })" class="mr-1" v-b-tooltip="$t('tooltipSettings')" v-if="storeTraits && storeTraits.length > 0"><BIconGearFill /></b-button>
 
       <!-- If it's a dataset that has been shared, show save and load buttons -->
-      <template v-if="storeDataset && storeDataset.uuid">
-        <b-button @click="onLoad" class="mr-1" v-b-tooltip="$t('tooltipLoad')"><BIconCloudDownloadFill /></b-button>
-        <b-button @click="onSave" class="mr-1" v-b-tooltip="$t('tooltipSave')"><BIconCloudUploadFill /></b-button>
-      </template>
+      <b-dropdown v-if="storeDataset && storeDataset.uuid" class="mr-1">
+        <template v-slot:button-content><BIconShareFill /></template>
+
+        <b-dropdown-item-button @click="onLoad" class="mr-1"><BIconCloudDownloadFill /> {{ $t('tooltipLoad') }}</b-dropdown-item-button>
+        <b-dropdown-item-button @click="onSave" class="mr-1"><BIconCloudUploadFill /> {{ $t('tooltipSave') }}</b-dropdown-item-button>
+        <b-dropdown-item-button @click="$refs.barcodeViewModal.show()" class="mr-1">
+          <!-- TODO: Replace with bootstrap-vue icon once new version is released -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-qr-code" viewBox="0 0 16 16">
+            <path d="M2 2h2v2H2V2Z"/>
+            <path d="M6 0v6H0V0h6ZM5 1H1v4h4V1ZM4 12H2v2h2v-2Z"/>
+            <path d="M6 10v6H0v-6h6Zm-5 1v4h4v-4H1Zm11-9h2v2h-2V2Z"/>
+            <path d="M10 0v6h6V0h-6Zm5 1v4h-4V1h4ZM8 1V0h1v2H8v2H7V1h1Zm0 5V4h1v2H8ZM6 8V7h1V6h1v2h1V7h5v1h-4v1H7V8H6Zm0 0v1H2V8H1v1H0V7h3v1h3Zm10 1h-1V7h1v2Zm-1 0h-1v2h2v-1h-1V9Zm-4 0h2v1h-1v1h-1V9Zm2 3v-1h-1v1h-1v1H9v1h3v-2h1Zm0 0h3v1h-2v1h-1v-2Zm-4-1v1h1v-2H7v1h2Z"/>
+            <path d="M7 12h1v3h4v1H7v-4Zm9 2v2h-3v-1h2v-1h1Z"/>
+          </svg> {{ $t('tooltipShowSharingCode') }}
+        </b-dropdown-item-button>
+      </b-dropdown>
+
       <!-- Else, show the share button -->
       <b-button v-else @click="$router.push({ name: 'share' })" class="mr-1" v-b-tooltip="$t('tooltipShare')"><BIconShareFill /></b-button>
 
@@ -62,13 +87,16 @@
 
     <GridTableCanvas @cell-clicked="onCellClicked" :traitStats="storeShowStatsInTable ? traitStats : null" v-if="storeTraits && storeTraits.length > 0" :highlightPosition="userPosition" ref="canvas" />
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
+    <BarcodeScannerModal ref="barcodeScannerModal" @code-scanned="searchByBarcode" />
+    <BarcodeViewerModal ref="barcodeViewModal" :text="storeDataset.uuid" v-if="storeDataset && storeDataset.uuid" />
   </div>
 </template>
 
 <script>
-// import GridTableIndividualCell from '@/components/tables/GridTableIndividualCell'
 import GridTableCanvas from '@/components/tables/GridTableCanvas'
 import DataPointModal from '@/components/modals/DataPointModal'
+import BarcodeScannerModal from '@/components/modals/BarcodeScannerModal'
+import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
 import { BIconCircleFill, BIconGearFill, BIconSearch, BIconCloudDownloadFill, BIconCircleHalf, BIconCircle, BIconCloudUploadFill, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
 
 import { EventBus } from '@/plugins/event-bus'
@@ -131,7 +159,8 @@ export default {
     BIconGeoAltFill,
     BIconCloudDownloadFill,
     BIconCloudUploadFill,
-    // GridTableIndividualCell,
+    BarcodeScannerModal,
+    BarcodeViewerModal,
     GridTableCanvas,
     DataPointModal
   },
@@ -181,6 +210,11 @@ export default {
     }
   },
   methods: {
+    searchByBarcode: function (code) {
+      this.searchTerm = code
+
+      this.$nextTick(() => this.openDataInput())
+    },
     scrollTo: function (corner) {
       this.$refs.canvas.scrollToCorner(corner)
       this.$refs.cornerDropdown.hide()
@@ -309,9 +343,9 @@ export default {
       EventBus.$emit('set-loading', true)
       this.getConfigFromSharing(this.storeDataset.uuid)
         .then(result => {
-          if (result && result.data) {
-            result.data.id = this.storeDataset.id
-            this.$store.dispatch('updateDataset', result.data)
+          if (result) {
+            result.id = this.storeDataset.id
+            this.$store.dispatch('updateDataset', result)
           }
         })
         .catch(err => {
@@ -336,17 +370,8 @@ export default {
     sendData: function () {
       EventBus.$emit('set-loading', true)
       let dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
-      const arrayData = []
-      for (let row = 0; row < this.storeRows; row++) {
-        const rowData = []
-        for (let col = 0; col < this.storeCols; col++) {
-          rowData.push(this.storeDataset.data.get(`${row}-${col}`))
-        }
-        arrayData.push(rowData)
-      }
-      delete dataCopy.data
-      dataCopy.data = arrayData
-      this.postConfigForSharing(dataCopy)
+
+      this.postConfigForSharing(dataCopy, this.storeDataset.data, this.storeDataset.uuid, this.storeRows, this.storeCols)
         .finally(() => EventBus.$emit('set-loading', false))
     }
   },

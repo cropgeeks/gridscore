@@ -7,6 +7,9 @@
       <b-form-group :label="$t('formLabelTrait')" label-for="trait">
         <b-form-select id="trait" :options="traits" v-model="trait" />
       </b-form-group>
+      <b-form-group :label="$t('formLabelMultiTraitVizType')" label-for="trait-viz-type" v-if="trait !== null && storeTraits[trait].mType === 'multi'">
+        <b-form-select id="trait-viz-type" :options="multiTraitOptions" v-model="selectedMultiTraitMethod" />
+      </b-form-group>
       <!-- Heatmap element -->
       <div id="heatmap-chart"/>
     </div>
@@ -24,7 +27,9 @@ export default {
   data: function () {
     return {
       traits: [],
-      trait: null
+      trait: null,
+      selectedMultiTraitMethod: 'last',
+      multiTraitOptions: []
     }
   },
   computed: {
@@ -48,13 +53,18 @@ export default {
     }
   },
   watch: {
-    trait: function () {
+    trait: function (newValue) {
+      this.selectedMultiTraitMethod = 'last'
+      this.multiTraitOptions = this.getMultiTraitMethods(this.storeTraits[newValue])
       this.update()
     },
     storeLocale: function () {
       this.update()
     },
     storeDarkMode: function () {
+      this.update()
+    },
+    selectedMultiTraitMethod: function () {
       this.update()
     }
   },
@@ -68,26 +78,15 @@ export default {
       let hasData = false
       let data = null
 
-      if (actualTrait.type === 'date' || actualTrait.type === 'text') {
-        // If we're dealing with dates or text, check if there is date data
-        outer:
-        for (let row = 0; row < rows; row++) {
-          for (let col = 0; col < cols; col++) {
-            if (this.storeData.get(`${row}-${col}`).dates[this.trait] !== null) {
-              hasData = true
-              break outer
-            }
-          }
-        }
-      } else {
-        // Else check if there is value data
-        outer:
-        for (let row = 0; row < rows; row++) {
-          for (let col = 0; col < cols; col++) {
-            if (this.storeData.get(`${row}-${col}`).values[this.trait] !== null) {
-              hasData = true
-              break outer
-            }
+      outer:
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          // If we're dealing with dates or text, check if there is date data, else check if there is value data
+          const dps = (actualTrait.type === 'date' || actualTrait.type === 'text') ? this.storeData.get(`${row}-${col}`).dates[this.trait] : this.storeData.get(`${row}-${col}`).values[this.trait]
+          if ((actualTrait.mType === 'multi' && dps !== null && dps.length > 0) ||
+              (actualTrait.mType !== 'multi' && dps !== null)) {
+            hasData = true
+            break outer
           }
         }
       }
@@ -101,9 +100,9 @@ export default {
           // Find the minimum in the data
           for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-              const date = this.storeData.get(`${row}-${col}`).dates[this.trait]
+              const date = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, this.storeData.get(`${row}-${col}`), false)
 
-              if (date) {
+              if (date !== null) {
                 minDateString = date < minDateString ? date : minDateString
               }
             }
@@ -122,7 +121,7 @@ export default {
               const cell = this.storeData.get(`${row}-${col}`)
               textZ.push(cell.name)
               // Get the cell date
-              const dateString = cell.dates[this.trait]
+              const dateString = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, cell, false)
 
               if (dateString) {
                 // If there is one, return the time difference to the minimum date in days
@@ -147,7 +146,7 @@ export default {
             text: text,
             type: 'heatmap',
             hoverongaps: false,
-            colorscale: [[0, this.storeDarkMode ? '#222222' : '#dddddd'], [1, this.storeTraitColors[this.trait % this.storeTraitColors.length]]],
+            colorscale: [[0, this.storeDarkMode ? '#444444' : '#dddddd'], [1, this.storeTraitColors[this.trait % this.storeTraitColors.length]]],
             colorbar: {
               title: {
                 text: this.$t('plotLegendDaysSinceFirstRecording'),
@@ -170,15 +169,15 @@ export default {
             for (let col = 0; col < cols; col++) {
               const cell = this.storeData.get(`${row}-${col}`)
 
+              // Get the cell date
+              const value = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, cell, true)
+
               if (isCategorical) {
                 // Plot the actual category rather than just its index
-                textZ.push(`x: ${col}<br>y: ${row}<br>z: ${cell.values[this.trait]}<br>${cell.name}`)
+                textZ.push(`x: ${col}<br>y: ${row}<br>z: ${value}<br>${cell.name}`)
               } else {
                 textZ.push(cell.name)
               }
-
-              // Get the cell date
-              const value = cell.values[this.trait]
 
               if (value !== undefined && value !== null) {
                 if (isCategorical) {
@@ -205,13 +204,24 @@ export default {
             text: text,
             type: 'heatmap',
             hoverongaps: false,
-            colorscale: [[0, this.storeDarkMode ? '#222222' : '#dddddd'], [1, this.storeTraitColors[this.trait % this.storeTraitColors.length]]],
+            colorscale: [[0, this.storeDarkMode ? '#444444' : '#dddddd'], [1, this.storeTraitColors[this.trait % this.storeTraitColors.length]]],
             hoverinfo: isCategorical ? 'text' : 'all',
             colorbar: isCategorical ? {
               tickmode: 'array',
               tickvals: actualTrait.restrictions.categories.map((c, i) => i),
-              ticktext: actualTrait.restrictions.categories
-            } : null
+              ticktext: actualTrait.restrictions.categories,
+              title: {
+                side: 'right',
+                font: { color: this.storeDarkMode ? 'white' : 'black' }
+              },
+              tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
+            } : {
+              title: {
+                side: 'right',
+                font: { color: this.storeDarkMode ? 'white' : 'black' }
+              },
+              tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
+            }
           }]
         }
 
@@ -263,6 +273,8 @@ export default {
       }
     })
     this.trait = this.traits.length > 0 ? 0 : null
+
+    this.multiTraitOptions = this.getMultiTraitMethods(this.storeTraits[this.trait])
   }
 }
 </script>

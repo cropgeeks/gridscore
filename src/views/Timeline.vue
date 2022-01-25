@@ -60,7 +60,7 @@ export default {
         mapping.push({})
         traces.push({})
       })
-      // For each field row
+      // For each field cell
       this.storeData.forEach((c, k) => {
         c.dates.forEach((d, i) => {
           // If it exists

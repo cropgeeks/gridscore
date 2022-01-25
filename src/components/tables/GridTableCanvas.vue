@@ -616,7 +616,7 @@ export default {
 
           let fill = cell.values[realIndex] !== null
 
-          // If the view should be inverted, to this here
+          // If the view should be inverted, do this here
           if (this.storeInvertView) {
             fill = !fill
           }

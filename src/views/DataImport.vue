@@ -4,7 +4,7 @@
 
     <b-tabs content-class="mt-3">
       <b-tab :title="$t('tabTitleImportUuid')" active>
-        <Import />
+        <Import :useDatasetUuid="false" />
       </b-tab>
       <b-tab :title="$t('tabTitleImportData')">
         <ImportFlatData />

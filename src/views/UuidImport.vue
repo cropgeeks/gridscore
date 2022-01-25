@@ -38,17 +38,9 @@ export default {
           // Get the config from the server
           this.getConfigFromSharing(this.uuid)
             .then(result => {
-              if (result && result.data) {
-                // Set the config
-                const config = result.data
-
-                // Initialize the data if not present
-                if (config && !config.data) {
-                  config.data = []
-                }
-
+              if (result) {
                 // Send to the store
-                this.$store.dispatch('addDataset', config)
+                this.$store.dispatch('addDataset', result)
               }
             })
             .catch(err => {

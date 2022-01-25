@@ -66,6 +66,7 @@
               <!-- Trait data type selection -->
               <b-input-group class="trait-type-select">
                 <b-form-select v-model="trait.type" :options="traitTypes" />
+                <b-form-select v-model="trait.mType" :options="traitMTypes" v-b-tooltip.left="$t('tooltipTraitMType')" />
 
                 <template v-slot:append>
                   <b-button-group>
@@ -151,6 +152,13 @@ export default {
       }, {
         value: 'categorical',
         text: this.$t('traitTypeCategorical')
+      }],
+      traitMTypes: [{
+        value: 'single',
+        text: this.$t('traitMTypeSingle')
+      }, {
+        value: 'multi',
+        text: this.$t('traitMTypeMulti')
       }],
       state: {
         datasetName: null,
@@ -262,6 +270,7 @@ export default {
             brapiId: t.observationVariableDbId,
             name: t.observationVariableName,
             type: type,
+            mType: 'single',
             restrictions: Object.keys(restrictions).length < 1 ? null : restrictions
           })
         })
@@ -321,6 +330,7 @@ export default {
         this.newTraits.push({
           name: this.trait,
           type: 'date',
+          mType: 'single',
           restrictions: null
         })
         this.trait = null

@@ -26,6 +26,10 @@
           </template>
         </b-input-group>
       </b-form-group>
+
+      <b-form-group :label="$t('formLabelAddTraitMType')" :description="$t('tooltipTraitMType')" label-for="trait-mtype">
+        <b-form-select id="trait-mtype" v-model="trait.mType" :options="traitMTypes" required />
+      </b-form-group>
     </b-form>
 
     <!-- Modal to show configuration options for a selected trait -->
@@ -54,6 +58,7 @@ export default {
       trait: {
         name: null,
         type: 'date',
+        mType: 'single',
         restrictions: null
       },
       state: {
@@ -75,6 +80,13 @@ export default {
       }, {
         value: 'categorical',
         text: this.$t('traitTypeCategorical')
+      }],
+      traitMTypes: [{
+        value: 'single',
+        text: this.$t('traitMTypeSingle')
+      }, {
+        value: 'multi',
+        text: this.$t('traitMTypeMulti')
       }]
     }
   },
@@ -86,6 +98,7 @@ export default {
       this.trait = {
         name: null,
         type: 'date',
+        mType: 'single',
         restrictions: null
       }
       this.state = {

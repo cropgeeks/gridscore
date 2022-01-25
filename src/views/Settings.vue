@@ -6,7 +6,7 @@
       <b-row>
         <b-col cols=12 lg=6>
           <h2>{{ $t('pageSettingsGeneralTitle') }}</h2>
-          <b-form-group :label="$t('formLabelSettingsGps')" label-for="use-gps" :description="$t('forlgescriptionSettingsGps')">
+          <b-form-group :label="$t('formLabelSettingsGps')" label-for="use-gps" :description="$t('formDescriptionSettingsGps')">
             <b-form-checkbox v-model="tempUseGps" switch id="use-gps">{{ $t('buttonToggleGps') }}</b-form-checkbox>
           </b-form-group>
           <b-form-group :label="$t('formLabelSettingsSpeech')" label-for="use-speech" :description="$t('formDescriptionSettingsSpeech')">

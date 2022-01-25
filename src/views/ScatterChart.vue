@@ -9,10 +9,16 @@
           <b-form-group :label="$t('formLabelTrait')" label-for="trait-one">
             <b-form-select id="trait-one" :options="traits" v-model="traitOne" />
           </b-form-group>
+          <b-form-group :label="$t('formLabelMultiTraitVizType')" label-for="trait-viz-type-one" v-if="traitOne !== null && storeTraits[traitOne].mType === 'multi'">
+            <b-form-select id="trait-viz-type-one" :options="multiTraitOptionsOne" v-model="selectedMultiTraitMethodOne" />
+          </b-form-group>
         </b-col>
         <b-col cols=12 md=6>
           <b-form-group :label="$t('formLabelTrait')" label-for="trait-two">
             <b-form-select id="trait-two" :options="traits" v-model="traitTwo" />
+          </b-form-group>
+          <b-form-group :label="$t('formLabelMultiTraitVizType')" label-for="trait-viz-type-two" v-if="traitTwo !== null && storeTraits[traitTwo].mType === 'multi'">
+            <b-form-select id="trait-viz-type-two" :options="multiTraitOptionsTwo" v-model="selectedMultiTraitMethodTwo" />
           </b-form-group>
         </b-col>
       </b-row>
@@ -31,7 +37,11 @@ export default {
     return {
       traits: [],
       traitOne: null,
-      traitTwo: null
+      traitTwo: null,
+      selectedMultiTraitMethodOne: 'last',
+      selectedMultiTraitMethodTwo: 'last',
+      multiTraitOptionsOne: [],
+      multiTraitOptionsTwo: []
     }
   },
   computed: {
@@ -51,13 +61,23 @@ export default {
     }
   },
   watch: {
-    traitOne: function () {
+    traitOne: function (newValue) {
+      this.selectedMultiTraitMethod = 'last'
+    this.multiTraitOptionsOne = this.getMultiTraitMethods(this.storeTraits[newValue])
       this.update()
     },
-    traitTwo: function () {
+    traitTwo: function (newValue) {
+      this.selectedMultiTraitMethod = 'last'
+      this.multiTraitOptionsTwo = this.getMultiTraitMethods(this.storeTraits[newValue])
       this.update()
     },
     storeDarkMode: function () {
+      this.update()
+    },
+    selectedMultiTraitMethodOne: function () {
+      this.update()
+    },
+    selectedMultiTraitMethodTwo: function () {
       this.update()
     }
   },
@@ -76,8 +96,8 @@ export default {
       // For each data point
       this.storeData.forEach((c, k) => {
         if (c.values) {
-          const one = c.values[this.traitOne]
-          const two = c.values[this.traitTwo]
+          const one = this.extractMultiTraitDatum(this.traitOne, this.storeTraits[this.traitOne].mType, this.selectedMultiTraitMethodOne, c, true)
+          const two = this.extractMultiTraitDatum(this.traitTwo, this.storeTraits[this.traitTwo].mType, this.selectedMultiTraitMethodTwo, c, true)
 
           if (one !== undefined && one !== null && two !== undefined && two !== null) {
             data[0].x.push(one)
@@ -134,6 +154,9 @@ export default {
     })
     this.traitOne = this.traits.length > 0 ? 0 : null
     this.traitTwo = this.traitOne
+
+    this.multiTraitOptionsOne = this.getMultiTraitMethods(this.storeTraits[this.traitOne])
+    this.multiTraitOptionsTwo = this.getMultiTraitMethods(this.storeTraits[this.traitTwo])
   }
 }
 </script>
