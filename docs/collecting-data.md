@@ -28,3 +28,7 @@ Optionally, you can use the `guided walk` feature, to let GridScore guide you th
 ## Image tagging
 
 In addition to the features highlighted above, GridScore can prompt your mobile device to take a photo which will then be tagged with the germplasm/variety name and a timestamp to significantly reduce the amount of effort that has to go into organising your photographs later.
+
+## Video tagging
+
+Similar to image tagging, videos can be recorded and stored using the germplasm/variety name and timestamp.

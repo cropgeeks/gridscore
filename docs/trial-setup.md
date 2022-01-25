@@ -34,6 +34,8 @@ Note how empty/blank cells in your trial can be achieved by leaving the row/cell
 
 Traits are then defined along with their type which can be one of 'integer', 'floating point', 'date', 'text' or 'categorical' (pick from a list of options). For numeric traits, minimum and maximum values can be defined to make sure that any data that is recorded falls within these limits. For categorical traits, the actual categories need to  be defined. Use the cog wheel button to enter these.
 
+Additionally, traits can either be single- or multi-score traits meaning that they are recorded only once per plot or multiple times (at different time points) per plot.
+
 <img src="img/screenshot-field-map.png" width="900" alt="Trials setup field plan">
 
 Optionally, the corner points of the field can be configured. This can either be done my walking to the corners of the field and clicking the button to get your GPS position or by manually entering the location. Defining the corner points allows GridScore to show your recorded data in the context of the field plots as well as to highlight your location in the data recording table for easier navigation and orientation.
