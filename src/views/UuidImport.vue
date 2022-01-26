@@ -12,14 +12,22 @@
     </b-jumbotron>
     <!-- Error messages -->
     <h4 class="text-danger font-weight-bold mt-3" v-if="serverError">{{ serverError }}</h4>
+
+    <YesNoCancelModal :title="$t('modalTitleReplaceDatasets')" :message="$t('modalTextReplaceDatasets')" :yesTitle="$t('buttonReplace')" :noTitle="$t('buttonImportAsNew')" :cancelTitle="$t('buttonCancel')" ref="yesNoCancelModal" @yes="yes" @no="no" />
   </b-container>
 </template>
 
 <script>
+import YesNoCancelModal from '@/components/modals/YesNoCancelModal'
+import idb from '@/plugins/idb'
+
 /**
  * Component that handles data configuration sharing via a UUID QR code
  */
 export default {
+  components: {
+    YesNoCancelModal
+  },
   data: function () {
     return {
       uuid: null,
@@ -28,40 +36,65 @@ export default {
   },
   methods: {
     getConfig: function () {
-      // Ask for confirmation
-      this.$bvModal.msgBoxConfirm(this.$t('modalTextSetupWarning'), {
-        title: this.$t('modalTitleSetupWarning'),
-        okTitle: this.$t('buttonOk'),
-        cancelTitle: this.$t('buttonCancel')
-      }).then(value => {
-        if (value === true) {
-          // Get the config from the server
-          this.getConfigFromSharing(this.uuid)
-            .then(result => {
-              if (result) {
-                // Send to the store
-                this.$store.dispatch('addDataset', result)
-              }
-            })
-            .catch(err => {
-              if (err && err.response && err.response.status) {
-                switch (err.response.status) {
-                  case 404:
-                    this.serverError = this.$t('axiosErrorConfigNotFound')
-                    break
-                  case 500:
-                    this.serverError = this.$t('axiosErrorGeneric500')
-                    break
-                  default:
-                    this.serverError = err
-                    break
-                }
-              } else {
-                this.serverError = this.$t('axiosErrorNoInternet')
-              }
-            })
+      this.getConfigFromSharing(this.uuid)
+        .then(result => {
+          if (result) {
+            this.config = result
+            this.importData()
+          }
+        })
+        .catch(err => {
+          if (err && err.response && err.response.status) {
+            switch (err.response.status) {
+              case 404:
+                this.serverError = this.$t('axiosErrorConfigNotFound')
+                break
+              case 500:
+                this.serverError = this.$t('axiosErrorGeneric500')
+                break
+              default:
+                this.serverError = err
+                break
+            }
+          } else {
+            this.serverError = this.$t('axiosErrorNoInternet')
+          }
+        })
+    },
+    importData: async function () {
+      if (this.config) {
+        // If the dataset has a name
+        if (this.config.name) {
+          // Get all existing datasets
+          const datasets = await idb.getDatasets()
+
+          // If there are any
+          if (datasets) {
+            // Check if one exists that matches
+            const match = datasets.filter(d => d.name === this.config.name && d.rows === this.config.rows && d.cols === this.config.cols) ||
+              datasets.filter(d => d.uuid === this.config.uuid)
+
+            // If so, ask if user wants to overwrite it
+            if (match && match.length > 0) {
+              this.config = this.config
+              this.config.id = match[0].id
+              this.$refs.yesNoCancelModal.show()
+              return
+            }
+          }
+        } else {
+          this.config.name = `Imported data: ${new Date().toISOString().split('T')[0]}`
         }
-      })
+      }
+
+      this.$store.dispatch('addDataset', this.config)
+    },
+    yes: function () {
+      this.$store.dispatch('updateDataset', this.config)
+    },
+    no: function () {
+      delete this.config.id
+      this.$store.dispatch('addDataset', this.config)
     }
   },
   mounted: function () {
