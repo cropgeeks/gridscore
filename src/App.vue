@@ -451,23 +451,25 @@ export default {
       }
 
       const config = new Detector().detect()
-      const data = {
-        application: 'GridScore',
-        runCount: this.storeRunCount + 1,
-        id: id,
-        version: `${this.gridScoreVersion}`,
-        locale: this.storeLocale,
-        os: `${config.os} ${config.osVersion}`
+      if (config.os !== undefined && config.os !== null && config.os !== 'Search Bot') {
+        const data = {
+          application: 'GridScore',
+          runCount: this.storeRunCount + 1,
+          id: id,
+          version: `${this.gridScoreVersion}`,
+          locale: this.storeLocale,
+          os: `${config.os} ${config.osVersion}`
+        }
+        this.axios('https://ics.hutton.ac.uk/app-logger/log', data, 'get')
+          .then(() => {
+            // If the call succeeds, reset the run count
+            this.$store.dispatch('setRunCount', 0)
+          })
+          .catch(() => {
+            // If this call fails (e.g. no internet), remember the run
+            this.$store.dispatch('setRunCount', this.storeRunCount + 1)
+          })
       }
-      this.axios('https://ics.hutton.ac.uk/app-logger/log', data, 'get')
-        .then(() => {
-          // If the call succeeds, reset the run count
-          this.$store.dispatch('setRunCount', 0)
-        })
-        .catch(() => {
-          // If this call fails (e.g. no internet), remember the run
-          this.$store.dispatch('setRunCount', this.storeRunCount + 1)
-        })
     }
 
     if (!this.storePlausible || !this.storePlausible.plausibleDomain) {
