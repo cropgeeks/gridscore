@@ -85,6 +85,8 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import { VuePlausible } from 'vue-plausible'
 import { mapGetters } from 'vuex'
 import Tour from '@/components/Tour'
 import { loadLanguageAsync } from '@/plugins/i18n'
@@ -205,7 +207,8 @@ export default {
       'storeDatasetId',
       'storeLocale',
       'storeUniqueClientId',
-      'storeRunCount'
+      'storeRunCount',
+      'storePlausible'
     ])
   },
   methods: {
@@ -401,6 +404,20 @@ export default {
       if (this.wakeLock !== null && document.visibilityState === 'visible') {
         await this.toggleWakeLock(true)
       }
+    },
+    enablePlausible: function () {
+      if (this.storePlausible) {
+        Vue.use(VuePlausible, {
+          domain: this.storePlausible.plausibleDomain,
+          hashMode: this.storePlausible.plausibleHashMode || true,
+          apiHost: this.storePlausible.plausibleApiHost,
+          trackLocalhost: false
+        })
+
+        this.$nextTick(() => {
+          this.$plausible.enableAutoPageviews()
+        })
+      }
     }
   },
   mounted: function () {
@@ -451,6 +468,18 @@ export default {
           // If this call fails (e.g. no internet), remember the run
           this.$store.dispatch('setRunCount', this.storeRunCount + 1)
         })
+    }
+
+    if (!this.storePlausible || !this.storePlausible.plausibleDomain) {
+      this.getServerSettings()
+        .then(result => {
+          if (result && result.data) {
+            this.$store.commit('ON_PLAUSIBLE_CHANGED', result.data)
+            this.enablePlausible()
+          }
+        })
+    } else {
+      this.enablePlausible()
     }
   },
   destroyed: function () {

@@ -49,7 +49,12 @@ const storeState = {
     showStatsInTable: false,
     visibleTraits: null,
     ignoreEmptyCells: true,
-    traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600']
+    traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600'],
+    plausible: {
+      plausibleDomain: null,
+      plausibleHashMode: true,
+      plausibleApiHost: null
+    }
   },
   getters: {
     storeDarkMode: (state) => state.darkMode,
@@ -79,7 +84,8 @@ const storeState = {
     storeShowStatsInTable: (state) => state.showStatsInTable,
     storeHideToggledTraits: (state) => state.hideToggledTraits,
     storeTraitColors: (state) => state.traitColors,
-    storeVisibleTraits: (state) => state.visibleTraits
+    storeVisibleTraits: (state) => state.visibleTraits,
+    storePlausible: (state) => state.plausible
   },
   mutations: {
     ON_RUN_COUNT_CHANGED_MUTATION: function (state, newRunCount) {
@@ -209,6 +215,9 @@ const storeState = {
     },
     ON_SERVER_URL_CHANGED: function (state, newServerUrl) {
       state.serverUrl = newServerUrl
+    },
+    ON_PLAUSIBLE_CHANGED: function (state, newPlausible) {
+      Vue.set(state, 'plausible', newPlausible)
     },
     ON_DATASET_UPDATED_MUTATION: function (state, newData) {
       EventBus.$emit('set-loading', true)
@@ -442,6 +451,9 @@ const storeState = {
     },
     setDataPoint: function ({ commit }, dataPoint) {
       commit('ON_DATA_POINT_CHANGED_MUTATION', dataPoint)
+    },
+    setPlausible: function ({ commit }, plausible) {
+      commit('ON_PLAUSIBLE_CHANGED', plausible)
     },
     setDataPointTraitData: function ({ commit }, config) {
       commit('ON_DATA_POINT_TRAIT_DATA_CHANGED_MUTATION', config)

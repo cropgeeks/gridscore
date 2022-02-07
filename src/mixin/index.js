@@ -175,6 +175,9 @@ export default {
           }
         })
     },
+    getServerSettings: function () {
+      return this.axios('settings')
+    },
     /**
      * Sends an axios REST request to the server with the given parameter configuration
      * @param {String} url The remote URL (relative) to send the request to
