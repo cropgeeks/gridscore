@@ -95,6 +95,7 @@
   "formDescriptionSettingsContinuousInput": "Aktivieren dieser Einstellung hält das Suchfeld fokussiert. Dies ist nötig wenn ein Barcode-Scanner zur Identifizierung von Beeten benutzt wird.",
   "formDescriptionSettingsColors": "Diese Farben werden zur visuellen Repräsentation der Merkmale genutzt - sowohl in der Dateneingabe als auch in den Visualisierungen.",
   "formDescriptionSettingsColorAdd": "Eine neue Farbe der Liste hinzufügen.",
+  "formDescriptionTraitCategoryMissing": "Kategorien noch nicht definiert.",
   "formLabelImportFlatData": "Daten zum Importieren",
   "formLabelImportFlatDataset": "Daten in Datensatz importieren",
   "formLabelSettingsColors": "Aktuelle Farben",

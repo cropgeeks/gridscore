@@ -95,6 +95,7 @@
   "formDescriptionSettingsContinuousInput": "Enabling this setting will keep the search box focussed. This is required when using a barcode scanner to identify plots.",
   "formDescriptionSettingsColors": "These colors are used for the visual representation of traits in the data entry as well as visualizations.",
   "formDescriptionSettingsColorAdd": "Add a new color to the list.",
+  "formDescriptionTraitCategoryMissing": "Categories not yet defined.",
   "formLabelImportFlatData": "Data to import",
   "formLabelImportFlatDataset": "Import data into dataset",
   "formLabelSettingsColors": "Current colors",
