@@ -61,7 +61,19 @@
           <!-- Trait definitions -->
           <b-list-group v-if="newTraits && newTraits.length > 0" class="mb-3 trait-list">
             <b-list-group-item v-for="(trait, index) in newTraits" :key="`trait-${index}`" class="d-flex justify-content-between align-items-center" :variant="getTraitVariant(trait)">
-              <span>{{ trait.name }}</span>
+              <span>
+                <span>{{ trait.name }}</span>
+                <template v-if="trait.type === 'categorical'">
+                  <small class="form-text text-muted" v-if="trait.restrictions && trait.restrictions.categories && trait.restrictions.categories.length > 0">{{ trait.restrictions.categories.join(', ') }}</small>
+                  <small class="form-text text-danger" v-else>{{ $t('formDescriptionTraitCategoryMissing') }}</small>
+                </template>
+                <template v-if="trait.type === 'int' || trait.type === 'float'">
+                  <small class="form-text text-muted" v-if="trait.restrictions && ((trait.restrictions.min !== undefined && trait.restrictions.min !== null) || (trait.restrictions.max !== undefined && trait.restrictions.max !== null))">
+                    <b-badge v-if="trait.restrictions.min !== null && trait.restrictions.min !== undefined">&ge; {{ trait.restrictions.min }}</b-badge>
+                    <b-badge v-if="trait.restrictions.max !== null && trait.restrictions.max !== undefined">&le; {{ trait.restrictions.max }}</b-badge>
+                  </small>
+                </template>
+              </span>
 
               <!-- Trait data type selection -->
               <b-input-group class="trait-type-select">

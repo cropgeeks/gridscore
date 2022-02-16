@@ -26,7 +26,7 @@
 
       <button class="close ml-0" @click="close()">×</button>
     </template>
-    <DataPointEntry :isMarked="isMarked" :row="localRow" :col="localCol" :key="`${localRow}-${localCol}`" @submit="onSubmit" ref="dataPointEntry" />
+    <DataPointEntry :isMarked="isMarked" :row="localRow" :col="localCol" :isGuidedWalk="isGuidedWalk" :key="`${localRow}-${localCol}`" @submit="onSubmit" ref="dataPointEntry" />
 
     <template v-if="!isGuidedWalk">
       <b-button @click="guidedWalkVisible = !guidedWalkVisible" class="my-3" id="guided-walk-toggle"><BIconSignpost /> {{ $t('buttonStartGuidedWalkToggle') }}</b-button>
@@ -39,9 +39,9 @@
 
     <template v-slot:modal-footer="{ ok, cancel }">
       <template v-if="isGuidedWalk">
-        <b-button @click="prev" :disabled="walkingOrderIndex <= 0"><BIconChevronLeft /> {{ $t('buttonBack') }}</b-button>
-        <b-button @click="finish" v-if="walkingOrderIndex >= walkingOrder.length - 1">{{ $t('buttonFinish') }} <BIconCheck2All /></b-button>
-        <b-button @click="next" v-else>{{ $t('buttonNext') }} <BIconChevronRight /></b-button>
+        <b-button @click="onPrevPressed" :disabled="walkingOrderIndex <= 0"><BIconChevronLeft /> {{ $t('buttonBack') }}</b-button>
+        <b-button @click="onFinishPressed" v-if="walkingOrderIndex >= walkingOrder.length - 1">{{ $t('buttonFinish') }} <BIconCheck2All /></b-button>
+        <b-button @click="onNextPressed" v-else>{{ $t('buttonNext') }} <BIconChevronRight /></b-button>
       </template>
       <template v-else>
         <b-button variant="secondary" @click="cancel">{{ $t('buttonCancel') }}</b-button>
@@ -123,7 +123,7 @@ export default {
       this.walkingOrder = orderObject.cellSequence({ x: this.localCol, y: this.localRow, direction: orderObject.initialDirection })
       this.walkingOrderIndex = 0
     },
-    prev: function () {
+    onPrevPressed: function () {
       this.$refs.dataPointEntry.verify(valid => {
         if (valid) {
           this.walkingOrderIndex = Math.min(this.walkingOrder.length - 1, this.walkingOrderIndex - 1)
@@ -144,28 +144,31 @@ export default {
         }
       })
     },
-    next: function () {
+    onNextPressed: function () {
       this.$refs.dataPointEntry.verify(valid => {
         if (valid) {
-          this.walkingOrderIndex = Math.max(0, this.walkingOrderIndex + 1)
-          const current = this.walkingOrder[this.walkingOrderIndex]
-
-          if (current.speak) {
-            this.$refs.dataPointEntry.speak(this.$t(current.speak))
-          }
-          if (current.finished) {
-            // TODO
-          } else {
-            this.localCol = current.x
-            this.localRow = current.y
-            this.update()
-          }
+          this.next()
         } else {
           // TODO
         }
       })
     },
-    finish: function () {
+    next: function () {
+      this.walkingOrderIndex = Math.max(0, this.walkingOrderIndex + 1)
+      const current = this.walkingOrder[this.walkingOrderIndex]
+
+      if (current.speak) {
+        this.$refs.dataPointEntry.speak(this.$t(current.speak))
+      }
+      if (current.finished) {
+        // TODO
+      } else {
+        this.localCol = current.x
+        this.localRow = current.y
+        this.update()
+      }
+    },
+    onFinishPressed: function () {
       this.$refs.dataPointEntry.verify(valid => {
         if (valid) {
           this.hide()
@@ -199,7 +202,11 @@ export default {
     onSubmit: function () {
       this.$refs.dataPointEntry.verify(valid => {
         if (valid) {
-          this.hide()
+          if (this.isGuidedWalk) {
+            this.next()
+          } else {
+            this.hide()
+          }
         }
       })
     },

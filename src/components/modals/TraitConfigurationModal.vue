@@ -11,22 +11,22 @@
       <template v-if="trait.type === 'int'">
         <b-form-group :label="$t('formLabelTraitConfigMin')"
                       label-for="min">
-          <b-input type="number" v-model.number="min" :state="formState.min" required/>
+          <b-input type="number" v-model.number="min" :state="formState.min"/>
         </b-form-group>
         <b-form-group :label="$t('formLabelTraitConfigMax')"
                       label-for="max">
-          <b-input type="number" v-model.number="max" :state="formState.max" required/>
+          <b-input type="number" v-model.number="max" :state="formState.max"/>
         </b-form-group>
       </template>
       <!-- If it's a `float`, show two number inputs for min and max -->
       <template v-else-if="trait.type === 'float'">
         <b-form-group :label="$t('formLabelTraitConfigMin')"
                       label-for="min">
-          <b-input type="number" v-model.number="min" :step="0.02" :state="formState.min" required/>
+          <b-input type="number" v-model.number="min" :step="0.02" :state="formState.min"/>
         </b-form-group>
         <b-form-group :label="$t('formLabelTraitConfigMax')"
                       label-for="max">
-          <b-input type="number" v-model.number="max" :step="0.02" :state="formState.max" required/>
+          <b-input type="number" v-model.number="max" :step="0.02" :state="formState.max"/>
         </b-form-group>
       </template>
       <!-- If it's `categorical`, show a text area where categories are defined -->
@@ -75,8 +75,8 @@ export default {
       if (this.trait.type === 'int' || this.trait.type === 'float') {
         // For numeric traits, check min and max fields
         this.formState = {
-          min: this.min !== undefined && this.min !== null && this.min !== '',
-          max: this.max !== undefined && this.max !== null && this.max !== '',
+          min: true,
+          max: true,
           categories: null
         }
       } else if (this.trait.type === 'categorical') {
@@ -96,8 +96,8 @@ export default {
 
       // If the form is valid, emit an event with the restrictions as payload
       this.$emit('config-changed', {
-        min: this.min,
-        max: this.max,
+        min: this.min === '' ? null : this.min,
+        max: this.max === '' ? null : this.max,
         categories: this.categories ? this.categories.split('\n') : null
       })
 

@@ -107,6 +107,10 @@ export default {
     isMarked: {
       type: Boolean,
       default: false
+    },
+    isGuidedWalk: {
+      type: Boolean,
+      default: false
     }
   },
   data: function () {
@@ -429,7 +433,10 @@ export default {
           this.speak(this.visibleTraitMapping[newIndex].trait.name)
         }
       } else {
-        this.$emit('submit')
+        if (this.isGuidedWalk) {
+          // Automatically call submit
+          this.$emit('submit')
+        }
       }
     },
     onValueChanged: function (event, index) {
@@ -475,7 +482,15 @@ export default {
             return t.trait.restrictions.categories.indexOf(this.values[i]) !== -1
           } else if (t.trait.type === 'int' || t.trait.type === 'float') {
             // Check whether the value lies between the required min and max
-            return t.trait.restrictions.min <= this.values[i] && this.values[i] <= t.trait.restrictions.max
+            let valid = true
+            if (t.trait.restrictions.min !== undefined && t.trait.restrictions.min !== null && t.trait.restrictions.min > this.values[i]) {
+              valid = false
+            }
+            if (t.trait.restrictions.max !== undefined && t.trait.restrictions.max !== null && t.trait.restrictions.max < this.values[i]) {
+              valid = false
+            }
+
+            return valid
           }
         } else {
           return true
