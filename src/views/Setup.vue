@@ -414,7 +414,7 @@ export default {
               rows: parseInt(this.rows),
               cols: parseInt(this.cols),
               traits: this.newTraits,
-              varieties: this.varietyFormat === 'row' ? this.varieties.split('\n') : this.varieties.split('\n').map(r => r.split('\t')).reduce((a, b) => a.concat(b), []),
+              varieties: this.varietyFormat === 'row' ? this.varieties.split('\n').map(v => v.trim()) : this.varieties.split('\n').map(r => r.split('\t').map(v => v.trim())).reduce((a, b) => a.concat(b), []),
               cornerPoints: this.$refs.map.getCornerPoints()
             }
 
