@@ -292,5 +292,9 @@
   "widgetImportDataText": "Daten per UUID-Kennzeichen importieren. Entweder UUID in das Eingabefeld einfügen oder QR-Code per Kamera scannen.",
   "widgetImportFlatDataText": "Existierende Daten können in einen Versuch importiert werden. Diese Daten überschreiben Daten die mit GridScore gesammelt wurden.",
   "widgetImportFlatDataErrorWrongDataType": "Einige Datenpunkte sind vom falschen Typ: Markmal: '{trait}'; Sorten: '{varieties}'",
+  "widgetImportFlatDataErrorNoTraits": "Keine Merkmale in Datei gefunden.",
+  "widgetImportFlatDataErrorNoVarieties": "Keine Sortennamen in Datei gefunden.",
+  "widgetImportFlatDataErrorVarietyNotFound": "Ein Sortenname wurde in der Datei referenziert der im GridScore Datensatz nicht existiert. Bitte nur existierende Sortennamen referenzieren.",
+  "widgetImportFlatDataErrorTraitNotFound": "Ein Merkmalsname wurde in der Datei referenziert der im GridScore Datensatz nicht existiert. Bitte nur existierende Merkmalsnamen referenzieren.",
   "widgetTraitSelectorTitle": "Merkmalssichtbarkeit"
 }

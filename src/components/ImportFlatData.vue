@@ -4,7 +4,7 @@
     <b-form @submit.prevent="importData" id="import-data-form">
       <b-form-group :label="$t('formLabelImportFlatData')"
                     label-for="import-data">
-        <b-form-textarea :rows="5" :readonly="false" id="import-data" v-model="flatData" :placeholder="$t('formPlaceholderFlatDataImport')" />
+        <b-form-textarea @keydown.tab.prevent="tabber($event)" :rows="5" :readonly="false" id="import-data" v-model="flatData" :placeholder="$t('formPlaceholderFlatDataImport')" />
         <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="dataFile" />
       </b-form-group>
 
@@ -61,6 +61,16 @@ export default {
     }
   },
   methods: {
+    tabber: function (event) {
+      const text = this.flatData
+      const originalSelectionStart = event.target.selectionStart
+      const textStart = text.slice(0, originalSelectionStart)
+      const textEnd = text.slice(originalSelectionStart)
+
+      this.flatData = `${textStart}\t${textEnd}`
+      event.target.value = this.flatData // required to make the cursor stay in place.
+      event.target.selectionEnd = event.target.selectionStart = originalSelectionStart + 1
+    },
     parseData: function () {
       const data = {
         traits: null,

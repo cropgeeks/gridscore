@@ -293,5 +293,9 @@
   "widgetImportDataText": "Import data using the UUID identifier. Either paste it into the input field or use the button to scan a QR code using the camera.",
   "widgetImportFlatDataText": "You can import existing data into a trial. This data will overwrite any information that has been recorded using GridScore.",
   "widgetImportFlatDataErrorWrongDataType": "Some data points are of the wrong type: Trait: '{trait}'; varieties: '{varieties}'",
+  "widgetImportFlatDataErrorNoTraits": "No trait names have been found in your file.",
+  "widgetImportFlatDataErrorNoVarieties": "No variety names have been found in your file.",
+  "widgetImportFlatDataErrorVarietyNotFound": "A germplasm/variety name referenced in the data file was not found in the GridScore dataset. Please make sure to only reference exising material.",
+  "widgetImportFlatDataErrorTraitNotFound": "A trait name referenced in the data file was not found in the GridScore dataset. Please make sure to only reference existing traits.",
   "widgetTraitSelectorTitle": "Trait visibility"
 }
