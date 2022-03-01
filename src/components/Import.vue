@@ -3,7 +3,7 @@
     <p>{{ $t('widgetImportDataText') }}</p>
     <b-form @submit.prevent="importExport" id="import-export-form">
       <b-input class="mb-3" v-model="uuid" :placeholder="$t('formPlaceholderUuid')" />
-      <b-button @click="onImportClicked">{{ uuid === storeDataset.uuid ? $t('buttonImportLoadDataset') : $t('formLabelImportDataServerUuid') }}</b-button>
+      <b-button @click="onImportClicked">{{ (storeDataset && (uuid === storeDataset.uuid)) ? $t('buttonImportLoadDataset') : $t('formLabelImportDataServerUuid') }}</b-button>
       <template v-if="showCamera">
         <p class="text-muted mt-3">{{ $t('formDescriptionImportDataServerUuid') }}</p>
         <QrcodeStream @decode="onDecode" @init="scrollToCamera" ref="cameraInput" />
