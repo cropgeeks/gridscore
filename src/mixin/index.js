@@ -33,6 +33,20 @@ export default {
     ])
   },
   methods: {
+    getErrorMessage: function (err) {
+      if (err && err.response && err.response.status) {
+        switch (err.response.status) {
+          case 404:
+            return this.$t('axiosErrorConfigNotFound')
+          case 500:
+            return this.$t('axiosErrorGeneric500')
+          default:
+            return err
+        }
+      } else {
+        return this.$t('axiosErrorNoInternet')
+      }
+    },
     getMultiTraitMethods: function (trait) {
       if (trait.type === 'int' || trait.type === 'float') {
         return Object.keys(this.multiTraitMethods).map(k => this.multiTraitMethods[k])

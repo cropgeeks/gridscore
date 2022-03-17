@@ -5,8 +5,8 @@
     <div v-show="serverUuid !== null">
       <p class="text-info mt-3">{{ $t('modalTextExportQR') }}</p>
       <StyledQRCode :text="serverUuid" />
-      <p class="text-danger" v-if="serverError">{{ serverError }}</p>
     </div>
+    <p class="text-danger" v-if="serverError">{{ serverError }}</p>
   </b-form>
 </template>
 
@@ -75,7 +75,9 @@ export default {
             this.serverUuid = null
           }
         })
-        .catch(err => { this.serverError = err })
+        .catch(err => {
+          this.serverError = this.getErrorMessage(err)
+        })
         .finally(() => EventBus.$emit('set-loading', false))
     }
   },

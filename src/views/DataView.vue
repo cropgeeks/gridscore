@@ -349,21 +349,7 @@ export default {
           }
         })
         .catch(err => {
-          if (err && err.response && err.response.status) {
-            switch (err.response.status) {
-              case 404:
-                this.serverError = this.$t('axiosErrorConfigNotFound')
-                break
-              case 500:
-                this.serverError = this.$t('axiosErrorGeneric500')
-                break
-              default:
-                this.serverError = err
-                break
-            }
-          } else {
-            this.serverError = this.$t('axiosErrorNoInternet')
-          }
+          this.serverError = this.getErrorMessage(err)
         })
         .finally(() => EventBus.$emit('set-loading', false))
     },
@@ -372,6 +358,9 @@ export default {
       let dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
 
       this.postConfigForSharing(dataCopy, this.storeDataset.data, this.storeDataset.uuid, this.storeRows, this.storeCols)
+        .catch(err => {
+          this.serverError = this.getErrorMessage(err)
+        })
         .finally(() => EventBus.$emit('set-loading', false))
     }
   },

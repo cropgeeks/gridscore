@@ -80,21 +80,7 @@ export default {
           }
         })
         .catch(err => {
-          if (err && err.response && err.response.status) {
-            switch (err.response.status) {
-              case 404:
-                this.serverError = this.$t('axiosErrorConfigNotFound')
-                break
-              case 500:
-                this.serverError = this.$t('axiosErrorGeneric500')
-                break
-              default:
-                this.serverError = err
-                break
-            }
-          } else {
-            this.serverError = this.$t('axiosErrorNoInternet')
-          }
+          this.serverError = this.getErrorMessage(err)
         })
     },
     reset: function () {
