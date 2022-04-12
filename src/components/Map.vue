@@ -110,7 +110,7 @@ export default {
     },
     /** The grid lines to show on the map */
     gridLines: function () {
-      let lines = []
+      const lines = []
       if (this.reverseProjection) {
         // Add the vertical lines
         for (let x = 1; x < this.cols; x++) {
@@ -154,7 +154,7 @@ export default {
     },
     updateBounds: function () {
       // Calculate bounds around all locations
-      let bounds = L.latLngBounds()
+      const bounds = L.latLngBounds()
       this.locations.filter(l => l !== null).forEach(l => bounds.extend(l))
       // if (this.storeGeolocation) {
       //   bounds.extend(this.storeGeolocation)
@@ -192,7 +192,7 @@ export default {
     })
 
     const baseMaps = {
-      'OpenStreetMap': openstreetmap,
+      OpenStreetMap: openstreetmap,
       'Esri WorldImagery': satellite
     }
 

@@ -93,7 +93,7 @@ export default {
             break
           }
           case 'text':
-          case 'categorical':
+          case 'categorical': {
             chartType = 'bar'
             const map = {}
             const datapoints = []
@@ -122,6 +122,7 @@ export default {
               }
             })
             break
+          }
         }
 
         const layout = {

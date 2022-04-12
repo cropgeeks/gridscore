@@ -125,7 +125,7 @@ export default {
           // close the file and write the contents to disk.
           await writableStream.close()
         } else {
-          let dl = document.createElement('a')
+          const dl = document.createElement('a')
           dl.setAttribute('href', this.imageData)
           dl.setAttribute('download', `${this.getDateTime(this.imageDate)}_${this.name}.${this.imageFile.name.split('.').pop()}`)
           dl.click()

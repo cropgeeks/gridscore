@@ -200,7 +200,7 @@ export default {
     return new Promise(resolve => {
       const tx = db.transaction('data', 'readwrite')
 
-      let allData = []
+      const allData = []
 
       for (let y = 0; y < data.length; y++) {
         for (let x = 0; x < data[y].length; x++) {

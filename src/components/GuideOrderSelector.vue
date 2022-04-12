@@ -50,7 +50,7 @@ export default {
       selectedOrder: null
     }
   },
-  mixins: [ types ],
+  mixins: [types],
   watch: {
     selectedOrder: function (newValue) {
       this.$emit('order-selected', newValue)

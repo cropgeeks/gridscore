@@ -206,22 +206,24 @@ export default {
             hoverongaps: false,
             colorscale: [[0, this.storeDarkMode ? '#444444' : '#dddddd'], [1, this.storeTraitColors[this.trait % this.storeTraitColors.length]]],
             hoverinfo: isCategorical ? 'text' : 'all',
-            colorbar: isCategorical ? {
-              tickmode: 'array',
-              tickvals: actualTrait.restrictions.categories.map((c, i) => i),
-              ticktext: actualTrait.restrictions.categories,
-              title: {
-                side: 'right',
-                font: { color: this.storeDarkMode ? 'white' : 'black' }
-              },
-              tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
-            } : {
-              title: {
-                side: 'right',
-                font: { color: this.storeDarkMode ? 'white' : 'black' }
-              },
-              tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
-            }
+            colorbar: isCategorical
+              ? {
+                tickmode: 'array',
+                tickvals: actualTrait.restrictions.categories.map((c, i) => i),
+                ticktext: actualTrait.restrictions.categories,
+                title: {
+                  side: 'right',
+                  font: { color: this.storeDarkMode ? 'white' : 'black' }
+                },
+                tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
+              }
+              : {
+                title: {
+                  side: 'right',
+                  font: { color: this.storeDarkMode ? 'white' : 'black' }
+                },
+                tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
+              }
           }]
         }
 

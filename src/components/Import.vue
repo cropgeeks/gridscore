@@ -106,7 +106,6 @@ export default {
 
             // If so, ask if user wants to overwrite it
             if (match && match.length > 0) {
-              this.config = this.config
               this.config.id = match[0].id
               this.$refs.yesNoCancelModal.show()
               return

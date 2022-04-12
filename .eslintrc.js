@@ -13,9 +13,10 @@ module.exports = {
     'vue/no-use-v-if-with-v-for': 'off',
     'template-curly-spacing' : 'off',
     'indent': 'off',
-    'no-labels': 'off'
+    'no-labels': 'off',
+    'vue/multi-word-component-names': 0
   },
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: '@babel/eslint-parser'
   },
 }

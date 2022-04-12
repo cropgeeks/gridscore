@@ -239,7 +239,7 @@ export default {
       if (brapiTraits && brapiTraits.length > 0) {
         brapiTraits.forEach(t => {
           let type = 'text'
-          let restrictions = {}
+          const restrictions = {}
 
           // Map the BrAPI data type to the internal data type
           if (t.scale && t.scale.dataType) {
@@ -418,10 +418,10 @@ export default {
               cornerPoints: this.$refs.map.getCornerPoints()
             }
 
-            let data = []
+            const data = []
             let counter = 0
             for (let y = 0; y < dataset.rows; y++) {
-              let rowData = []
+              const rowData = []
               for (let x = 0; x < dataset.cols; x++) {
                 rowData.push({
                   name: dataset.varieties.length > counter ? dataset.varieties[counter++] : null,

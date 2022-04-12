@@ -111,7 +111,7 @@ export default {
      * @returns Promise
      */
     postConfigForSharing: function (dataset, data, serverUuid, rows, cols) {
-      let dataCopy = JSON.parse(JSON.stringify(dataset))
+      const dataCopy = JSON.parse(JSON.stringify(dataset))
       const arrayData = []
       for (let row = 0; row < rows; row++) {
         const rowData = []

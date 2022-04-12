@@ -78,7 +78,7 @@ export default {
       'storeTraits'
     ]),
     selectedLocationData: function () {
-      let result = {}
+      const result = {}
 
       this.storeTraits.forEach((t, i) => {
         if (this.selectedLocation.values[i] !== null) {
@@ -102,7 +102,7 @@ export default {
     },
     // The data recordig locations
     locations: function () {
-      let locs = []
+      const locs = []
 
       if (this.storeData) {
         this.storeData.forEach((c, k) => {
@@ -136,7 +136,7 @@ export default {
     },
     /** The grid lines to show on the map */
     gridLines: function () {
-      let lines = []
+      const lines = []
       if (this.reverseProjection) {
         // The vertical lines
         for (let x = 1; x < this.storeCols; x++) {
@@ -159,7 +159,7 @@ export default {
     },
     /** The bounds of the map */
     bounds: function () {
-      let b = L.latLngBounds()
+      const b = L.latLngBounds()
 
       if (this.locations) {
         this.locations.forEach(l => b.extend(l))
@@ -201,7 +201,7 @@ export default {
       })
 
       const baseMaps = {
-        'OpenStreetMap': openstreetmap,
+        OpenStreetMap: openstreetmap,
         'Esri WorldImagery': satellite
       }
 
@@ -215,15 +215,15 @@ export default {
       if (this.storeData) {
         const map = this.$refs.locationMap.mapObject
 
-        var markers = L.markerClusterGroup({
+        const markers = L.markerClusterGroup({
           disableClusteringAtZoom: 20
         })
 
         this.storeData.forEach((c, k) => {
           if (c.geolocation) {
-            let marker = L.marker(L.latLng(c.geolocation.lat, c.geolocation.lng)).bindPopup('')
+            const marker = L.marker(L.latLng(c.geolocation.lat, c.geolocation.lng)).bindPopup('')
             marker.on('click', e => {
-              let popup = e.target.getPopup()
+              const popup = e.target.getPopup()
               this.selectedLocation = c
               // Set the popup content on click
               this.$nextTick(() => popup.setContent(this.$refs.popupContent))

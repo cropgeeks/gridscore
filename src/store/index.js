@@ -16,7 +16,7 @@ if (!name) {
   name = 'gridscore-' + window.location.pathname
 }
 
-let store
+let store = null
 
 const storeState = {
   state: {
@@ -251,7 +251,7 @@ const storeState = {
     },
     ON_DATA_POINT_TRAIT_DATA_CHANGED_MUTATION: function (state, config) {
       // To save time, write directly to the temporary dataset object
-      let temp = state.dataset.data.get(`${config.row}-${config.col}`)
+      const temp = state.dataset.data.get(`${config.row}-${config.col}`)
       temp.dates[config.traitIndex] = JSON.parse(JSON.stringify(config.dates))
       temp.values[config.traitIndex] = JSON.parse(JSON.stringify(config.values))
       state.dataset.data.set(`${config.row}-${config.col}`, temp)
@@ -262,7 +262,7 @@ const storeState = {
     },
     ON_DATA_POINT_CHANGED_MUTATION: function (state, dataPoint) {
       // To save time, write directly to the temporary dataset object
-      let temp = state.dataset.data.get(`${dataPoint.row}-${dataPoint.col}`)
+      const temp = state.dataset.data.get(`${dataPoint.row}-${dataPoint.col}`)
       const traits = state.dataset.traits
       temp.dates = dataPoint.dates.map((dp, i) => {
         if (traits[i].mType === 'multi') {
@@ -332,7 +332,7 @@ const storeState = {
     },
     ON_GEOLOCATION_CHANGED_MUTATION: function (state, newGeolocation) {
       if (state.geolocation && newGeolocation) {
-        let newObject = {
+        const newObject = {
           lat: newGeolocation.lat,
           lng: newGeolocation.lng,
           elv: newGeolocation.elv
@@ -531,7 +531,7 @@ const storeState = {
               // Fix the old object based format to a 2d array format
               if (!Array.isArray(d.data[0])) {
                 d.data = d.data.map(r => {
-                  let rowData = []
+                  const rowData = []
 
                   for (let col = 0; col < d.cols; col++) {
                     rowData.push(r[col + 1])

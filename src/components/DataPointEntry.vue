@@ -256,7 +256,7 @@ export default {
           this.speechRecognition.onresult = event => {
             let result = ''
 
-            for (var i = event.resultIndex; i < event.results.length; ++i) {
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
               result += event.results[i][0].transcript
             }
             this.comment = result
@@ -365,7 +365,7 @@ export default {
       Vue.set(this.values, index, this.getTodayString())
     },
     getToday: function () {
-      let today = new Date()
+      const today = new Date()
       const offset = today.getTimezoneOffset()
       return new Date(today.getTime() + (offset * 60 * 1000))
     },
@@ -492,9 +492,9 @@ export default {
 
             return valid
           }
-        } else {
-          return true
         }
+
+        return true
       })
 
       // If the form is invalid, return

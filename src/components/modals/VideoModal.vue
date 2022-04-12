@@ -101,7 +101,7 @@ export default {
           // close the file and write the contents to disk.
           await writableStream.close()
         } else {
-          let dl = document.createElement('a')
+          const dl = document.createElement('a')
           dl.setAttribute('href', this.videoData)
           dl.setAttribute('download', `${this.getDateTime(this.videoDate)}_${this.name}.${this.videoFile.name.split('.').pop()}`)
           dl.click()

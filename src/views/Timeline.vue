@@ -53,8 +53,8 @@ export default {
       const plots = this.storeRows * this.storeCols
 
       // The mapping is used to figure out for each trait how many fields were scored at each timepoint
-      let mapping = []
-      let traces = []
+      const mapping = []
+      const traces = []
       // For each trait, add an empty object to the fields
       this.storeTraits.forEach(() => {
         mapping.push({})

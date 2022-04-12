@@ -89,9 +89,8 @@ export default {
             // Check whether the value lies between the required min and max
             return this.trait.restrictions.min <= v && v <= this.trait.restrictions.max
           }
-        } else {
-          return true
         }
+        return true
       })
 
       // If the form is invalid, return

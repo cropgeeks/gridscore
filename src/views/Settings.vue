@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <h1><b-button :to="{ name: 'data' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleSettings') }}</h1>
+    <h1><b-button @click="onSubmit(true)"><BIconArrowLeft /></b-button> {{ $t('modalTitleSettings') }}</h1>
     <hr />
     <b-form @submit.prevent="onSubmit" class="settings-form">
       <b-row>
@@ -77,7 +77,7 @@
       </b-collapse>
     </b-form>
 
-    <b-button @click="onSubmit" variant="primary" class="mt-3">{{ $t('buttonSave') }}</b-button>
+    <b-button @click="onSubmit(false)" variant="primary" class="mt-3">{{ $t('buttonSave') }}</b-button>
   </b-container>
 </template>
 
@@ -164,7 +164,30 @@ export default {
             }
           })
     },
-    onSubmit: function () {
+    onSubmit: function (askConfirmation) {
+      if (askConfirmation) {
+        // Ask for confirmation, because this will overwrite the old settings
+        this.$bvModal.msgBoxConfirm(this.$t('modalTextSaveSettings'), {
+          title: this.$t('modalTitleSaveSettings'),
+          okTitle: this.$t('buttonSave'),
+          cancelTitle: this.$t('buttonCancel')
+        }).then(value => {
+          if (value) {
+            this.save()
+          } else {
+            // If not, just return to the previous page
+            if (this.storeDatasetId) {
+              this.$router.push({ name: 'data' })
+            } else {
+              this.$router.push({ name: 'home' })
+            }
+          }
+        })
+      } else {
+        this.save()
+      }
+    },
+    save: function () {
       // Dispatch to the store
       if (this.tempUseGps !== this.storeUseGps) {
         this.$store.dispatch('setUseGps', this.tempUseGps)

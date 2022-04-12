@@ -180,6 +180,8 @@ export default {
             // If it's not a valid category, remember this variety
             return !oldTrait.restrictions.categories.includes(value)
           }
+
+          return false
         })
 
         if (wrongType.length > 0) {
@@ -245,7 +247,7 @@ export default {
       return d.getMonth() === parts[1] && d.getDate() === parts[2] && d.getFullYear() === parts[0]
     },
     getToday: function () {
-      let today = new Date()
+      const today = new Date()
       const offset = today.getTimezoneOffset()
       return new Date(today.getTime() + (offset * 60 * 1000))
     },

@@ -62,7 +62,7 @@ export default {
           return 0
         }).map(t => {
           // Then map to HTML showing the name, type as well as the restrictions.
-          let name = t.observationVariableName
+          const name = t.observationVariableName
           let type = ''
           let restrictions = ''
 
@@ -118,7 +118,7 @@ export default {
   components: {
     BrapiModal
   },
-  mixins: [ brapi ],
+  mixins: [brapi],
   methods: {
     /**
      * Shows the modal and resets it to its default values

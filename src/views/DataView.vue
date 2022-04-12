@@ -201,7 +201,7 @@ export default {
           { x: 0, y: 100 }
         ]
         const perspT = fixPer(from, to)
-        let result = perspT(this.storeGeolocation.lat, this.storeGeolocation.lng)
+        const result = perspT(this.storeGeolocation.lat, this.storeGeolocation.lng)
         result.heading = this.storeGeolocation.heading
         return result
       } else {
@@ -224,7 +224,7 @@ export default {
         return
       }
       this.storeData.forEach((c, k) => {
-        const [ rowIndex, columnIndex ] = k.split('-').map(i => +i)
+        const [rowIndex, columnIndex] = k.split('-').map(i => +i)
 
         if (c.name !== undefined && c.name !== null && c.name.toLowerCase() === this.searchTermLowerCase) {
           const cell = document.querySelector(`#grid-table table tr:nth-child(${rowIndex}) td:nth-child(${columnIndex + 1})`)
@@ -297,7 +297,7 @@ export default {
         })
 
         this.storeData.forEach((c, k) => {
-          const [ rowIndex, colIndex ] = k.split('-').map(i => +i)
+          const [rowIndex, colIndex] = k.split('-').map(i => +i)
 
           this.storeTraits.forEach((t, tIndex) => {
             tempStats[t.name].total++
@@ -355,7 +355,7 @@ export default {
     },
     sendData: function () {
       EventBus.$emit('set-loading', true)
-      let dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
+      const dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
 
       this.postConfigForSharing(dataCopy, this.storeDataset.data, this.storeDataset.uuid, this.storeRows, this.storeCols)
         .catch(err => {

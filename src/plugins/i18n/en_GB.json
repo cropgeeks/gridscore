@@ -179,6 +179,8 @@
   "modalTitleGuidedWalkExit": "Exit",
   "modalTitleSaveToServerWarning": "Save to server",
   "modalTextSaveToServerWarning": "Looks like you are working on a shared trial. Are you sure you want to save it to the server?",
+  "modalTitleSaveSettings": "Save settings",
+  "modalTextSaveSettings": "Are you sure you want to save these settings?",
   "modalTextGuidedWalkExit": "Stop guided walk and exit data entry mode?",
   "pageAboutGitHubLink": "The source code of GridScore is available on <a href='https://github.com/cropgeeks/gridscore/'>GitHub</a>.",
   "pageAboutParagraphOne": "GridScore is a field trial phenotyping app for trait data. It lets you keep track of what's happening in the field on a plot-level basis. This could be anything from plant emergence, flowering date, plant height, flower colour, etc.",

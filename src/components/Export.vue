@@ -63,7 +63,7 @@ export default {
     },
     sendData: function () {
       EventBus.$emit('set-loading', true)
-      let dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
+      const dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
 
       this.postConfigForSharing(dataCopy, this.storeDataset.data, this.serverUuid, this.storeRows, this.storeCols)
         .then(result => {

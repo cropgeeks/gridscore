@@ -100,7 +100,7 @@ export default {
     DataPointEntry,
     GuideOrderSelector
   },
-  mixins: [ types ],
+  mixins: [types],
   methods: {
     startTour: function () {
       EventBus.$emit('show-data-entry-tour')
