@@ -21,7 +21,13 @@ const loadedLanguages = ['en_GB']
 
 function setI18nLanguage (lang) {
   i18n.locale = lang
-  document.querySelector('html').setAttribute('lang', lang)
+
+  let htmlTag = lang
+  const underscoreIndex = lang.indexOf('_')
+  if (underscoreIndex !== -1) {
+    htmlTag = lang.substring(0, underscoreIndex)
+  }
+  document.querySelector('html').setAttribute('lang', htmlTag)
   return lang
 }
 
