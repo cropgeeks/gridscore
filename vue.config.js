@@ -19,7 +19,9 @@ module.exports = {
       fallback: {
         'path': require.resolve('path-browserify')
       }
-    }
+    },
+    devtool: 'source-map',
+    target: 'web'
   }
   // configureWebpack: {
   //   plugins: [
