@@ -135,9 +135,15 @@ export default {
           if (current.finished) {
             // TODO
           } else {
-            this.localCol = current.x
-            this.localRow = current.y
-            this.update()
+            const cell = this.$store.getters.storeData.get(`${current.y}-${current.x}`)
+
+            if (cell.name) {
+              this.localCol = current.x
+              this.localRow = current.y
+              this.update()
+            } else {
+              this.onPrevPressed()
+            }
           }
         } else {
           // TODO
@@ -163,9 +169,15 @@ export default {
       if (current.finished) {
         // TODO
       } else {
-        this.localCol = current.x
-        this.localRow = current.y
-        this.update()
+        const cell = this.$store.getters.storeData.get(`${current.y}-${current.x}`)
+
+        if (cell.name) {
+          this.localCol = current.x
+          this.localRow = current.y
+          this.update()
+        } else {
+          this.next()
+        }
       }
     },
     onFinishPressed: function () {

@@ -7,7 +7,10 @@
     <b-progress :value="100" height="5px" variant="info" animated v-if="!text" />
     <b-tabs content-class="mt-3" v-else>
       <!-- Tab for the data -->
-      <b-tab :title="$t('tabTitleExportData')" active>
+      <b-tab active>
+        <template #title>
+          <BIconFileEarmarkSpreadsheet /> {{ $t('tabTitleExportData') }}
+        </template>
         <p>{{ $t('modalTextExportData') }}</p>
         <b-form @submit.prevent>
           <b-form-group :label="$t('formLabelExportText')"
@@ -36,7 +39,10 @@
         </div>
       </b-tab>
       <!-- Tab for the trait definitions -->
-      <b-tab :title="$t('tabTitleExportTraits')">
+      <b-tab>
+        <template #title>
+          <BIconTags /> {{ $t('tabTitleExportTraits') }}
+        </template>
         <p v-html="$t('modalTextExportTraits')" />
         <b-form @submit.prevent>
           <b-form-group :label="$t('formLabelExportTraits')"
@@ -50,7 +56,10 @@
           <BIconDownload /> <a :href="getHrefTraits" :download="getFilenameTraits"> {{ $t('linkExport') }}</a>
         </div>
       </b-tab>
-      <b-tab :title="$t('tabTitleExportFieldPlan')">
+      <b-tab>
+        <template #title>
+          <BIconGrid3x3 /> {{ $t('tabTitleExportFieldPlan') }}
+        </template>
         <p v-html="$t('modalTextExportFieldPlan')" />
 
         <b-form @submit.prevent>
@@ -68,32 +77,55 @@
           <BIconDownload /> <a :href="getHrefFieldPlant" :download="getFilenameFieldPlan"> {{ $t('linkExport') }}</a>
         </div>
       </b-tab>
+      <b-tab>
+        <template #title>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+            <path :fill="storeDarkMode ? 'white' : 'black'" d="M 11.999836,0 C 5.384778,0 -3.9999998e-7,5.38515 0,12.00026 -3.9999998e-7,18.61531 5.384778,24.00011 11.999836,24.00011 18.614894,24.00011 24,18.61531 24,12.00026 24,5.38515 18.614894,0 11.999836,0 Z m 0,2.09227 c 5.484271,0 9.907984,4.42367 9.907984,9.90799 0,5.48425 -4.423713,9.90754 -9.907984,9.90754 -5.4842703,0 -9.9076558,-4.42329 -9.9076558,-9.90754 0,-5.48432 4.4233855,-9.90799 9.9076558,-9.90799 z M 9.5003025,5.50579 c -2.4997191,0 -2.4997043,0 -3.7494633,2.16472 L 4.500991,9.83539 c -1.2498943,2.16476 -1.2498943,2.16487 0,4.32945 l 1.2498482,2.16476 c 1.261759,2.16476 1.2617442,2.16476 3.7494633,2.16476 2.4996545,0 2.4997185,0 3.7495455,-2.16476 h -8.1e-5 c 1.249812,-2.16476 1.249787,-2.16469 0,-4.32934 v -1.1e-4 H 10.750152 8.2505363 l 1.2497662,2.16469 H 12 L 10.750152,16.3296 H 8.2505363 L 7.0006881,14.16484 5.7508392,12.00015 7.0006881,9.83539 8.2505363,7.67051 h 2.4996157 2.499696 L 12,5.50579 Z m 4.9993125,0 1.249849,2.16472 1.249848,2.16488 h -2.499697 l -1.249767,2.16476 h 2.499616 l 1.249848,2.16469 -1.249848,2.16476 -1.249849,2.16476 h 2.499697 l 1.249849,-2.16476 1.249766,-2.16476 c 1.249826,-2.16476 1.249826,-2.16469 0,-4.32945 L 18.249161,7.67051 16.999312,5.50579 Z"/>
+          </svg> &nbsp; Germinate
+        </template>
+        <p v-html="$t('modalTextExportGerminate')" />
+
+        <b-button @click="exportToGerminateFormat">{{ $t('buttonExportGerminateFormat') }}</b-button>
+
+        <div v-if="germinateTemplateFile" class="my-3">
+          <BIconDownload /> <a :href="germinateTemplateFile" @click="() => { germinateTemplateFile = null }"> {{ $t('linkExport') }}</a>
+        </div>
+      </b-tab>
     </b-tabs>
   </b-container>
 </template>
 
 <script>
-import { BIconDownload, BIconArrowLeft } from 'bootstrap-vue'
+import { BIconDownload, BIconArrowLeft, BIconTags, BIconFileEarmarkSpreadsheet, BIconGrid3x3 } from 'bootstrap-vue'
 
 import { mapGetters } from 'vuex'
+
+import { EventBus } from '@/plugins/event-bus'
 
 export default {
   components: {
     BIconDownload,
-    BIconArrowLeft
+    BIconArrowLeft,
+    BIconTags,
+    BIconFileEarmarkSpreadsheet,
+    BIconGrid3x3
   },
   data: function () {
     return {
-      selectedTrait: null
+      selectedTrait: null,
+      germinateTemplateFile: null
     }
   },
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
       'storeCols',
+      'storeDarkMode',
       'storeData',
+      'storeDatasetUuid',
       'storeDatasetName',
       'storeRows',
+      'storeServerUrl',
       'storeTraits'
     ]),
     traitOptions: function () {
@@ -318,6 +350,34 @@ export default {
       }
 
       return result
+    }
+  },
+  methods: {
+    exportToGerminateFormat: function () {
+      if (this.storeData) {
+        EventBus.$emit('set-loading', true)
+
+        const dataCopy = JSON.parse(JSON.stringify(this.$store.getters.storeDataset))
+
+          this.postConfigForSharing(dataCopy, this.storeData, this.storeDatasetUuid, this.storeRows, this.storeCols)
+            .then(result => {
+              if (result && result.data) {
+                this.$store.commit('ON_DATASET_UUID_CHANGED_MUTATION', result.data)
+              }
+            })
+            .then(() => this.axios(`config/${this.storeDatasetUuid}/export-g8`, null, 'get'))
+            .then(result => {
+              if (result && result.data) {
+                this.germinateTemplateFile = `${this.storeServerUrl}config/${this.storeDatasetUuid}/export-g8/${result.data}`
+              } else {
+                this.germinateTemplateFile = null
+              }
+            })
+            .catch(() => {
+              // TODO
+            })
+            .finally(() => EventBus.$emit('set-loading', false))
+      }
     }
   }
 }

@@ -8,7 +8,7 @@ export default {
       if (db) {
         return resolve(db)
       } else {
-        openDB('gridscore-' + window.location.pathname, 3, {
+        openDB('gridscore-' + window.location.pathname, 4, {
           upgrade: function (db, oldVersion, newVersion, transaction) {
             let datasets
             if (oldVersion < 1) {
@@ -39,6 +39,11 @@ export default {
               // Add a uuid column to the datasets
               datasets = transaction.objectStore('datasets')
               datasets.createIndex('uuid', 'uuid', { unique: false })
+            }
+            if (oldVersion < 4) {
+              // Add a markers column to the datasets
+              datasets = transaction.objectStore('datasets')
+              datasets.createIndex('markers', 'markers', { unique: false })
             }
           }
         }).then(db => resolve(db))
@@ -152,6 +157,7 @@ export default {
       cornerPoints: dataset.cornerPoints,
       brapiConfig: dataset.brapiConfig,
       uuid: dataset.uuid,
+      markers: dataset.markers,
       lastUpdatedOn: new Date().toISOString()
     })
   },

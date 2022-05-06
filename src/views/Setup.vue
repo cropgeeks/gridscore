@@ -109,9 +109,13 @@
         </b-col>
       </b-row>
       <!-- Map used for defining the field's corner points -->
-      <b-button v-b-toggle.collapse-1 id="map-toggle-button"><BIconBoundingBox /> {{ $t('buttonShowFieldMap') }}</b-button>
-      <b-collapse id="collapse-1" class="mt-2" v-model="mapVisible" @shown="invalidateMap">
+      <b-button v-b-toggle.collapse-fieldmap id="map-toggle-button"><BIconBoundingBox /> {{ $t('buttonShowFieldMap') }}</b-button>
+      <b-button class="mx-2" v-b-toggle.collapse-markers id="marker-toggle-button"><BIconSignpost2 /> {{ $t('buttonShowMarkerSetup') }}</b-button>
+      <b-collapse accordion="option-accordion" id="collapse-fieldmap" class="mt-2" v-model="mapVisible" @shown="invalidateMap">
         <FieldMap :rows="rows" :cols="cols" :useCurrentDataset="false" ref="map" />
+      </b-collapse>
+      <b-collapse accordion="option-accordion" id="collapse-markers" class="mt-2" @shown="$refs.markerSetup.reset()">
+        <MarkerSetup :rows="rows" :cols="cols" ref="markerSetup" />
       </b-collapse>
     </b-form>
 
@@ -129,9 +133,10 @@ import FieldMap from '@/components/FieldMap'
 import BrapiTraitImportModal from '@/components/modals/BrapiTraitImportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
 import IconBrapi from '@/components/IconBrapi'
+import MarkerSetup from '@/components/MarkerSetup'
 
 import { mapGetters } from 'vuex'
-import { BIconGear, BIconArrowLeft, BIconPlus, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconGrid3x3, BIconJournalPlus, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
+import { BIconGear, BIconArrowLeft, BIconPlus, BIconSignpost2, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconGrid3x3, BIconJournalPlus, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
 
 /**
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
@@ -142,6 +147,7 @@ export default {
       datasetName: null,
       rows: 1,
       cols: 1,
+      markers: null,
       newTraits: null,
       trait: null,
       traitToConfigure: null,
@@ -208,6 +214,7 @@ export default {
     BIconArrowLeft,
     BIconX,
     BIconLayoutThreeColumns,
+    BIconSignpost2,
     BIconTextLeft,
     BIconGrid3x3,
     BIconBoundingBox,
@@ -218,7 +225,8 @@ export default {
     IconBrapi,
     FieldMap,
     BrapiTraitImportModal,
-    TraitConfigurationModal
+    TraitConfigurationModal,
+    MarkerSetup
   },
   methods: {
     tabber: function (event) {
@@ -367,6 +375,7 @@ export default {
       this.datasetName = null
       this.rows = 1
       this.cols = 1
+      this.markers = null
       this.newTraits = []
       this.varieties = null
       this.formValidated = false
@@ -415,7 +424,8 @@ export default {
               cols: parseInt(this.cols),
               traits: this.newTraits,
               varieties: this.varietyFormat === 'row' ? this.varieties.split('\n').map(v => v.trim()) : this.varieties.split('\n').map(r => r.split('\t').map(v => v.trim())).reduce((a, b) => a.concat(b), []),
-              cornerPoints: this.$refs.map.getCornerPoints()
+              cornerPoints: this.$refs.map.getCornerPoints(),
+              markers: this.$refs.markerSetup ? this.$refs.markerSetup.getMarkerConfig() : null
             }
 
             const data = []

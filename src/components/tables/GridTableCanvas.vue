@@ -127,10 +127,12 @@ export default {
       'storeDarkMode',
       'storeDatasetId',
       'storeHideToggledTraits',
+      'storeHideMarkers',
       'storeIgnoreEmptyCells',
       'storeInvertNumberingX',
       'storeInvertNumberingY',
       'storeInvertView',
+      'storeMarkers',
       'storeRows',
       'storeTraits',
       'storeTraitColors',
@@ -167,6 +169,47 @@ export default {
         return this.origin.y + dataHeight - dataHeight * this.highlightPosition.y / 100.0
       } else {
         return null
+      }
+    },
+    markerPositions: function () {
+      if (!this.storeHideMarkers && this.storeMarkers && this.storeMarkers.corner && this.storeMarkers.everyRow && this.storeMarkers.everyCol) {
+        const markV = this.cellHeight * this.storeMarkers.everyRow
+        const markH = this.cellWidth * this.storeMarkers.everyCol
+
+        const coords = []
+
+        const width = this.storeCols * this.cellWidth
+        const height = this.storeRows * this.cellHeight
+        let x = 0
+        let y = 0
+        while (x <= width) {
+          while (y <= height) {
+            let finalX = x
+            let finalY = y
+
+            switch (this.storeMarkers.corner) {
+              case 'topright':
+                finalX = width - x
+                break
+              case 'bottomleft':
+                finalY = height - y
+                break
+              case 'bottomright':
+                finalX = width - x
+                finalY = height - y
+                break
+            }
+
+            coords.push([finalX, finalY])
+            y += markV
+          }
+          x += markH
+          y = 0
+        }
+
+        return coords
+      } else {
+        return []
       }
     },
     columnHeaderHeight: function () {
@@ -263,6 +306,8 @@ export default {
       for (let row = minRow; row < maxRow; row++) {
         this.updateCell(row, col)
       }
+
+      this.updateMarkers()
     },
     onRowMarked: function (row) {
       this.markedRows[row] = !this.markedRows[row]
@@ -273,6 +318,8 @@ export default {
       for (let col = minCol; col < maxCol; col++) {
         this.updateCell(row, col)
       }
+
+      this.updateMarkers()
     },
     init: function () {
       if (this.isInitting) {
@@ -469,16 +516,20 @@ export default {
         return
       }
 
+      // Calculate row and column bounds that need to be redrawn
       const minRow = Math.max(0, Math.floor(Math.abs(this.origin.y) / this.cellHeight))
       const maxRow = Math.min(minRow + Math.ceil(this.canvasHeight / this.cellHeight) + 1, this.storeRows)
       const minCol = Math.max(0, Math.floor(Math.abs(this.origin.x) / this.cellWidth))
       const maxCol = Math.min(minCol + Math.ceil(this.canvasWidth / this.cellWidth) + 1, this.storeCols)
 
+      // Draw all cells
       for (let row = minRow; row < maxRow; row++) {
         for (let col = minCol; col < maxCol; col++) {
           this.updateCell(row, col, this.data.get(`${row}-${col}`))
         }
       }
+
+      this.updateMarkers()
 
       if (this.$refs.colHead) {
         this.$refs.colHead.reset()
@@ -492,6 +543,27 @@ export default {
       }
 
       this.isDrawing = false
+    },
+    updateMarkers: function () {
+      // Draw markers
+      if (this.markerPositions && this.markerPositions.length > 0) {
+        this.ctx.fillStyle = '#8e8c84'
+
+        this.markerPositions.forEach(m => {
+          const x = m[0] - Math.abs(this.origin.x)
+          const y = m[1] - Math.abs(this.origin.y)
+          const diameter = 6
+          if (x >= 0 && x <= this.canvasWidth && y >= 0 && y <= this.canvasHeight) {
+            this.ctx.beginPath()
+            // Draw the arc (circle)
+            this.ctx.arc(
+              Math.min(this.canvasWidth - diameter, Math.max(diameter, x)),
+              Math.min(this.canvasHeight - diameter, Math.max(diameter, y)),
+              diameter, 0, 2 * Math.PI)
+            this.ctx.fill()
+          }
+        })
+      }
     },
     updateUserPosition: function () {
       this.ctx.fillStyle = this.fillStyleUserPosition
@@ -538,10 +610,12 @@ export default {
       this.ctx.closePath()
       this.ctx.fill()
     },
-    updataDataPoint: function (row, col) {
+    updateDataPoint: function (row, col) {
       this.data.set(`${row}-${col}`, this.$store.getters.storeData.get(`${row}-${col}`))
 
       this.updateCell(row, col, this.data.get(`${row}-${col}`))
+
+      this.updateMarkers()
     },
     updateCell: function (row, col, data) {
       const cell = data || this.$store.getters.storeData.get(`${row}-${col}`)
@@ -732,10 +806,10 @@ export default {
 
     window.addEventListener('resize', this.handleResize)
     EventBus.$on('dataset-changed', this.onDatasetChanged)
-    EventBus.$on('data-point-changed', this.updataDataPoint)
+    EventBus.$on('data-point-changed', this.updateDataPoint)
   },
   beforeDestroy: function () {
-    EventBus.$off('data-point-changed', this.updataDataPoint)
+    EventBus.$off('data-point-changed', this.updateDataPoint)
     EventBus.$off('dataset-changed', this.onDatasetChanged)
 
     window.removeEventListener('resize', this.handleResize)

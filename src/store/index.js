@@ -46,6 +46,7 @@ const storeState = {
     invertNumberingX: false,
     invertNumberingY: false,
     hideToggledTraits: false,
+    hideMarkers: false,
     showStatsInTable: false,
     visibleTraits: null,
     ignoreEmptyCells: true,
@@ -66,10 +67,12 @@ const storeState = {
     storeDataset: (state) => state.dataset ? state.dataset : null,
     storeDatasetId: (state) => state.datasetId,
     storeDatasetName: (state) => state.dataset ? state.dataset.name : null,
+    storeDatasetUuid: (state) => state.dataset ? state.dataset.uuid : null,
     storeCols: (state) => state.dataset ? state.dataset.cols : null,
     storeCornerPoints: (state) => state.dataset ? state.dataset.cornerPoints : null,
     storeRows: (state) => state.dataset ? state.dataset.rows : null,
     storeTraits: (state) => state.dataset ? state.dataset.traits : null,
+    storeMarkers: (state) => state.dataset ? state.dataset.markers : null,
     storeUseGps: (state) => state.useGps,
     storeUseSpeech: (state) => state.useSpeech,
     storeContinuousInput: (state) => state.continuousInput,
@@ -83,6 +86,7 @@ const storeState = {
     storeInvertNumberingY: (state) => state.invertNumberingY,
     storeShowStatsInTable: (state) => state.showStatsInTable,
     storeHideToggledTraits: (state) => state.hideToggledTraits,
+    storeHideMarkers: (state) => state.hideMarkers,
     storeTraitColors: (state) => state.traitColors,
     storeVisibleTraits: (state) => state.visibleTraits,
     storePlausible: (state) => state.plausible
@@ -330,6 +334,9 @@ const storeState = {
     ON_HIDE_TOGGLED_TRAITS_CHANGED_MUTATION: function (state, newHideToggledTraits) {
       state.hideToggledTraits = newHideToggledTraits
     },
+    ON_HIDE_MARKERS_CHANGED_MUTATION: function (state, newHideMarkers) {
+      state.hideMarkers = newHideMarkers
+    },
     ON_GEOLOCATION_CHANGED_MUTATION: function (state, newGeolocation) {
       if (state.geolocation && newGeolocation) {
         const newObject = {
@@ -478,6 +485,9 @@ const storeState = {
     },
     setHideToggledTraits: function ({ commit }, hideToggledTraits) {
       commit('ON_HIDE_TOGGLED_TRAITS_CHANGED_MUTATION', hideToggledTraits)
+    },
+    setHideMarkers: function ({ commit }, hideMarkers) {
+      commit('ON_HIDE_MARKERS_CHANGED_MUTATION', hideMarkers)
     },
     setTraitColors: function ({ commit }, traitColors) {
       commit('ON_TRAIT_COLORS_CHANGED_MUTATION', traitColors)

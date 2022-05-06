@@ -44,6 +44,9 @@
           <b-form-group :label="$t('formLabelSettingsIgnoreEmptyCells')" label-for="ignode-empty-cells" :description="$t('formDescriptionSettingsIgnoreEmptyCells')">
             <b-form-checkbox v-model="tempIgnoreEmptyCells" switch id="ignode-empty-cells">{{ $t('buttonToggleIgnoreEmptyCells') }}</b-form-checkbox>
           </b-form-group>
+          <b-form-group :label="$t('formLabelSettingsHideMarkers')" label-for="hide-markers" :description="$t('formDescriptionSettingsHideMarkers')">
+            <b-form-checkbox v-model="tempHideMarkers" switch id="hide-markers">{{ $t('buttonToggleHideMarkers') }}</b-form-checkbox>
+          </b-form-group>
           <b-form-group :label="$t('formLabelSettingsShowStatsInTable')" label-for="stats-in-table" :description="$t('formDescriptionSettingsShowStatsInTable')">
             <b-form-checkbox v-model="tempShowStatsInTable" switch id="stats-in-table">{{ $t('buttonToggleShowStatsInTable') }}</b-form-checkbox>
           </b-form-group>
@@ -108,6 +111,7 @@ export default {
       tempInvertNumberingY: false,
       tempShowStatsInTable: false,
       tempHideToggledTraits: false,
+      tempHideMarkers: false,
       tempGridLinesEvery: 5,
       tempColumnWidth: null,
       tempColors: [],
@@ -123,6 +127,7 @@ export default {
       'storeDatasetId',
       'storeGridLinesEvery',
       'storeHideToggledTraits',
+      'storeHideMarkers',
       'storeIgnoreEmptyCells',
       'storeInvertView',
       'storeInvertNumberingX',
@@ -148,6 +153,7 @@ export default {
       this.tempInvertNumberingY = this.storeInvertNumberingY
       this.tempShowStatsInTable = this.storeShowStatsInTable
       this.tempHideToggledTraits = this.storeHideToggledTraits
+      this.tempHideMarkers = this.storeHideMarkers
       this.tempIgnoreEmptyCells = this.storeIgnoreEmptyCells
       this.tempColors = JSON.parse(JSON.stringify(this.storeTraitColors))
     },
@@ -215,6 +221,9 @@ export default {
       }
       if (this.tempHideToggledTraits !== this.storeHideToggledTraits) {
         this.$store.dispatch('setHideToggledTraits', this.tempHideToggledTraits)
+      }
+      if (this.tempHideMarkers !== this.storeHideMarkers) {
+        this.$store.dispatch('setHideMarkers', this.tempHideMarkers)
       }
       if (this.tempColumnWidth !== this.storeColumnWidth) {
         this.$store.dispatch('setColumnWidth', this.tempColumnWidth)
