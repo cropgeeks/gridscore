@@ -1,6 +1,6 @@
 {
   "name": "gridscore",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -10,9 +10,9 @@
   "dependencies": {
     "@solgenomics/brapijs": "^1.0.1",
     "axios": "^0.21.4",
-    "bootstrap": "~4.5.3",
+    "bootstrap": "^4.6.1",
     "bootstrap-vue": "^2.22.0",
-    "bootswatch": "~4.5.0",
+    "bootswatch": "^4.6.1",
     "core-js": "^3.6.5",
     "es6-polyfill": "~1.1.0",
     "es6-promise": "^4.2.8",
@@ -50,8 +50,7 @@
     "path-browserify": "^1.0.1",
     "sass": "^1.32.13",
     "sass-loader": "~8.0.2",
-    "vue-template-compiler": "~2.6.11",
-    "webpack-bundle-analyzer": "^3.8.0"
+    "vue-template-compiler": "~2.6.11"
   },
   "browserslist": [
     "> 1%",

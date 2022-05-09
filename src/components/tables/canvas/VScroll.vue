@@ -33,7 +33,9 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeRows'
+      'storeRows',
+      'storeDatasetId',
+      'storeDarkMode'
     ])
   },
   watch: {
@@ -51,6 +53,9 @@ export default {
     },
     storeDatasetId: function () {
       this.reset()
+    },
+    storeDarkMode: function () {
+      this.draw()
     }
   },
   methods: {
@@ -68,10 +73,10 @@ export default {
       const y = Math.round(Math.abs(-this.y / (this.storeRows * this.cellHeight) * this.height))
 
       // Background color
-      this.ctx.fillStyle = '#f2f2f2'
+      this.ctx.fillStyle = this.storeDarkMode ? '#8e8c84' : '#f2f2f2'
       this.ctx.fillRect(0, 0, this.width, this.height)
       // Draw the handle
-      this.ctx.fillStyle = '#8e8c84'
+      this.ctx.fillStyle = this.storeDarkMode ? '#f2f2f2' : '#8e8c84'
       this.ctx.fillRect(0, y, this.width, h)
     },
     reset: function () {

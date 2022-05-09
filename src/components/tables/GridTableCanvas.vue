@@ -281,7 +281,7 @@ export default {
       return this.storeDarkMode ? '#1e1032' : '#e1efcd'
     },
     fillStyleMarked: function () {
-      return this.storeDarkMode ? '#392d21' : '#c6d2de'
+      return this.storeDarkMode ? '#415971' : '#c6d2de'
     },
     fillStyleUserPosition: function () {
       return this.storeDarkMode ? '#71737b' : '#8e8c84'

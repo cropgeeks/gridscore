@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar toggleable="lg" type="dark" variant="primary" id="main-navigation">
+    <b-navbar toggleable="lg" type="dark" variant="dark" id="main-navigation">
       <button v-b-toggle.sidebar variant="outline-light" id="dataset-selector" class="mr-3 navbar-toggler collapsed"><span class="navbar-toggler-icon" /></button>
       <b-navbar-brand :to="{ name: 'home' }" class="d-flex align-items-center">
         <img src="img/gridscore2.svg" height="40px" class="d-inline-block align-top mr-3" alt="GridScore">
@@ -41,7 +41,7 @@
       </b-collapse>
     </b-navbar>
 
-    <b-sidebar id="sidebar" title="GridScore" shadow backdrop v-model="sidebarShown" :bg-variant="storeDarkMode ? 'primary' : 'light'" @shown="notifyCaller" @hidden="notifyCaller">
+    <b-sidebar id="sidebar" title="GridScore" shadow backdrop v-model="sidebarShown" :bg-variant="storeDarkMode ? 'dark' : 'light'" @shown="notifyCaller" @hidden="notifyCaller">
       <b-img fluid class="py-4 mx-auto d-block" src="img/gridscore2.svg" />
 
       <template>
@@ -504,10 +504,14 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/assets/css/light-mode.scss';
+$primary: #00a0f1;
+$secondary: #7f8c8d;
+$dark: #2c3e50;
+
+@import '~bootswatch/dist/united/variables';
 @import '~bootstrap/scss/bootstrap';
 @import '~bootstrap-vue/src/index.scss';
-@import '~bootswatch/dist/sandstone/bootswatch';
+@import '~bootswatch/dist/united/bootswatch';
 
 @each $breakpoint in map-keys($grid-breakpoints) {
   @include media-breakpoint-up($breakpoint) {
@@ -535,7 +539,7 @@ export default {
   }
 }
 
-@import './assets/css/dark-mode';
+@import '@/assets/css/dark-mode';
 
 html {
   position: relative !important;

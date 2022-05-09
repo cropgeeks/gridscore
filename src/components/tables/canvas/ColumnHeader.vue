@@ -60,7 +60,7 @@ export default {
       'storeTraitColors'
     ]),
     fillStyleMarked: function () {
-      return this.storeDarkMode ? '#392d21' : '#c6d2de'
+      return this.storeDarkMode ? '#364a5e' : '#aebfd0'
     },
     fillStyleLightGray: function () {
       return this.storeDarkMode ? '#0d0d0d' : '#f2f2f2'
