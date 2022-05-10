@@ -53,6 +53,7 @@
   "buttonOpenFile": "Aus Datei laden",
   "buttonSettingsModal": "Einrichtung",
   "buttonShowFieldMap": "Feld-Eckpunkte definieren",
+  "buttonShowMarkerSetup": "Visuelle Markierungen zum Feldplan hinzufügen",
   "buttonImportExportShare": "Per GridScore Server teilen",
   "buttonImportExportSave": "Auf GridScore Server speichern",
   "buttonImportLoadDataset": "Datensatz vom GridScore Server aktualisieren",
