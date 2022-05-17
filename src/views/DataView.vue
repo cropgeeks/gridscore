@@ -27,7 +27,7 @@
       <b-button @click="$router.push({ name: 'settings' })" class="mr-1" v-b-tooltip="$t('tooltipSettings')" v-if="storeTraits && storeTraits.length > 0"><BIconGearFill /></b-button>
 
       <!-- If it's a dataset that has been shared, show save and load buttons -->
-      <b-dropdown v-if="storeDataset && storeDataset.uuid" class="mr-1">
+      <b-dropdown v-if="storeDataset && storeDatasetUuid" class="mr-1">
         <template v-slot:button-content><BIconShareFill /></template>
 
         <b-dropdown-item-button @click="onLoad" class="mr-1"><BIconCloudDownloadFill /> {{ $t('tooltipLoad') }}</b-dropdown-item-button>
@@ -98,11 +98,9 @@ import DataPointModal from '@/components/modals/DataPointModal'
 import BarcodeScannerModal from '@/components/modals/BarcodeScannerModal'
 import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
 import { BIconCircleFill, BIconGearFill, BIconSearch, BIconCloudDownloadFill, BIconCircleHalf, BIconCircle, BIconCloudUploadFill, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
-
-import { EventBus } from '@/plugins/event-bus'
-
 import { mapGetters } from 'vuex'
 
+const emitter = require('tiny-emitter/instance')
 const fixPer = require('fix-perspective')
 
 export default {
@@ -173,6 +171,7 @@ export default {
       'storeData',
       'storeDatasetId',
       'storeDataset',
+      'storeDatasetUuid',
       'storeGeolocation',
       'storeRows',
       'storeShowStatsInTable',
@@ -340,7 +339,7 @@ export default {
         })
     },
     loadData: function () {
-      EventBus.$emit('set-loading', true)
+      emitter.emit('set-loading', true)
       this.getConfigFromSharing(this.storeDataset.uuid)
         .then(result => {
           if (result) {
@@ -351,17 +350,17 @@ export default {
         .catch(err => {
           this.serverError = this.getErrorMessage(err)
         })
-        .finally(() => EventBus.$emit('set-loading', false))
+        .finally(() => emitter.emit('set-loading', false))
     },
     sendData: function () {
-      EventBus.$emit('set-loading', true)
+      emitter.emit('set-loading', true)
       const dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
 
       this.postConfigForSharing(dataCopy, this.storeDataset.data, this.storeDataset.uuid, this.storeRows, this.storeCols)
         .catch(err => {
           this.serverError = this.getErrorMessage(err)
         })
-        .finally(() => EventBus.$emit('set-loading', false))
+        .finally(() => emitter.emit('set-loading', false))
     }
   },
   mounted: function () {
@@ -370,15 +369,15 @@ export default {
     } else {
       this.update()
     }
-    EventBus.$on('dataset-changed', this.update)
-    EventBus.$on('data-point-changed', this.updateTraitStats)
+    emitter.on('dataset-changed', this.update)
+    emitter.on('data-point-changed', this.updateTraitStats)
   },
   beforeDestroy: function () {
     if (this.focusInterval) {
       clearInterval(this.focusInterval)
     }
-    EventBus.$off('dataset-changed', this.update)
-    EventBus.$off('data-point-changed', this.updateTraitStats)
+    emitter.off('dataset-changed', this.update)
+    emitter.off('data-point-changed', this.updateTraitStats)
   }
 }
 </script>

@@ -15,7 +15,7 @@ import StyledQRCode from '@/components/StyledQRCode'
 
 import { mapGetters } from 'vuex'
 
-import { EventBus } from '@/plugins/event-bus'
+const emitter = require('tiny-emitter/instance')
 
 export default {
   components: {
@@ -62,7 +62,7 @@ export default {
       }
     },
     sendData: function () {
-      EventBus.$emit('set-loading', true)
+      emitter.emit('set-loading', true)
       const dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
 
       this.postConfigForSharing(dataCopy, this.storeDataset.data, this.serverUuid, this.storeRows, this.storeCols)
@@ -78,7 +78,7 @@ export default {
         .catch(err => {
           this.serverError = this.getErrorMessage(err)
         })
-        .finally(() => EventBus.$emit('set-loading', false))
+        .finally(() => emitter.emit('set-loading', false))
     }
   },
   mounted: function () {

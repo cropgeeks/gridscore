@@ -1,11 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
-
-import { EventBus } from '@/plugins/event-bus'
-
 import idb from '@/plugins/idb'
 
+const emitter = require('tiny-emitter/instance')
 const localStorage = window.localStorage
 
 Vue.use(Vuex)
@@ -98,7 +96,7 @@ const storeState = {
     ON_DATASET_LOAD_MUTATION: function (state, datasetId) {
       state.datasetId = datasetId
       if (datasetId) {
-        EventBus.$emit('set-loading', true)
+        emitter.emit('set-loading', true)
         idb.getDataset(datasetId)
           .then(dataset => {
             if (dataset) {
@@ -115,11 +113,11 @@ const storeState = {
                   state.dataset = ds
                 })
                 .finally(() => {
-                  EventBus.$emit('set-loading', false)
-                  EventBus.$emit('dataset-changed')
+                  emitter.emit('set-loading', false)
+                  emitter.emit('dataset-changed')
                 })
             } else {
-              EventBus.$emit('set-loading', false)
+              emitter.emit('set-loading', false)
               state.dataset = null
               state.datasetId = null
             }
@@ -130,7 +128,7 @@ const storeState = {
       }
     },
     ON_DATASET_ADDED_MUTATION: function (state, newDataset) {
-      EventBus.$emit('set-loading', true)
+      emitter.emit('set-loading', true)
       idb.addDataset(newDataset)
         .then(dsId => {
           state.datasetId = dsId
@@ -149,41 +147,41 @@ const storeState = {
                   state.dataset = ds
                 })
                 .finally(() => {
-                  EventBus.$emit('set-loading', false)
-                  EventBus.$emit('dataset-changed')
+                  emitter.emit('set-loading', false)
+                  emitter.emit('dataset-changed')
                 })
             })
-            .then(() => EventBus.$emit('datasets-changed'))
+            .then(() => emitter.emit('datasets-changed'))
         })
     },
     ON_DATASET_RESET_MUTATION: function (state, datasetId) {
-      EventBus.$emit('set-loading', true)
+      emitter.emit('set-loading', true)
 
       idb.resetDatasetData(datasetId)
         .finally(() => {
-          EventBus.$emit('set-loading', false)
-          EventBus.$emit('dataset-changed')
-          EventBus.$emit('datasets-changed')
+          emitter.emit('set-loading', false)
+          emitter.emit('dataset-changed')
+          emitter.emit('datasets-changed')
         })
     },
     ON_DATASET_DELETED_MUTATION: function (state, datasetId) {
       idb.deleteDatasetData(datasetId)
         .then(() => idb.deleteDataset(datasetId))
         .finally(() => {
-          EventBus.$emit('dataset-deleted')
-          EventBus.$emit('datasets-changed')
+          emitter.emit('dataset-deleted')
+          emitter.emit('datasets-changed')
         })
 
       state.datasetId = null
       state.dataset = null
     },
     ON_ADD_TRAIT_TO_DATASET_MUTATION: function (state, config) {
-      EventBus.$emit('set-loading', true)
+      emitter.emit('set-loading', true)
 
       idb.addTraitToDataset(config.datasetId, config.trait)
         .finally(() => {
-          EventBus.$emit('set-loading', false)
-          EventBus.$emit('datasets-changed')
+          emitter.emit('set-loading', false)
+          emitter.emit('datasets-changed')
         })
     },
     ON_DATASET_INDEX_CHANGED_MUTATION: function (state, newDatasetIndex) {
@@ -224,7 +222,7 @@ const storeState = {
       Vue.set(state, 'plausible', newPlausible)
     },
     ON_DATASET_UPDATED_MUTATION: function (state, newData) {
-      EventBus.$emit('set-loading', true)
+      emitter.emit('set-loading', true)
       state.datasetId = newData.id
       idb.updateDatasetAndData(newData)
         .then(() => {
@@ -241,12 +239,12 @@ const storeState = {
                     state.dataset = ds
                   })
                   .finally(() => {
-                    EventBus.$emit('set-loading', false)
-                    EventBus.$emit('datasets-changed')
-                    EventBus.$emit('dataset-changed')
+                    emitter.emit('set-loading', false)
+                    emitter.emit('datasets-changed')
+                    emitter.emit('dataset-changed')
                   })
               } else {
-                EventBus.$emit('set-loading', false)
+                emitter.emit('set-loading', false)
                 state.dataset = null
                 state.datasetId = null
               }
@@ -262,7 +260,7 @@ const storeState = {
 
       // Then update the database
       idb.updateDatapoint(state.datasetId, temp)
-        .then(() => EventBus.$emit('data-point-changed', config.row, config.col))
+        .then(() => emitter.emit('data-point-changed', config.row, config.col))
     },
     ON_DATA_POINT_CHANGED_MUTATION: function (state, dataPoint) {
       // To save time, write directly to the temporary dataset object
@@ -314,7 +312,7 @@ const storeState = {
 
       // Then update the database
       idb.updateDatapoint(state.datasetId, temp)
-        .then(() => EventBus.$emit('data-point-changed', dataPoint.row, dataPoint.col))
+        .then(() => emitter.emit('data-point-changed', dataPoint.row, dataPoint.col))
     },
     ON_USE_GPS_CHANGED_MUTATION: function (state, newUseGps) {
       state.useGps = newUseGps
@@ -372,6 +370,7 @@ const storeState = {
     },
     ON_DATASET_UUID_CHANGED_MUTATION: function (state, newUuid) {
       idb.updateDatasetUuid(state.datasetId, newUuid)
+      Vue.set(state.dataset, 'uuid', newUuid)
     },
     ON_VISIBLE_TRAITS_CHANGED_MUTATION: function (state, newVisibleTraits) {
       state.visibleTraits = newVisibleTraits
@@ -400,7 +399,7 @@ const storeState = {
       commit('ON_DATASET_DELETED_MUTATION', datasetId)
     },
     resetDataset: function ({ commit }, datasetId) {
-      EventBus.$emit('set-loading', true)
+      emitter.emit('set-loading', true)
       commit('ON_DATASET_RESET_MUTATION', datasetId)
       commit('ON_DATASET_LOAD_MUTATION', datasetId)
     },
@@ -408,7 +407,7 @@ const storeState = {
       commit('ON_ADD_TRAIT_TO_DATASET_MUTATION', config)
     },
     resetGridScore: function ({ commit }) {
-      EventBus.$emit('set-loading', true)
+      emitter.emit('set-loading', true)
       idb.deleteDatabase().then(() => {
         commit('ON_DATASET_INDEX_CHANGED_MUTATION', null)
         commit('ON_COLUMN_WIDTH_CHANGED_MUTATION', 300)
@@ -424,9 +423,9 @@ const storeState = {
         commit('ON_INVERT_NUMBERING_Y_CHANGED_MUTATION', false)
         commit('ON_DATASET_LOAD_MUTATION', null)
       }).finally(() => {
-        EventBus.$emit('set-loading', false)
-        EventBus.$emit('datasets-changed')
-        EventBus.$emit('dataset-deleted')
+        emitter.emit('set-loading', false)
+        emitter.emit('datasets-changed')
+        emitter.emit('dataset-deleted')
       })
     },
     setDatasetIndex: function ({ commit }, datasetIndex) {

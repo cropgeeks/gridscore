@@ -39,7 +39,7 @@ import RowHeader from '@/components/tables/canvas/RowHeader'
 import VScroll from '@/components/tables/canvas/VScroll'
 
 import { mapGetters } from 'vuex'
-import { EventBus } from '@/plugins/event-bus.js'
+const emitter = require('tiny-emitter/instance')
 
 export default {
   components: {
@@ -805,12 +805,12 @@ export default {
     this.reset()
 
     window.addEventListener('resize', this.handleResize)
-    EventBus.$on('dataset-changed', this.onDatasetChanged)
-    EventBus.$on('data-point-changed', this.updateDataPoint)
+    emitter.on('dataset-changed', this.onDatasetChanged)
+    emitter.on('data-point-changed', this.updateDataPoint)
   },
   beforeDestroy: function () {
-    EventBus.$off('data-point-changed', this.updateDataPoint)
-    EventBus.$off('dataset-changed', this.onDatasetChanged)
+    emitter.off('data-point-changed', this.updateDataPoint)
+    emitter.off('dataset-changed', this.onDatasetChanged)
 
     window.removeEventListener('resize', this.handleResize)
 

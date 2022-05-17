@@ -73,8 +73,9 @@ import VideoModal from '@/components/modals/VideoModal'
 import DataEntryInput from '@/components/DataEntryInput'
 import MultiTraitValueModal from '@/components/modals/MultiTraitValueModal'
 import { mapGetters } from 'vuex'
-import { EventBus } from '@/plugins/event-bus.js'
 import { BIconCameraFill, BIconCircleFill, BIconMic, BIconInfoCircle, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
+
+const emitter = require('tiny-emitter/instance')
 
 export default {
   components: {
@@ -548,7 +549,7 @@ export default {
         comment: comment
       })
 
-      EventBus.$emit('data-point-changed', this.row, this.col)
+      emitter.emit('data-point-changed', this.row, this.col)
       verifyCallback(true)
     }
   },
@@ -560,10 +561,10 @@ export default {
   mounted: function () {
     this.reset()
 
-    EventBus.$on('show-data-entry-tour', this.showTour)
+    emitter.on('show-data-entry-tour', this.showTour)
   },
   beforeDestroy: function () {
-    EventBus.$off('show-data-entry-tour', this.showTour)
+    emitter.off('show-data-entry-tour', this.showTour)
   }
 }
 </script>

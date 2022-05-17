@@ -48,13 +48,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { EventBus } from '@/plugins/event-bus'
-
 import AddTraitModal from '@/components/modals/AddTraitModal'
-
 import idb from '@/plugins/idb'
-
 import { BIconJournalPlus, BIconFileSpreadsheet, BIconCloudDownloadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
+
+const emitter = require('tiny-emitter/instance')
 
 export default {
   components: {
@@ -84,7 +82,7 @@ export default {
   },
   methods: {
     startTour: function () {
-      EventBus.$emit('show-introduction-tour')
+      emitter.emit('show-introduction-tour')
     },
     loadExampleData: function () {
       this.$store.dispatch('addDataset', require('@/example-data.json'))
@@ -158,10 +156,10 @@ export default {
   created: function () {
     this.updateDatasets()
 
-    EventBus.$on('datasets-changed', this.updateDatasets)
+    emitter.on('datasets-changed', this.updateDatasets)
   },
   destroyed: function () {
-    EventBus.$off('datasets-changed', this.updateDatasets)
+    emitter.off('datasets-changed', this.updateDatasets)
   }
 }
 </script>

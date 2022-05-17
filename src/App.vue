@@ -91,9 +91,10 @@ import { mapGetters } from 'vuex'
 import Tour from '@/components/Tour'
 import { loadLanguageAsync } from '@/plugins/i18n'
 import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconMoon, BIconSun, BIconDice3, BIconBarChartSteps, BIconGearFill, BIconCalendarDate, BIconGridFill, BIconTrash, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
-import { EventBus } from '@/plugins/event-bus'
 import idb from '@/plugins/idb'
 import { Detector } from '@/plugins/browser-detect.js'
+
+const emitter = require('tiny-emitter/instance')
 
 export default {
   name: 'App',
@@ -429,11 +430,11 @@ export default {
 
     document.documentElement.className = this.darkMode ? 'dark-mode' : 'light-mode'
 
-    EventBus.$on('datasets-changed', this.updateDatasets)
-    EventBus.$on('dataset-changed', this.navigateToDataset)
-    EventBus.$on('dataset-deleted', this.navigateHome)
-    EventBus.$on('set-loading', this.setLoading)
-    EventBus.$on('show-introduction-tour', this.showIntroductionTour)
+    emitter.on('datasets-changed', this.updateDatasets)
+    emitter.on('dataset-changed', this.navigateToDataset)
+    emitter.on('dataset-deleted', this.navigateHome)
+    emitter.on('set-loading', this.setLoading)
+    emitter.on('show-introduction-tour', this.showIntroductionTour)
     this.updateDatasets()
 
     if ('wakeLock' in navigator) {
@@ -489,11 +490,11 @@ export default {
       navigator.geolocation.clearWatch(this.geolocationWatchId)
     }
 
-    EventBus.$off('datasets-changed', this.updateDatasets)
-    EventBus.$off('dataset-changed', this.navigateToDataset)
-    EventBus.$off('dataset-deleted', this.navigateHome)
-    EventBus.$off('set-loading', this.setLoading)
-    EventBus.$off('show-introduction-tour', this.showIntroductionTour)
+    emitter.off('datasets-changed', this.updateDatasets)
+    emitter.off('dataset-changed', this.navigateToDataset)
+    emitter.off('dataset-deleted', this.navigateHome)
+    emitter.off('set-loading', this.setLoading)
+    emitter.off('show-introduction-tour', this.showIntroductionTour)
 
     if ('wakeLock' in navigator) {
       this.toggleWakeLock(false)

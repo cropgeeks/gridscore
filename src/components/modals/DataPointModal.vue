@@ -55,8 +55,9 @@
 import DataPointEntry from '@/components/DataPointEntry'
 import GuideOrderSelector from '@/components/GuideOrderSelector'
 import { BIconBookmarkCheckFill, BIconBookmark, BIconQuestionCircle, BIconCheck2All, BIconPlay, BIconSignpost, BIconChevronLeft, BIconChevronRight } from 'bootstrap-vue'
-import { EventBus } from '@/plugins/event-bus.js'
 import types from '@/mixin/types'
+
+const emitter = require('tiny-emitter/instance')
 
 /**
  * Shows a modal used to enter the data into GridScore. Each trait is shown and based on its type a different method for data input is show.
@@ -103,7 +104,7 @@ export default {
   mixins: [types],
   methods: {
     startTour: function () {
-      EventBus.$emit('show-data-entry-tour')
+      emitter.emit('show-data-entry-tour')
     },
     /**
      * Shows the modal and resets it to its initial state
