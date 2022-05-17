@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar toggleable="lg" type="dark" variant="dark" id="main-navigation">
+    <b-navbar toggleable="xl" type="dark" variant="dark" id="main-navigation">
       <button v-b-toggle.sidebar variant="outline-light" id="dataset-selector" class="mr-3 navbar-toggler collapsed"><span class="navbar-toggler-icon" /></button>
       <b-navbar-brand :to="{ name: 'home' }" class="d-flex align-items-center">
         <img src="img/gridscore2.svg" height="40px" class="d-inline-block align-top mr-3" alt="GridScore">

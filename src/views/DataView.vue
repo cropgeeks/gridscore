@@ -24,11 +24,13 @@
       </b-form>
     </div>
     <div class="d-flex flex-row align-items-end top-banner">
-      <b-button @click="$router.push({ name: 'settings' })" class="mr-1" v-b-tooltip="$t('tooltipSettings')" v-if="storeTraits && storeTraits.length > 0"><BIconGearFill /></b-button>
+      <b-button @click="$router.push({ name: 'settings' })" class="mr-1" v-b-tooltip="$t('tooltipSettings')" v-if="storeTraits && storeTraits.length > 0">
+        <BIconGearFill /> <span class="d-none d-lg-inline-block">{{ $t('tooltipSettings') }}</span>
+      </b-button>
 
       <!-- If it's a dataset that has been shared, show save and load buttons -->
       <b-dropdown v-if="storeDataset && storeDatasetUuid" class="mr-1">
-        <template v-slot:button-content><BIconShareFill /></template>
+        <template v-slot:button-content><BIconShareFill /> <span class="d-none d-lg-inline-block">{{ $t('tooltipShare') }}</span></template>
 
         <b-dropdown-item-button @click="onLoad" class="mr-1"><BIconCloudDownloadFill /> {{ $t('tooltipLoad') }}</b-dropdown-item-button>
         <b-dropdown-item-button @click="onSave" class="mr-1"><BIconCloudUploadFill /> {{ $t('tooltipSave') }}</b-dropdown-item-button>
@@ -45,10 +47,14 @@
       </b-dropdown>
 
       <!-- Else, show the share button -->
-      <b-button v-else @click="$router.push({ name: 'share' })" class="mr-1" v-b-tooltip="$t('tooltipShare')"><BIconShareFill /></b-button>
+      <b-button v-else @click="$router.push({ name: 'share' })" class="mr-1" v-b-tooltip="$t('tooltipShare')">
+        <BIconShareFill /> <span class="d-none d-lg-inline-block">{{ $t('tooltipShare') }}</span>
+      </b-button>
 
       <b-dropdown class="mr-1" v-b-tooltip="$t('tooltipJumpTo')" ref="cornerDropdown">
-        <template v-slot:button-content><BIconArrowsFullscreen /></template>
+        <template v-slot:button-content>
+          <BIconArrowsFullscreen /> <span class="d-none d-lg-inline-block">{{ $t('tooltipJumpTo') }}</span>
+        </template>
 
         <div class="grid-direction-grid p-2">
           <div><b-button @click="scrollTo('topleft')"><BIconArrowUpLeft /></b-button></div>
@@ -64,9 +70,9 @@
         </div>
       </b-dropdown>
 
-      <b-dropdown :text="$t('widgetTraitSelectorTitle')" class="trait-dropdown">
+      <b-dropdown v-b-tooltip="$t('widgetTraitSelectorTitle')" class="trait-dropdown">
         <template #button-content>
-          <BIconCircleHalf /> {{ $t('widgetTraitSelectorTitle') }}
+          <BIconCircleHalf /> <span class="d-none d-lg-inline-block">{{ $t('widgetTraitSelectorTitle') }}</span>
         </template>
         <b-dropdown-form>
           <b-button-group>
@@ -82,7 +88,9 @@
         </b-dropdown-item>
       </b-dropdown>
 
-      <b-button @click="$router.push({ name: 'export' })" class="ml-auto"><BIconDownload /> {{ $t('buttonExport') }}</b-button>
+      <b-button @click="$router.push({ name: 'export' })" class="ml-auto">
+        <BIconDownload /> <span class="d-none d-lg-inline-block">{{ $t('buttonExport') }}</span>
+      </b-button>
     </div>
 
     <GridTableCanvas @cell-clicked="onCellClicked" :traitStats="storeShowStatsInTable ? traitStats : null" v-if="storeTraits && storeTraits.length > 0" :highlightPosition="userPosition" ref="canvas" />
