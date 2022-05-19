@@ -5,7 +5,7 @@ const axios = require('axios').default
 export default {
   data: function () {
     return {
-      gridScoreVersion: '1.8.0',
+      gridScoreVersion: '1.9.0',
       multiTraitMethods: {
         // TODO: Handle dates!
         last: {

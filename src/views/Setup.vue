@@ -112,10 +112,14 @@
       <b-button v-b-toggle.collapse-fieldmap id="map-toggle-button"><BIconBoundingBox /> {{ $t('buttonShowFieldMap') }}</b-button>
       <b-button class="mx-2" v-b-toggle.collapse-markers id="marker-toggle-button"><BIconSignpost2 /> {{ $t('buttonShowMarkerSetup') }}</b-button>
       <b-collapse accordion="option-accordion" id="collapse-fieldmap" class="mt-2" v-model="mapVisible" @shown="invalidateMap">
-        <FieldMap :rows="rows" :cols="cols" :useCurrentDataset="false" ref="map" />
+        <b-card>
+          <FieldMap :rows="rows" :cols="cols" :useCurrentDataset="false" ref="map" />
+        </b-card>
       </b-collapse>
       <b-collapse accordion="option-accordion" id="collapse-markers" class="mt-2" @shown="$refs.markerSetup.reset()">
-        <MarkerSetup :rows="rows" :cols="cols" ref="markerSetup" />
+        <b-card>
+          <MarkerSetup :rows="rows" :cols="cols" ref="markerSetup" />
+        </b-card>
       </b-collapse>
     </b-form>
 

@@ -2,7 +2,7 @@
   <div>
     <h1>{{ $t('pageHeatmapTitle') }}</h1>
     <p>{{ $t('pageHeatmapText') }}</p>
-    <div v-if="storeData && storeData.size > 0 && storeTraits && storeTraits.length > 0">
+    <div v-if="storeDatasetId && storeTraits && storeTraits.length > 0">
       <!-- Trait selection box -->
       <b-form-group :label="$t('formLabelTrait')" label-for="trait">
         <b-form-select id="trait" :options="traits" v-model="trait" />
@@ -20,6 +20,13 @@
 <script>
 import { mapGetters } from 'vuex'
 
+const Plotly = require('plotly.js/lib/core')
+
+// Only register the chart types we're actually using to reduce the final bundle size
+Plotly.register([
+  require('plotly.js/lib/heatmap')
+])
+
 /**
  * Component that shows a heatmap for the selected trait
  */
@@ -36,8 +43,8 @@ export default {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
       'storeCols',
-      'storeData',
       'storeDatasetName',
+      'storeDatasetId',
       'storeDarkMode',
       'storeLocale',
       'storeRows',
@@ -70,7 +77,7 @@ export default {
   },
   methods: {
     update: function () {
-      this.$plotly.purge('heatmap-chart')
+      Plotly.purge('heatmap-chart')
 
       const rows = this.storeRows
       const cols = this.storeCols
@@ -78,11 +85,13 @@ export default {
       let hasData = false
       let data = null
 
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+
       outer:
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           // If we're dealing with dates or text, check if there is date data, else check if there is value data
-          const dps = (actualTrait.type === 'date' || actualTrait.type === 'text') ? this.storeData.get(`${row}-${col}`).dates[this.trait] : this.storeData.get(`${row}-${col}`).values[this.trait]
+          const dps = (actualTrait.type === 'date' || actualTrait.type === 'text') ? storeData.get(`${row}-${col}`).dates[this.trait] : storeData.get(`${row}-${col}`).values[this.trait]
           if ((actualTrait.mType === 'multi' && dps !== null && dps.length > 0) ||
               (actualTrait.mType !== 'multi' && dps !== null)) {
             hasData = true
@@ -100,7 +109,7 @@ export default {
           // Find the minimum in the data
           for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-              const date = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, this.storeData.get(`${row}-${col}`), false)
+              const date = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, storeData.get(`${row}-${col}`), false)
 
               if (date !== null) {
                 minDateString = date < minDateString ? date : minDateString
@@ -118,7 +127,7 @@ export default {
             const rowZ = []
             const textZ = []
             for (let col = 0; col < cols; col++) {
-              const cell = this.storeData.get(`${row}-${col}`)
+              const cell = storeData.get(`${row}-${col}`)
               textZ.push(cell.name)
               // Get the cell date
               const dateString = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, cell, false)
@@ -167,7 +176,7 @@ export default {
             const rowZ = []
             const textZ = []
             for (let col = 0; col < cols; col++) {
-              const cell = this.storeData.get(`${row}-${col}`)
+              const cell = storeData.get(`${row}-${col}`)
 
               // Get the cell date
               const value = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, cell, true)
@@ -263,7 +272,7 @@ export default {
           displaylogo: false
         }
 
-        this.$plotly.newPlot('heatmap-chart', data, layout, config)
+        Plotly.newPlot('heatmap-chart', data, layout, config)
       }
     }
   },

@@ -29,6 +29,8 @@
     <div />
     <HScroll :height="hScrollHeight" :width="canvasWidth" :x="origin.x" :cellWidth="cellWidth" ref="hScroll" />
     <div />
+
+    <OffscreenCanvas :circleRadius="circleRadius" ref="offscreenCanvas" />
   </div>
 </template>
 
@@ -37,6 +39,7 @@ import ColumnHeader from '@/components/tables/canvas/ColumnHeader'
 import HScroll from '@/components/tables/canvas/HScroll'
 import RowHeader from '@/components/tables/canvas/RowHeader'
 import VScroll from '@/components/tables/canvas/VScroll'
+import OffscreenCanvas from '@/components/tables/canvas/OffscreenCanvas'
 
 import { mapGetters } from 'vuex'
 const emitter = require('tiny-emitter/instance')
@@ -45,6 +48,7 @@ export default {
   components: {
     ColumnHeader,
     HScroll,
+    OffscreenCanvas,
     RowHeader,
     VScroll
   },
@@ -116,7 +120,7 @@ export default {
       this.update()
     },
     storeDarkMode: function () {
-      this.update()
+      this.$nextTick(() => this.update())
     }
   },
   computed: {
@@ -283,12 +287,6 @@ export default {
     fillStyleMarked: function () {
       return this.storeDarkMode ? '#415971' : '#c6d2de'
     },
-    fillStyleUserPosition: function () {
-      return this.storeDarkMode ? '#71737b' : '#8e8c84'
-    },
-    fillStyleBookmark: function () {
-      return this.storeDarkMode ? '#71737b' : '#8e8c84'
-    },
     fillStyleHiddenTrait: function () {
       return this.storeDarkMode ? '#2c2c2c' : '#d3d3d3'
     },
@@ -308,6 +306,10 @@ export default {
       }
 
       this.updateMarkers()
+
+      if (this.storeUseGps && this.highlightPosition) {
+        this.updateUserPosition()
+      }
     },
     onRowMarked: function (row) {
       this.markedRows[row] = !this.markedRows[row]
@@ -320,6 +322,10 @@ export default {
       }
 
       this.updateMarkers()
+
+      if (this.storeUseGps && this.highlightPosition) {
+        this.updateUserPosition()
+      }
     },
     init: function () {
       if (this.isInitting) {
@@ -338,7 +344,7 @@ export default {
         c.style.height = this.canvasHeight + 'px'
 
         this.$nextTick(() => {
-          this.ctx = c.getContext('2d')
+          this.ctx = c.getContext('2d', { alpha: false })
           this.ctx.scale(scale, scale)
           this.ctx.textBaseline = 'middle'
           this.ctx.textAlign = 'center'
@@ -403,7 +409,7 @@ export default {
           y: this.origin.y
         }
         this.dragPosition = ev
-        this.dragStartTime = new Date().getMilliseconds()
+        this.dragStartTime = Date.now()
       }
     },
     onMouseUp: function (e) {
@@ -430,7 +436,7 @@ export default {
           })
         }
       } else if (e.type === 'touchend' || e.type === 'touchcancel') {
-        const deltaT = Math.abs(new Date().getMilliseconds() - this.dragStartTime)
+        const deltaT = Math.abs(Date.now() - this.dragStartTime)
         // We have to use dragPosition here, because the end/cancel events don't provide location information
         const deltaX = Math.round((this.dragPosition.x - this.dragStart.x) / deltaT * 10)
         const deltaY = Math.round((this.dragPosition.y - this.dragStart.y) / deltaT * 10)
@@ -440,8 +446,8 @@ export default {
         // Define an update interval
         this.flingInterval = setInterval(() => {
           // Run 50 iterations
-          if (counter++ < 50) {
-            const i = 1 - counter / 50.0
+          if (counter++ < 25) {
+            const i = 1 - counter / 25.0
             // Calculate the velocity in both dimensions
             const velocityX = (1 - Math.pow(1 - i, 5)) * deltaX
             const velocityY = (1 - Math.pow(1 - i, 5)) * deltaY
@@ -465,21 +471,28 @@ export default {
       if (this.drag) {
         const ev = this.getTouchPosition(e)
         if (ev) {
-          const deltaX = Math.round(ev.x - this.dragStart.x)
-          const deltaY = Math.round(ev.y - this.dragStart.y)
+          const now = Date.now()
 
-          this.origin.x = Math.round(Math.max(Math.min(0, this.originStart.x + deltaX), -(this.storeCols * this.cellWidth - this.canvasWidth)))
-          this.origin.y = Math.round(Math.max(Math.min(0, this.originStart.y + deltaY), -(this.storeRows * this.cellHeight - this.canvasHeight)))
+          // Throttle to one draw per 25 milliseconds
+          if (!this.lastMove || (now - this.lastMove) > 25) {
+            const deltaX = Math.round(ev.x - this.dragStart.x)
+            const deltaY = Math.round(ev.y - this.dragStart.y)
 
-          const deltaYSinceLast = ev.y - this.dragPosition.y
-          // Prevent scrolling up the page while the table hasn't reached the top yet
-          if (deltaYSinceLast >= 0 && this.origin.y !== 0 && e.cancelable) {
-            e.preventDefault()
+            this.origin.x = Math.round(Math.max(Math.min(0, this.originStart.x + deltaX), -(this.storeCols * this.cellWidth - this.canvasWidth)))
+            this.origin.y = Math.round(Math.max(Math.min(0, this.originStart.y + deltaY), -(this.storeRows * this.cellHeight - this.canvasHeight)))
+
+            const deltaYSinceLast = ev.y - this.dragPosition.y
+            // Prevent scrolling up the page while the table hasn't reached the top yet
+            if (deltaYSinceLast >= 0 && this.origin.y !== 0 && e.cancelable) {
+              e.preventDefault()
+            }
+
+            this.dragPosition = ev
+
+            this.update()
+
+            this.lastMove = now
           }
-
-          this.dragPosition = ev
-
-          this.update()
         }
       }
     },
@@ -509,6 +522,8 @@ export default {
         return
       }
       this.isDrawing = true
+
+      console.log('redraw-all')
 
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
 
@@ -566,19 +581,14 @@ export default {
       }
     },
     updateUserPosition: function () {
-      this.ctx.fillStyle = this.fillStyleUserPosition
       this.ctx.save()
       this.ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, this.highlightX * window.devicePixelRatio, this.highlightY * window.devicePixelRatio)
       if (this.highlightPosition && this.highlightPosition.heading) {
-        this.ctx.rotate(((this.highlightPosition.heading + 90) % 360) * Math.PI / 180)
+        this.ctx.rotate(((this.highlightPosition.heading + 45) % 360) * Math.PI / 180)
+      } else {
+        this.ctx.rotate(-45 * Math.PI / 180)
       }
-      this.ctx.beginPath()
-      this.ctx.moveTo(0, -10)
-      this.ctx.lineTo(7.5, 10)
-      this.ctx.lineTo(0, 5)
-      this.ctx.lineTo(-7.5, 10)
-      this.ctx.closePath()
-      this.ctx.fill()
+      this.ctx.drawImage(this.userPositionImg, -8, -8)
       this.ctx.restore()
     },
     fittingString: function (str, maxWidth) {
@@ -600,15 +610,7 @@ export default {
       this.ctx.drawImage(this.commentImg, x, y)
     },
     drawBookmark: function (x, y, w, h) {
-      this.ctx.fillStyle = this.fillStyleBookmark
-      this.ctx.beginPath()
-      this.ctx.moveTo(x, y)
-      this.ctx.lineTo(x, y + h)
-      this.ctx.lineTo(x + w / 2, y + h / 3 * 2)
-      this.ctx.lineTo(x + w, y + h)
-      this.ctx.lineTo(x + w, y)
-      this.ctx.closePath()
-      this.ctx.fill()
+      this.ctx.drawImage(this.bookmarkImg, x, y)
     },
     updateDataPoint: function (row, col) {
       this.data.set(`${row}-${col}`, this.$store.getters.storeData.get(`${row}-${col}`))
@@ -624,13 +626,15 @@ export default {
         return
       }
 
+      let count = 0
       if (row === this.highlightRow && col === this.highlightCol) {
+        count = 4
         this.ctx.fillStyle = this.fillStyleHighlight
       } else if ((this.markedRows && this.markedRows[row]) || (this.markedColumns && this.markedColumns[col])) {
+        count = 3
         this.ctx.fillStyle = this.fillStyleMarked
       } else {
         // Determine the background color
-        let count = 0
         if (row % 2 === 0) {
           count++
         }
@@ -676,30 +680,23 @@ export default {
         const extraPadding = this.coreWidth - circlesInThisRow * this.circleWidth - (circlesInThisRow - 1) * this.padding / 2
 
         for (let t = 0; t < circlesInThisRow; t++) {
-          const realIndex = this.positionToIndex[traitCounter]
-          const hidden = !this.storeHideToggledTraits && !this.storeVisibleTraits[realIndex]
-          this.ctx.fillStyle = (!hidden && this.storeTraitColors) ? this.storeTraitColors[realIndex % this.storeTraitColors.length] : this.fillStyleHiddenTrait
-          this.ctx.strokeStyle = (!hidden && this.storeTraitColors) ? this.storeTraitColors[realIndex % this.storeTraitColors.length] : this.fillStyleHiddenTrait
-
-          this.ctx.beginPath()
-          // Draw the arc (circle)
-          this.ctx.arc(extraPadding / 2 + x + this.padding + this.circleRadius + t * (this.circleRadius + this.padding),
-                      y + this.textPartHeight + this.circleRadius + r * (this.circleRadius * 2 + this.padding),
-                      this.circleRadius, 0,
-                      2 * Math.PI)
+          let realIndex = this.positionToIndex[traitCounter]
+          const hidden = !this.storeHideToggledTraits && this.storeVisibleTraits && !this.storeVisibleTraits[realIndex]
 
           let fill = cell.values[realIndex] !== null
 
+          if (hidden) {
+            realIndex = this.storeTraits.length
+          }
           // If the view should be inverted, do this here
           if (this.storeInvertView) {
             fill = !fill
           }
 
-          if (fill) {
-            this.ctx.fill()
-          } else {
-            this.ctx.stroke()
-          }
+          const targetX = Math.round(extraPadding / 2 + x + this.padding + t * (this.circleRadius + this.padding))
+          const targetY = Math.round(y + this.textPartHeight + r * (this.circleRadius * 2 + this.padding))
+          this.$refs.offscreenCanvas.copyToCanvas(realIndex, fill, count, this.ctx, targetX, targetY)
+
           traitCounter++
         }
       }
@@ -798,7 +795,11 @@ export default {
       y: 0
     }
     this.commentImg = new Image()
-    this.commentImg.src = 'data:image/svg+xml,%3Csvg viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img" aria-label="chat text" xmlns="http://www.w3.org/2000/svg" fill="%238e8c84"%3E%3Cg%3E%3Cpath d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"%3E%3C/path%3E%3Cpath d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8zm0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"%3E%3C/path%3E%3C/g%3E%3C/svg%3E'
+    this.commentImg.src = 'data:image/svg+xml,%3Csvg viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img" aria-label="chat right text fill" xmlns="http://www.w3.org/2000/svg" fill="%238e8c84"%3E%3Cg %3E%3Cpath d="M16 2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h9.586a1 1 0 0 1 .707.293l2.853 2.853a.5.5 0 0 0 .854-.353V2zM3.5 3h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1 0-1zm0 2.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1 0-1zm0 2.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1z"%3E%3C/path%3E%3C/g%3E%3C/svg%3E'
+    this.userPositionImg = new Image()
+    this.userPositionImg.src = 'data:image/svg+xml,%3Csvg viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img" aria-label="cursor fill" xmlns="http://www.w3.org/2000/svg" fill="%238e8c84"%3E%3Cg %3E%3Cpath d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"%3E%3C/path%3E%3C/g%3E%3C/svg%3E'
+    this.bookmarkImg = new Image()
+    this.bookmarkImg.src = 'data:image/svg+xml,%3Csvg viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img" aria-label="bookmark check fill" xmlns="http://www.w3.org/2000/svg" fill="%238e8c84" %3E%3Cg %3E%3Cpath fill-rule="evenodd" d="M2 15.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5zm8.854-9.646a.5.5 0 0 0-.708-.708L7.5 7.793 6.354 6.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"%3E%3C/path%3E%3C/g%3E%3C/svg%3E'
     this.markedColumns = Array.from(Array(this.storeCols).keys()).map(i => false)
     this.markedRows = Array.from(Array(this.storeRows).keys()).map(i => false)
     // Get the height first. This may trigger scroll bars which will affect the width -> Wait a bit
@@ -825,6 +826,7 @@ export default {
 <style scoped>
 .grid {
   height: 100vh;
+  max-height: 100vh;
   display: grid;
   grid-template-columns: min-content 1fr min-content;
   grid-template-rows: min-content 1fr min-content;

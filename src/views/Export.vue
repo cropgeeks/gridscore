@@ -121,7 +121,6 @@ export default {
     ...mapGetters([
       'storeCols',
       'storeDarkMode',
-      'storeData',
       'storeDatasetUuid',
       'storeDatasetName',
       'storeRows',
@@ -230,7 +229,8 @@ export default {
       return result
     },
     datesText: function () {
-      if (!this.storeData || this.storeData.size < 1 || !this.storeTraits || this.storeTraits.length < 1) {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (!storeData || storeData.size < 1 || !this.storeTraits || this.storeTraits.length < 1) {
         return this.$t('labelNoData')
       }
 
@@ -242,7 +242,7 @@ export default {
         // And each field column
         for (let x = 0; x < this.storeCols; x++) {
           // Get the data cell
-          const cell = this.storeData.get(`${y}-${x}`)
+          const cell = storeData.get(`${y}-${x}`)
           // If there is data
           if (cell) {
             // Get it
@@ -275,7 +275,8 @@ export default {
       return result
     },
     text: function () {
-      if (!this.storeData || this.storeData.length < 1 || !this.storeTraits || this.storeTraits.length < 1) {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (!storeData || storeData.length < 1 || !this.storeTraits || this.storeTraits.length < 1) {
         return this.$t('labelNoData')
       }
 
@@ -287,7 +288,7 @@ export default {
         // And each field column
         for (let x = 0; x < this.storeCols; x++) {
           // Get the data cell
-          const cell = this.storeData.get(`${y}-${x}`)
+          const cell = storeData.get(`${y}-${x}`)
           // If there is data
           if (cell) {
             // Get it
@@ -320,7 +321,8 @@ export default {
       return result
     },
     fieldPlan: function () {
-      if (!this.storeData || this.storeData.length < 1 || !this.storeTraits || this.storeTraits.length < 1 || this.selectedTrait === null) {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (!storeData || storeData.length < 1 || !this.storeTraits || this.storeTraits.length < 1 || this.selectedTrait === null) {
         return this.$t('labelNoData')
       }
 
@@ -336,7 +338,7 @@ export default {
           }
 
           // Get the data cell
-          const cell = this.storeData.get(`${y}-${x}`)
+          const cell = storeData.get(`${y}-${x}`)
           // If there is data
           if (cell) {
             if (this.selectedTrait === 'name') {
@@ -354,12 +356,13 @@ export default {
   },
   methods: {
     exportToGerminateFormat: function () {
-      if (this.storeData) {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (storeData) {
         emitter.emit('set-loading', true)
 
         const dataCopy = JSON.parse(JSON.stringify(this.$store.getters.storeDataset))
 
-          this.postConfigForSharing(dataCopy, this.storeData, this.storeDatasetUuid, this.storeRows, this.storeCols)
+          this.postConfigForSharing(dataCopy, storeData, this.storeDatasetUuid, this.storeRows, this.storeCols)
             .then(result => {
               if (result && result.data) {
                 this.$store.commit('ON_DATASET_UUID_CHANGED_MUTATION', result.data)

@@ -14,6 +14,9 @@ module.exports = {
     }
   },
   configureWebpack: {
+    // plugins: [
+    //   new BundleAnalyzerPlugin()
+    // ],
     resolve: {
       // ... rest of the resolve config
       fallback: {
@@ -23,9 +26,4 @@ module.exports = {
     devtool: 'source-map',
     target: 'web'
   }
-  // configureWebpack: {
-  //   plugins: [
-  //     new BundleAnalyzerPlugin()
-  //   ]
-  // }
 }

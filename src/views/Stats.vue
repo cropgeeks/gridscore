@@ -20,6 +20,14 @@ import { mapGetters } from 'vuex'
 
 import { BIconCircleFill } from 'bootstrap-vue'
 
+const Plotly = require('plotly.js/lib/core')
+
+// Only register the chart types we're actually using to reduce the final bundle size
+Plotly.register([
+  require('plotly.js/lib/bar'),
+  require('plotly.js/lib/box')
+])
+
 export default {
   components: {
     BIconCircleFill
@@ -28,7 +36,6 @@ export default {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
       'storeDarkMode',
-      'storeData',
       'storeDatasetName',
       'storeTraitColors',
       'storeTraits'
@@ -64,9 +71,10 @@ export default {
   },
   methods: {
     update: function () {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
       this.storeTraits.forEach((trait, index) => {
         const div = this.$refs[`trait-chart-${index}`][0]
-        this.$plotly.purge(div)
+        Plotly.purge(div)
 
         const data = []
         let chartType
@@ -77,7 +85,7 @@ export default {
           case 'date': {
             chartType = 'box'
             const datapoints = []
-            this.storeData.forEach((c, k) => datapoints.push({ value: this.extractMultiTraitDatum(index, trait.mType, this.selectedMultiTraitMethods[index], c, true), name: c.name }))
+            storeData.forEach((c, k) => datapoints.push({ value: this.extractMultiTraitDatum(index, trait.mType, this.selectedMultiTraitMethods[index], c, true), name: c.name }))
             data.push({
               x: datapoints.map(d => d.value),
               text: datapoints.map(d => d.name),
@@ -97,7 +105,7 @@ export default {
             chartType = 'bar'
             const map = {}
             const datapoints = []
-            this.storeData.forEach((c, k) => datapoints.push(this.extractMultiTraitDatum(index, trait.mType, this.selectedMultiTraitMethods[index], c, true)))
+            storeData.forEach((c, k) => datapoints.push(this.extractMultiTraitDatum(index, trait.mType, this.selectedMultiTraitMethods[index], c, true)))
             datapoints.forEach(c => {
               if (map[c]) {
                 map[c] += 1
@@ -170,7 +178,7 @@ export default {
           displaylogo: false
         }
 
-        this.$plotly.newPlot(div, data, layout, config)
+        Plotly.newPlot(div, data, layout, config)
       })
     }
   },

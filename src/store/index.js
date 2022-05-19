@@ -405,6 +405,7 @@ const storeState = {
     },
     addTraitToDataset: function ({ commit }, config) {
       commit('ON_ADD_TRAIT_TO_DATASET_MUTATION', config)
+      commit('ON_VISIBLE_TRAITS_CHANGED_MUTATION', null)
     },
     resetGridScore: function ({ commit }) {
       emitter.emit('set-loading', true)

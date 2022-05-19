@@ -30,8 +30,7 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeDataset',
-      'storeData',
+      'storeDatasetUuid',
       'storeRows',
       'storeCols'
     ])
@@ -42,11 +41,12 @@ export default {
       this.serverError = null
     },
     exportJson: function () {
-      if (!this.storeDataset || !this.storeDataset.data || this.storeDataset.data.length < 1) {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (!this.storeDatasetUuid || !storeData || storeData.length < 1) {
         return
       }
 
-      if (this.storeDataset.uuid) {
+      if (this.storeDatasetUuid) {
         // Ask for confirmation, because this will overwrite what's on the server
         this.$bvModal.msgBoxConfirm(this.$t('modalTextSaveToServerWarning'), {
           title: this.$t('modalTitleSaveToServerWarning'),
@@ -63,9 +63,9 @@ export default {
     },
     sendData: function () {
       emitter.emit('set-loading', true)
-      const dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
+      const dataCopy = JSON.parse(JSON.stringify(this.$store.state.dataset))
 
-      this.postConfigForSharing(dataCopy, this.storeDataset.data, this.serverUuid, this.storeRows, this.storeCols)
+      this.postConfigForSharing(dataCopy, this.$store.state.dataset.data, this.serverUuid, this.storeRows, this.storeCols)
         .then(result => {
           if (result && result.data) {
             this.serverUuid = result.data

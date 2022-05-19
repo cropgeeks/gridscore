@@ -2,13 +2,20 @@
   <div>
     <h1>{{ $t('pageTimelineTitle') }}</h1>
     <p>{{ $t('pageTimelineText') }}</p>
-    <div id="timeseries-chart" class="time-chart" v-if="storeData && storeData.size > 0 && storeTraits && storeTraits.length > 0"/>
+    <div id="timeseries-chart" class="time-chart" v-if="storeDatasetId && storeTraits && storeTraits.length > 0"/>
     <h3 v-else>{{ $t('labelNoData') }}</h3>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+
+const Plotly = require('plotly.js/lib/core')
+
+// Only register the chart types we're actually using to reduce the final bundle size
+Plotly.register([
+  require('plotly.js/lib/scatter')
+])
 
 /**
  * Shows the timeline for data recording of each trait as a percentage of all plots scored.
@@ -27,7 +34,7 @@ export default {
     ...mapGetters([
       'storeCols',
       'storeDarkMode',
-      'storeData',
+      'storeDatasetId',
       'storeDatasetName',
       'storeLocale',
       'storeRows',
@@ -44,11 +51,12 @@ export default {
   },
   methods: {
     plot: function () {
-      if (!this.storeData || this.storeData.size < 1 || !this.storeTraits || this.storeTraits.length < 1) {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (!storeData || storeData.size < 1 || !this.storeTraits || this.storeTraits.length < 1) {
         return
       }
 
-      this.$plotly.purge('timeseries-chart')
+      Plotly.purge('timeseries-chart')
 
       const plots = this.storeRows * this.storeCols
 
@@ -61,7 +69,7 @@ export default {
         traces.push({})
       })
       // For each field cell
-      this.storeData.forEach((c, k) => {
+      storeData.forEach((c, k) => {
         c.dates.forEach((d, i) => {
           // If it exists
           if (d) {
@@ -145,7 +153,7 @@ export default {
         displaylogo: false
       }
 
-      this.$plotly.newPlot('timeseries-chart', traces, layout, config)
+      Plotly.newPlot('timeseries-chart', traces, layout, config)
     }
   },
   mounted: function () {

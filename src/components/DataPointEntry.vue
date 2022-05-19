@@ -38,9 +38,12 @@
       </b-form-group>
 
       <!-- User comments -->
-      <b-form-group :label="$t('formLabelComment')" label-for="comment">
+      <b-form-group label-for="comment">
+        <template v-slot:label>
+          <BIconChatRightTextFill /> {{ $t('formLabelComment') }}
+        </template>
         <b-input-group>
-          <b-form-input v-model="comment" id="comment" />
+          <b-form-textarea rows="3" v-model="comment" id="comment" />
           <b-input-group-addon append v-if="supportsSpeechRecognition">
             <b-button @click="toggleRecording" :variant="speechRecognition ? 'danger' : null" v-b-tooltip="$t('tooltipDataEntryCommentMicrophone')"><BIconMic /></b-button>
           </b-input-group-addon>
@@ -73,9 +76,11 @@ import VideoModal from '@/components/modals/VideoModal'
 import DataEntryInput from '@/components/DataEntryInput'
 import MultiTraitValueModal from '@/components/modals/MultiTraitValueModal'
 import { mapGetters } from 'vuex'
-import { BIconCameraFill, BIconCircleFill, BIconMic, BIconInfoCircle, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
+import { BIconCameraFill, BIconCircleFill, BIconMic, BIconInfoCircle, BIconChatRightTextFill, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
 
 const emitter = require('tiny-emitter/instance')
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
 export default {
   components: {
@@ -83,6 +88,7 @@ export default {
     BIconCircleFill,
     BIconCaretLeftFill,
     BIconCaretRightFill,
+    BIconChatRightTextFill,
     BIconInfoCircle,
     BIconCalendar3,
     BIconMic,
@@ -166,9 +172,9 @@ export default {
   computed: {
      /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeData',
       'storeGeolocation',
       'storeHideToggledTraits',
+      'storeLocale',
       'storeTraitColors',
       'storeTraits',
       'storeUseGps',
@@ -176,7 +182,7 @@ export default {
       'storeVisibleTraits'
     ]),
     supportsSpeechRecognition: function () {
-      return ('webkitSpeechRecognition' in window)
+      return SpeechRecognition !== undefined && SpeechRecognition !== null
     },
     visibleTraitMapping: function () {
       const result = []
@@ -207,8 +213,9 @@ export default {
       this.$refs.dataEntryTour.start()
     },
     updateFormDescriptions: function () {
-      if (this.visibleTraitMapping && this.storeData && this.row !== null && this.col !== null) {
-        const dp = this.storeData.get(`${this.row}-${this.col}`)
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (this.visibleTraitMapping && storeData && this.row !== null && this.col !== null) {
+        const dp = storeData.get(`${this.row}-${this.col}`)
         this.formDescriptions = this.visibleTraitMapping.map(t => {
           if (t.trait.mType === 'multi') {
             const values = dp.values[t.index]
@@ -249,9 +256,10 @@ export default {
           this.disableSpeechRecognition()
         } else {
           // eslint-disable-next-line new-cap
-          this.speechRecognition = new window.webkitSpeechRecognition()
+          this.speechRecognition = new SpeechRecognition()
           this.speechRecognition.continuous = true
           this.speechRecognition.interimResults = true
+          this.speechRecognition.lang = this.storeLocale ? this.storeLocale.replace('_', '-') : 'en-GB'
 
           this.speechRecognition.start()
           this.speechRecognition.onresult = event => {
@@ -261,6 +269,12 @@ export default {
               result += event.results[i][0].transcript
             }
             this.comment = result
+
+            console.log(result)
+          }
+          this.speechRecognition.onspeechend = event => {
+            this.speechRecognition.stop()
+            this.speechRecognition = null
           }
         }
       }
@@ -379,7 +393,8 @@ export default {
       this.imageFile = null
       this.imageData = null
       if (this.col !== null && this.row !== null) {
-        const dp = this.storeData.get(`${this.row}-${this.col}`)
+        const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+        const dp = storeData.get(`${this.row}-${this.col}`)
         this.values = this.visibleTraitMapping.map(t => t.trait.mType === 'multi' ? null : dp.values[t.index])
         this.dates = this.visibleTraitMapping.map(t => t.trait.mType === 'multi' ? null : dp.dates[t.index])
         this.name = dp.name
@@ -528,7 +543,8 @@ export default {
       // Only store the comment if it's not empty
       const comment = (this.comment !== undefined && this.comment !== null && this.comment.length > 0) ? this.comment : null
 
-      const dp = this.storeData.get(`${this.row}-${this.col}`)
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      const dp = storeData.get(`${this.row}-${this.col}`)
       const finalValues = JSON.parse(JSON.stringify(dp.values))
       const finalDates = JSON.parse(JSON.stringify(dp.dates))
 

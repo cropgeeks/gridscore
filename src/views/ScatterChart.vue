@@ -2,7 +2,7 @@
   <div>
     <h1>{{ $t('pageScatterTitle') }}</h1>
     <p>{{ $t('pageScatterText') }}</p>
-    <div v-if="storeData && storeData.size > 0 && storeTraits && storeTraits.length > 0">
+    <div v-if="storeDatasetId && storeTraits && storeTraits.length > 0">
       <b-row>
         <b-col cols=12 md=6>
           <!-- Trait selection box -->
@@ -32,6 +32,13 @@
 <script>
 import { mapGetters } from 'vuex'
 
+const Plotly = require('plotly.js/lib/core')
+
+// Only register the chart types we're actually using to reduce the final bundle size
+Plotly.register([
+  require('plotly.js/lib/scatter')
+])
+
 export default {
   data: function () {
     return {
@@ -48,7 +55,7 @@ export default {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
       'storeDarkMode',
-      'storeData',
+      'storeDatasetId',
       'storeDatasetName',
       'storeTraits'
     ]),
@@ -83,7 +90,7 @@ export default {
   },
   methods: {
     update: function () {
-      this.$plotly.purge('scatter-chart')
+      Plotly.purge('scatter-chart')
 
       const data = [{
         x: [],
@@ -94,7 +101,8 @@ export default {
       }]
 
       // For each data point
-      this.storeData.forEach((c, k) => {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      storeData.forEach((c, k) => {
         if (c.values) {
           const one = this.extractMultiTraitDatum(this.traitOne, this.storeTraits[this.traitOne].mType, this.selectedMultiTraitMethodOne, c, true)
           const two = this.extractMultiTraitDatum(this.traitTwo, this.storeTraits[this.traitTwo].mType, this.selectedMultiTraitMethodTwo, c, true)
@@ -142,7 +150,7 @@ export default {
         displaylogo: false
       }
 
-      this.$plotly.newPlot('scatter-chart', data, layout, config)
+      Plotly.newPlot('scatter-chart', data, layout, config)
     }
   },
   created: function () {

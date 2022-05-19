@@ -93,14 +93,6 @@ if (process.env.VUE_APP_BASE_URL) {
 
 store.commit('ON_SERVER_URL_CHANGED', baseUrl)
 
-Vue.use({
-  install: function (Vue) {
-    // Make custom plotly available
-    Vue.prototype.$plotly = require('@/custom-plotly')
-    window.Plotly = Vue.prototype.$plotly
-  }
-})
-
 new Vue({
   router,
   store,

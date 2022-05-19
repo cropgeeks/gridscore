@@ -3,8 +3,11 @@
     <div class="d-flex justify-content-between mb-3" v-if="storeTraits && storeTraits.length > 0">
       <p>{{ $t('pageHomeText') }}</p>
       <b-form inline @submit.prevent.stop>
-        <b-input-group>
-          <b-input-group-prepend>
+        <VueTypeaheadBootstrap id="typeahead" v-model="searchTerm" @hit="openDataInput" :data="germplasmNames">
+          <template slot="append">
+            <b-button @click="openDataInput"><BIconSearch /></b-button>
+          </template>
+          <template slot="prepend">
             <b-button @click="$refs.barcodeScannerModal.show()" v-b-tooltip="$t('tooltipScanQRCodeFindPlot')">
               <!-- TODO: Replace with bootstrap-vue icon once new version is released -->
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-qr-code-scan" viewBox="0 0 16 16">
@@ -15,12 +18,8 @@
                 <path d="M12 9h2V8h-2v1Z"/>
               </svg>
             </b-button>
-          </b-input-group-prepend>
-          <b-input v-model="searchTerm" ref="searchInput" @keyup.enter.prevent="openDataInput" />
-          <b-input-group-append>
-            <b-button @click="openDataInput"><BIconSearch /></b-button>
-          </b-input-group-append>
-        </b-input-group>
+          </template>
+        </VueTypeaheadBootstrap>
       </b-form>
     </div>
     <div class="d-flex flex-row align-items-end top-banner">
@@ -29,7 +28,7 @@
       </b-button>
 
       <!-- If it's a dataset that has been shared, show save and load buttons -->
-      <b-dropdown v-if="storeDataset && storeDatasetUuid" class="mr-1">
+      <b-dropdown v-if="storeDatasetUuid" class="mr-1" v-b-tooltip="$t('tooltipShare')">
         <template v-slot:button-content><BIconShareFill /> <span class="d-none d-lg-inline-block">{{ $t('tooltipShare') }}</span></template>
 
         <b-dropdown-item-button @click="onLoad" class="mr-1"><BIconCloudDownloadFill /> {{ $t('tooltipLoad') }}</b-dropdown-item-button>
@@ -96,7 +95,7 @@
     <GridTableCanvas @cell-clicked="onCellClicked" :traitStats="storeShowStatsInTable ? traitStats : null" v-if="storeTraits && storeTraits.length > 0" :highlightPosition="userPosition" ref="canvas" />
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
     <BarcodeScannerModal ref="barcodeScannerModal" @code-scanned="searchByBarcode" />
-    <BarcodeViewerModal ref="barcodeViewModal" :text="storeDataset.uuid" v-if="storeDataset && storeDataset.uuid" />
+    <BarcodeViewerModal ref="barcodeViewModal" :text="storeDatasetUuid" v-if="storeDatasetUuid" />
   </div>
 </template>
 
@@ -107,6 +106,7 @@ import BarcodeScannerModal from '@/components/modals/BarcodeScannerModal'
 import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
 import { BIconCircleFill, BIconGearFill, BIconSearch, BIconCloudDownloadFill, BIconCircleHalf, BIconCircle, BIconCloudUploadFill, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
+import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap'
 
 const emitter = require('tiny-emitter/instance')
 const fixPer = require('fix-perspective')
@@ -116,6 +116,7 @@ export default {
     return {
       searchTerm: null,
       focusInterval: null,
+      germplasmNames: [],
       cell: {
         row: null,
         col: null
@@ -168,7 +169,8 @@ export default {
     BarcodeScannerModal,
     BarcodeViewerModal,
     GridTableCanvas,
-    DataPointModal
+    DataPointModal,
+    VueTypeaheadBootstrap
   },
   computed: {
     /** Mapgetters exposing the store configuration */
@@ -176,9 +178,7 @@ export default {
       'storeCols',
       'storeContinuousInput',
       'storeCornerPoints',
-      'storeData',
       'storeDatasetId',
-      'storeDataset',
       'storeDatasetUuid',
       'storeGeolocation',
       'storeRows',
@@ -227,32 +227,28 @@ export default {
       this.$refs.cornerDropdown.hide()
     },
     openDataInput: function () {
-      if (this.searchTermLowerCase === null) {
-        return
-      }
-      this.storeData.forEach((c, k) => {
-        const [rowIndex, columnIndex] = k.split('-').map(i => +i)
-
-        if (c.name !== undefined && c.name !== null && c.name.toLowerCase() === this.searchTermLowerCase) {
-          const cell = document.querySelector(`#grid-table table tr:nth-child(${rowIndex}) td:nth-child(${columnIndex + 1})`)
-
-          if (cell) {
-            cell.scrollIntoView()
-          }
-
-          this.$nextTick(() => {
-            this.onCellClicked({
-              row: rowIndex,
-              col: columnIndex
-            })
-          })
-
-          this.searchTerm = null
+      this.$nextTick(() => {
+        if (this.searchTermLowerCase === null) {
+          return
         }
+        this.$store.state.dataset.data.forEach((c, k) => {
+          if (c.name !== undefined && c.name !== null && c.name.toLowerCase() === this.searchTermLowerCase) {
+            this.$nextTick(() => {
+              const [rowIndex, columnIndex] = k.split('-').map(i => +i)
+
+              this.onCellClicked({
+                row: rowIndex,
+                col: columnIndex
+              })
+            })
+
+            this.searchTerm = ''
+          }
+        })
       })
     },
     toggleVisibilityAll: function (select) {
-      this.$store.dispatch('setVisibleTraits', this.storeVisibleTraits.map(i => select))
+      this.$store.dispatch('setVisibleTraits', this.storeTraits.map(i => select))
     },
     toggleVisibility: function (index) {
       const temp = this.storeVisibleTraits.concat()
@@ -264,10 +260,11 @@ export default {
       this.$nextTick(() => this.$refs.dataPointModal.show())
     },
     forceFocus: function () {
-      if (this.$refs.searchInput && !document.body.classList.contains('modal-open')) {
+      const el = document.querySelector('#typeahead input')
+      if (el && !document.body.classList.contains('modal-open')) {
         const x = window.scrollX
         const y = window.scrollY
-        this.$refs.searchInput.focus({
+        el.focus({
           preventScroll: true
         })
         window.scrollTo(x, y)
@@ -288,9 +285,23 @@ export default {
       }
 
       this.updateTraitStats()
+
+      const germplasmArray = []
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (storeData) {
+        storeData.forEach((value, key) => {
+          if (value.name && value.name.length > 0) {
+            germplasmArray.push(value.name)
+          }
+        })
+        germplasmArray.sort()
+        Object.freeze(germplasmArray)
+      }
+      this.germplasmNames = germplasmArray
     },
     updateTraitStats: function () {
-      if (this.storeTraits) {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (this.storeTraits && storeData) {
         // If we don't have stats yet, get them from the dataset
         const tempStats = {}
 
@@ -303,7 +314,7 @@ export default {
           }
         })
 
-        this.storeData.forEach((c, k) => {
+        storeData.forEach((c, k) => {
           const [rowIndex, colIndex] = k.split('-').map(i => +i)
 
           this.storeTraits.forEach((t, tIndex) => {
@@ -348,10 +359,10 @@ export default {
     },
     loadData: function () {
       emitter.emit('set-loading', true)
-      this.getConfigFromSharing(this.storeDataset.uuid)
+      this.getConfigFromSharing(this.storeDatasetUuid)
         .then(result => {
           if (result) {
-            result.id = this.storeDataset.id
+            result.id = this.storeDatasetId
             this.$store.dispatch('updateDataset', result)
           }
         })
@@ -361,21 +372,25 @@ export default {
         .finally(() => emitter.emit('set-loading', false))
     },
     sendData: function () {
-      emitter.emit('set-loading', true)
-      const dataCopy = JSON.parse(JSON.stringify(this.storeDataset))
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (storeData) {
+        emitter.emit('set-loading', true)
+        const dataset = this.$store.state.dataset
+        const dataCopy = JSON.parse(JSON.stringify(dataset))
 
-      this.postConfigForSharing(dataCopy, this.storeDataset.data, this.storeDataset.uuid, this.storeRows, this.storeCols)
-        .catch(err => {
-          this.serverError = this.getErrorMessage(err)
-        })
-        .finally(() => emitter.emit('set-loading', false))
+        this.postConfigForSharing(dataCopy, storeData, this.storeDatasetUuid, this.storeRows, this.storeCols)
+          .catch(err => {
+            this.serverError = this.getErrorMessage(err)
+          })
+          .finally(() => emitter.emit('set-loading', false))
+      }
     }
   },
   mounted: function () {
-    if (this.storeDatasetId !== undefined && this.storeDatasetId !== null && (!this.storeData || this.storeData.length < 1)) {
+    if (this.storeDatasetId !== undefined && this.storeDatasetId !== null && (!this.$store.state.dataset.data || this.$store.state.dataset.data.length < 1)) {
       this.$store.dispatch('loadDataset', this.storeDatasetId)
     } else {
-      this.update()
+      this.$nextTick(() => this.update())
     }
     emitter.on('dataset-changed', this.update)
     emitter.on('data-point-changed', this.updateTraitStats)

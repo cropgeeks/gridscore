@@ -3,7 +3,7 @@
     <h1>{{ $t('pageLocationsTitle') }}</h1>
     <p>{{ $t('pageLocationsText') }}</p>
     <b-row class="location-map">
-      <LMap :zoom="3" :bounds="bounds" ref="locationMap" @ready="loadMap">
+      <LMap :zoom="3" :bounds="bounds" ref="locationMap" @ready="loadMap" @click="log">
         <!-- Draw a polygon connecting all markers -->
         <LPolygon :lat-lngs="corners" v-if="corners" :fillOpacity="0.1" />
         <!-- Grid lines -->
@@ -72,7 +72,6 @@ export default {
     ...mapGetters([
       'storeCols',
       'storeCornerPoints',
-      'storeData',
       'storeGeolocation',
       'storeRows',
       'storeTraits'
@@ -104,8 +103,9 @@ export default {
     locations: function () {
       const locs = []
 
-      if (this.storeData) {
-        this.storeData.forEach((c, k) => {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (storeData) {
+        storeData.forEach((c, k) => {
           if (c.geolocation) {
             locs.push(L.latLng(c.geolocation.lat, c.geolocation.lng))
           }
@@ -179,6 +179,9 @@ export default {
     }
   },
   methods: {
+    log: function (event) {
+      console.log(event.latlng)
+    },
     loadMap: function () {
       // Add OSM as the default
       const openstreetmap = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -212,14 +215,15 @@ export default {
       this.$nextTick(() => window.scrollTo(0, document.body.scrollHeight))
     },
     updateMarkers: function () {
-      if (this.storeData) {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (storeData) {
         const map = this.$refs.locationMap.mapObject
 
         const markers = L.markerClusterGroup({
           disableClusteringAtZoom: 20
         })
 
-        this.storeData.forEach((c, k) => {
+        storeData.forEach((c, k) => {
           if (c.geolocation) {
             const marker = L.marker(L.latLng(c.geolocation.lat, c.geolocation.lng)).bindPopup('')
             marker.on('click', e => {

@@ -39,11 +39,11 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeDataset'
+      'storeDatasetUuid'
     ])
   },
   watch: {
-    'storeDataset.uuid': function () {
+    storeDatasetUuid: function () {
       this.reset()
     }
   },
@@ -87,8 +87,8 @@ export default {
       this.serverError = null
       this.showCamera = false
 
-      if (this.useDatasetUuid && this.storeDataset && this.storeDataset.uuid) {
-        this.uuid = this.storeDataset.uuid
+      if (this.useDatasetUuid && this.storeDatasetUuid) {
+        this.uuid = this.storeDatasetUuid
       }
     },
     importExport: async function () {

@@ -40,7 +40,6 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeData',
       'storeTraitColors',
       'storeTraits'
     ]),
@@ -174,7 +173,7 @@ export default {
      * Shows and resets modal dialog
      */
     show: function () {
-      const dp = this.storeData.get(`${this.row}-${this.col}`)
+      const dp = this.$store.state.dataset.data.get(`${this.row}-${this.col}`)
 
       if (dp) {
         this.values = (dp.values && dp.values[this.traitIndex]) ? dp.values[this.traitIndex].concat() : []
