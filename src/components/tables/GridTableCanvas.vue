@@ -473,6 +473,12 @@ export default {
         if (ev) {
           const now = Date.now()
 
+          const deltaYSinceLast = ev.y - this.dragPosition.y
+          // Prevent scrolling up the page while the table hasn't reached the top yet
+          if (deltaYSinceLast >= 0 && this.origin.y !== 0 && e.cancelable) {
+            e.preventDefault()
+          }
+
           // Throttle to one draw per 25 milliseconds
           if (!this.lastMove || (now - this.lastMove) > 25) {
             const deltaX = Math.round(ev.x - this.dragStart.x)
@@ -480,12 +486,6 @@ export default {
 
             this.origin.x = Math.round(Math.max(Math.min(0, this.originStart.x + deltaX), -(this.storeCols * this.cellWidth - this.canvasWidth)))
             this.origin.y = Math.round(Math.max(Math.min(0, this.originStart.y + deltaY), -(this.storeRows * this.cellHeight - this.canvasHeight)))
-
-            const deltaYSinceLast = ev.y - this.dragPosition.y
-            // Prevent scrolling up the page while the table hasn't reached the top yet
-            if (deltaYSinceLast >= 0 && this.origin.y !== 0 && e.cancelable) {
-              e.preventDefault()
-            }
 
             this.dragPosition = ev
 
