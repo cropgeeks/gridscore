@@ -479,8 +479,8 @@ export default {
             e.preventDefault()
           }
 
-          // Throttle to one draw per 25 milliseconds
-          if (!this.lastMove || (now - this.lastMove) > 25) {
+          // Throttle to one draw per 20 milliseconds
+          if (!this.lastMove || (now - this.lastMove) > 20) {
             const deltaX = Math.round(ev.x - this.dragStart.x)
             const deltaY = Math.round(ev.y - this.dragStart.y)
 
