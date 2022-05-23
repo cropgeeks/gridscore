@@ -467,7 +467,7 @@ export default {
   right: 1em;
   bottom: 20%;
   transition: opacity linear 0.1s;
-  opacity: 0.5;
+  opacity: 0.66;
 }
 #jump-navigation:hover,
 #jump-navigation:focus {
