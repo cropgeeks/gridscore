@@ -141,7 +141,8 @@ export default {
       'storeTraits',
       'storeTraitColors',
       'storeUseGps',
-      'storeVisibleTraits'
+      'storeVisibleTraits',
+      'storeNavigationMode'
     ]),
     /** The row the user is currently in */
     highlightRow: function () {
@@ -359,15 +360,22 @@ export default {
             y: 0
           }
 
-          c.onmousedown = this.onMouseDown
-          c.ontouchstart = this.onMouseDown
-          c.onmouseup = this.onMouseUp
-          c.ontouchend = this.onMouseUp
-          c.onmouseleave = this.onMouseLeave
-          c.ontouchleave = this.onMouseLeave
-          c.onmousemove = this.onMouseMove
-          c.ontouchmove = this.onMouseMove
-          c.onwheel = this.onMouseWheel
+          if (this.storeNavigationMode === 'scroll') {
+            c.onmousedown = this.onMouseDown
+            c.ontouchstart = this.onMouseDown
+            c.onmouseup = this.onMouseUp
+            c.ontouchend = this.onMouseUp
+            c.onmouseleave = this.onMouseLeave
+            c.ontouchleave = this.onMouseLeave
+            c.onmousemove = this.onMouseMove
+            c.ontouchmove = this.onMouseMove
+            c.onwheel = this.onMouseWheel
+          } else {
+            c.onmousedown = this.onMouseDown
+            c.ontouchstart = this.onMouseDown
+            c.onmouseup = this.onMouseUp
+            c.ontouchend = this.onMouseUp
+          }
 
           this.update()
 
@@ -435,7 +443,7 @@ export default {
             col
           })
         }
-      } else if (e.type === 'touchend' || e.type === 'touchcancel') {
+      } else if (this.storeNavigationMode === 'scroll' && (e.type === 'touchend' || e.type === 'touchcancel')) {
         const deltaT = Math.abs(Date.now() - this.dragStartTime)
         // We have to use dragPosition here, because the end/cancel events don't provide location information
         const deltaX = Math.round((this.dragPosition.x - this.dragStart.x) / deltaT * 10)
@@ -522,8 +530,6 @@ export default {
         return
       }
       this.isDrawing = true
-
-      console.log('redraw-all')
 
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
 
@@ -751,6 +757,40 @@ export default {
       }
 
       this.update()
+    },
+    scrollBy: function (x, y) {
+      this.origin.x = Math.round(Math.max(Math.min(0, this.origin.x + x), -(this.storeCols * this.cellWidth - this.canvasWidth)))
+      this.origin.y = Math.round(Math.max(Math.min(0, this.origin.y + y), -(this.storeRows * this.cellHeight - this.canvasHeight)))
+
+      this.update()
+    },
+    moveInDirection: function (direction) {
+      switch (direction) {
+        case 'topleft':
+          this.scrollBy(this.cellWidth, this.cellHeight)
+          break
+        case 'top':
+          this.scrollBy(0, this.cellHeight)
+          break
+        case 'topright':
+          this.scrollBy(-this.cellWidth, this.cellHeight)
+          break
+        case 'left':
+          this.scrollBy(this.cellWidth, 0)
+          break
+        case 'right':
+          this.scrollBy(-this.cellWidth, 0)
+          break
+        case 'bottomleft':
+          this.scrollBy(this.cellWidth, -this.cellHeight)
+          break
+        case 'bottom':
+          this.scrollBy(0, -this.cellHeight)
+          break
+        case 'bottomright':
+          this.scrollBy(-this.cellWidth, -this.cellHeight)
+          break
+      }
     },
     scrollToCorner: function (corner) {
       switch (corner) {

@@ -15,6 +15,9 @@
           <b-form-group :label="$t('formLabelSettingsContinuousInput')" label-for="continuous-input" :description="$t('formDescriptionSettingsContinuousInput')">
             <b-form-checkbox v-model="tempContinuousInput" switch id="continuous-input">{{ $t('buttonToggleContinuousInput') }}</b-form-checkbox>
           </b-form-group>
+          <b-form-group :label="$t('formLabelSettingsNavigationMode')" label-for="navigation-mode" :description="$t('formDescriptionSettingsNavigationMode')">
+            <b-form-select :options="navigationModeOptions" v-model="tempNavigationMode" id="navigation-mode" />
+          </b-form-group>
 
           <div class="settings-colors">
             <h2>{{ $t('pageSettingsColorsTitle') }} <b-button size="sm" variant="light" v-b-tooltip="$t('tooltipSettingsResetColors')" @click="resetColors"><BIconArrowClockwise /></b-button></h2>
@@ -115,6 +118,7 @@ export default {
       tempGridLinesEvery: 5,
       tempColumnWidth: null,
       tempColors: [],
+      tempNavigationMode: null,
       newColor: 'black',
       validGridLines: [2, 3, 4, 5]
     }
@@ -135,8 +139,21 @@ export default {
       'storeShowStatsInTable',
       'storeTraitColors',
       'storeUseGps',
-      'storeUseSpeech'
-    ])
+      'storeUseSpeech',
+      'storeNavigationMode'
+    ]),
+    navigationModeOptions: function () {
+      return [
+        {
+          text: this.$t('formSelectOptionNavigationModeScroll'),
+          value: 'scroll'
+        },
+        {
+          text: this.$t('formSelectOptionNavigationModeJump'),
+          value: 'jump'
+        }
+      ]
+    }
   },
   methods: {
     /**
@@ -155,6 +172,7 @@ export default {
       this.tempHideToggledTraits = this.storeHideToggledTraits
       this.tempHideMarkers = this.storeHideMarkers
       this.tempIgnoreEmptyCells = this.storeIgnoreEmptyCells
+      this.tempNavigationMode = this.storeNavigationMode
       this.tempColors = JSON.parse(JSON.stringify(this.storeTraitColors))
     },
     resetApp: function () {
@@ -230,6 +248,9 @@ export default {
       }
       if (this.tempIgnoreEmptyCells !== this.storeIgnoreEmptyCells) {
         this.$store.dispatch('setIgnoreEmptyCells', this.tempIgnoreEmptyCells)
+      }
+      if (this.tempNavigationMode !== this.storeNavigationMode) {
+        this.$store.dispatch('setNavigationMode', this.tempNavigationMode)
       }
 
       if (this.tempColors.length !== this.storeTraitColors.length || !this.tempColors.every((value, index) => value === this.storeTraitColors[index])) {

@@ -47,6 +47,7 @@ const storeState = {
     hideMarkers: false,
     showStatsInTable: false,
     visibleTraits: null,
+    navigationMode: 'scroll',
     ignoreEmptyCells: true,
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600'],
     plausible: {
@@ -87,7 +88,8 @@ const storeState = {
     storeHideMarkers: (state) => state.hideMarkers,
     storeTraitColors: (state) => state.traitColors,
     storeVisibleTraits: (state) => state.visibleTraits,
-    storePlausible: (state) => state.plausible
+    storePlausible: (state) => state.plausible,
+    storeNavigationMode: (state) => state.navigationMode
   },
   mutations: {
     ON_RUN_COUNT_CHANGED_MUTATION: function (state, newRunCount) {
@@ -380,6 +382,13 @@ const storeState = {
     },
     ON_DARK_MODE_CHANGED_MUTATION: function (state, newDarkMode) {
       state.darkMode = newDarkMode
+    },
+    ON_NAVIGATION_MODE_CHANGED_MUTATION: function (state, newNavigationMode) {
+      if (!state.navigationMode) {
+        Vue.set(state, 'navigationMode', newNavigationMode)
+      } else {
+        state.navigationMode = newNavigationMode
+      }
     }
   },
   actions: {
@@ -515,13 +524,16 @@ const storeState = {
     },
     setDarkMode: function ({ commit }, darkMode) {
       commit('ON_DARK_MODE_CHANGED_MUTATION', darkMode)
+    },
+    setNavigationMode: function ({ commit }, navigationMode) {
+      commit('ON_NAVIGATION_MODE_CHANGED_MUTATION', navigationMode)
     }
   },
   plugins: [createPersistedState({
     key: name,
     storage: {
       getItem: key => {
-        const result = JSON.parse(localStorage.getItem(key))
+        let result = JSON.parse(localStorage.getItem(key))
 
         if (result && result.datasets && result.datasets.length > 0) {
           result.datasets.forEach(d => {
@@ -565,6 +577,8 @@ const storeState = {
           // Add a new database entry, cause we're not using localstorage anymore
           setTimeout(() => store.dispatch('addDataset', result.datasets[0]), 5000)
         }
+
+        result = Object.assign(JSON.parse(JSON.stringify(storeState.state)), result)
 
         return JSON.stringify(result)
       },

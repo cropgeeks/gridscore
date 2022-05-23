@@ -22,6 +22,23 @@
         </VueTypeaheadBootstrap>
       </b-form>
     </div>
+    <template v-if="storeNavigationMode === 'jump'">
+      <b-button class="btn-circle" id="jump-navigation" variant="primary"><BIconArrowsMove /></b-button>
+
+      <b-popover ref="navigationPopover" target="jump-navigation" triggers="click blur" placement="left" :variant="storeDarkMode ? 'dark' : null">
+        <div class="grid-direction-grid p-2">
+          <div><b-button @click="moveCanvas('topleft')"><BIconArrowUpLeft /></b-button></div>
+          <div><b-button @click="moveCanvas('top')"><BIconArrowUp /></b-button></div>
+          <div><b-button @click="moveCanvas('topright')"><BIconArrowUpRight /></b-button></div>
+          <div><b-button @click="moveCanvas('left')"><BIconArrowLeft /></b-button></div>
+          <div><b-button @click="$refs.navigationPopover.$emit('close')"><BIconSlashCircle /></b-button></div>
+          <div><b-button @click="moveCanvas('right')"><BIconArrowRight /></b-button></div>
+          <div><b-button @click="moveCanvas('bottomleft')"><BIconArrowDownLeft /></b-button></div>
+          <div><b-button @click="moveCanvas('bottom')"><BIconArrowDown /></b-button></div>
+          <div><b-button @click="moveCanvas('bottomright')"><BIconArrowDownRight /></b-button></div>
+        </div>
+      </b-popover>
+    </template>
     <div class="d-flex flex-row align-items-end top-banner">
       <b-button @click="$router.push({ name: 'settings' })" class="mr-1" v-b-tooltip="$t('tooltipSettings')" v-if="storeTraits && storeTraits.length > 0">
         <BIconGearFill /> <span class="d-none d-lg-inline-block">{{ $t('tooltipSettings') }}</span>
@@ -104,7 +121,7 @@ import GridTableCanvas from '@/components/tables/GridTableCanvas'
 import DataPointModal from '@/components/modals/DataPointModal'
 import BarcodeScannerModal from '@/components/modals/BarcodeScannerModal'
 import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
-import { BIconCircleFill, BIconGearFill, BIconSearch, BIconCloudDownloadFill, BIconCircleHalf, BIconCircle, BIconCloudUploadFill, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
+import { BIconCircleFill, BIconGearFill, BIconSearch, BIconArrowsMove, BIconSlashCircle, BIconCloudDownloadFill, BIconCircleHalf, BIconCircle, BIconCloudUploadFill, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap'
 
@@ -148,9 +165,11 @@ export default {
   },
   components: {
     BIconCircleFill,
+    BIconSlashCircle,
     BIconGearFill,
     BIconCircleHalf,
     BIconCircle,
+    BIconArrowsMove,
     BIconSearch,
     BIconShareFill,
     BIconArrowsFullscreen,
@@ -178,6 +197,7 @@ export default {
       'storeCols',
       'storeContinuousInput',
       'storeCornerPoints',
+      'storeDarkMode',
       'storeDatasetId',
       'storeDatasetUuid',
       'storeGeolocation',
@@ -186,7 +206,8 @@ export default {
       'storeTraitColors',
       'storeTraits',
       'storeUseGps',
-      'storeVisibleTraits'
+      'storeVisibleTraits',
+      'storeNavigationMode'
     ]),
     searchTermLowerCase: function () {
       if (this.searchTerm) {
@@ -225,6 +246,9 @@ export default {
     scrollTo: function (corner) {
       this.$refs.canvas.scrollToCorner(corner)
       this.$refs.cornerDropdown.hide()
+    },
+    moveCanvas: function (direction) {
+      this.$refs.canvas.moveInDirection(direction)
     },
     openDataInput: function () {
       this.$nextTick(() => {
@@ -437,5 +461,23 @@ export default {
 }
 .grid-direction-grid .gps-button {
   grid-column: 1 / span 3;
+}
+#jump-navigation {
+  position: fixed;
+  right: 1em;
+  bottom: 20%;
+  transition: opacity linear 0.1s;
+  opacity: 0.5;
+}
+#jump-navigation:hover,
+#jump-navigation:focus {
+  opacity: 1;
+}
+.btn-circle {
+  width: 50px;
+  height: 50px;
+  padding: 7px 10px;
+  border-radius: 25px;
+  text-align: center;
 }
 </style>
