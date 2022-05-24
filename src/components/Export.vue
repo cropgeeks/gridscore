@@ -42,7 +42,7 @@ export default {
     },
     exportJson: function () {
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
-      if (!this.storeDatasetUuid || !storeData || storeData.length < 1) {
+      if (!storeData || storeData.length < 1) {
         return
       }
 
