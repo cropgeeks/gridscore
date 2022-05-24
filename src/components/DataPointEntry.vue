@@ -378,6 +378,8 @@ export default {
     },
     setDateToday: function (index) {
       Vue.set(this.values, index, this.getTodayString())
+
+      this.traverseForm(index + 1)
     },
     getToday: function () {
       const today = new Date()

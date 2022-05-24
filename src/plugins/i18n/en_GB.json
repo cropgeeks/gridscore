@@ -224,6 +224,8 @@
   "pageShareText": "<p>Data or trial setup configurations can easily be shared between GridScore devices using QR codes. An internet connection is required to share and you may have to grant permissions to use the device's camera.</p><p>To share data or a configuration from device A, use the export section below to generate a QR code. Then on device B, use the import section and scan the QR code using the button and then the camera.</p><p>Data shared using the GridScore server is only accessible using the unique identifier encoded in the QR code. Data will automatically be deleted from the server after 30 days of inactivity. Data on your local device will not be deleted automatically and can be shared again at any time, even after those 30 days of inactivity.</p>",
   "pageStatsTitle": "Trait statistics",
   "pageStatsText": "This page shows overview statistics for each trait. Numeric and date traits are visualized in a box plot while text and categorical traits are shown in bar charts.",
+  "pageTimelineMultiTitle": "Multi-trait charts",
+  "pageTimelineMultiText": "The charts below show the development of values per multi-trait. Each line represents a plant/plot.",
   "pageTimelineText": "The following chart shows the percentage of scored plots over time. This highlights the development of plots as time goes on as well as the relationship between traits. The x-axis shows time, the y-axis shows the percentage of scored plots. Each trait is shown in their respective color.",
   "pageTimelineTitle": "Timeline",
   "pageUuidImportTitle": "Trial import",

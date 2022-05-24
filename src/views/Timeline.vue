@@ -4,11 +4,17 @@
     <p>{{ $t('pageTimelineText') }}</p>
     <div id="timeseries-chart" class="time-chart" v-if="storeDatasetId && storeTraits && storeTraits.length > 0"/>
     <h3 v-else>{{ $t('labelNoData') }}</h3>
+
+    <div v-if="multiTraits && multiTraits.length > 0" class="mt-3">
+      <h1>{{ $t('pageTimelineMultiTitle') }}</h1>
+      <MultiTraitTimeline :trait="mt" v-for="mt in multiTraits" :key="`mt-${mt.name}`" />
+    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import MultiTraitTimeline from '@/components/MultiTraitTimeline'
 
 const Plotly = require('plotly.js/lib/core')
 
@@ -21,6 +27,9 @@ Plotly.register([
  * Shows the timeline for data recording of each trait as a percentage of all plots scored.
  */
 export default {
+  components: {
+    MultiTraitTimeline
+  },
   watch: {
     storeLocale: function () {
       this.plot()
@@ -47,6 +56,9 @@ export default {
       } else {
         return ''
       }
+    },
+    multiTraits: function () {
+      return this.storeTraits.filter(t => t.mType === 'multi')
     }
   },
   methods: {
