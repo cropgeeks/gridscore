@@ -1,6 +1,6 @@
 <template>
   <b-form @submit.prevent id="import-export-form">
-    <b-button @click="exportJson">{{ storeDataset.uuid ? $t('buttonImportExportSave') : $t('buttonImportExportShare') }}</b-button>
+    <b-button @click="exportJson">{{ storeDatasetUuid ? $t('buttonImportExportSave') : $t('buttonImportExportShare') }}</b-button>
 
     <div v-show="serverUuid !== null">
       <p class="text-info mt-3">{{ $t('modalTextExportQR') }}</p>
