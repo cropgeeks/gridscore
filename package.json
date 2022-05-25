@@ -1,7 +1,7 @@
 {
   "name": "gridscore",
   "version": "1.9.0",
-  "private": true,
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build && copyfiles .htaccess dist/ && copyfiles assetlinks.json dist/.well-known",
