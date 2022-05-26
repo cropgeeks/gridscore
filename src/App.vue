@@ -217,7 +217,7 @@ export default {
       return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === ''
     },
     onDatasetSelected: function (datasetId) {
-      this.$store.dispatch('loadDataset', { datasetId: this.storeDatasetId, redirect: true })
+      this.$store.dispatch('loadDataset', { datasetId: datasetId, redirect: true })
       this.sidebarShown = false
       // this.$router.push({ name: 'data', params: { datasetId: datasetId } })
     },

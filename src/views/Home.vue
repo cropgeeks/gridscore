@@ -119,7 +119,7 @@ export default {
       })
     },
     onDatasetSelected: function (datasetId) {
-      this.$store.dispatch('loadDataset', { datasetId: this.storeDatasetId, redirect: true })
+      this.$store.dispatch('loadDataset', { datasetId: datasetId, redirect: true })
     },
     onResetClicked: function (dataset) {
       this.$bvModal.msgBoxConfirm(this.$t('modalTextResetDataset'), {
