@@ -118,7 +118,7 @@
       </b-collapse>
       <b-collapse accordion="option-accordion" id="collapse-markers" class="mt-2" @shown="$refs.markerSetup.reset()">
         <b-card>
-          <MarkerSetup :rows="rows" :cols="cols" ref="markerSetup" />
+          <MarkerSetup :rows="rows" :cols="cols" :useCurrentDataset="false" ref="markerSetup" />
         </b-card>
       </b-collapse>
     </b-form>

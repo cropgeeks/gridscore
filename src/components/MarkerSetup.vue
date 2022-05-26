@@ -44,12 +44,17 @@ export default {
     cols: {
       type: Number,
       default: 1
+    },
+    useCurrentDataset: {
+      type: Boolean,
+      default: true
     }
   },
   computed: {
     ...mapGetters([
       'storeTraitColors',
-      'storeDarkMode'
+      'storeDarkMode',
+      'storeMarkers'
     ]),
     markerCornerOptions: function () {
       return [
@@ -197,6 +202,13 @@ export default {
     reset: function () {
       if (this.resizeRunning) {
         return
+      }
+
+      if (this.useCurrentDataset && this.storeMarkers) {
+        this.markersEveryCol = this.storeMarkers.everyCol
+        this.markersEveryRow = this.storeMarkers.everyRow
+        this.markersCorner = this.storeMarkers.corner
+        this.markersUse = true
       }
 
       this.width = this.$refs.canvasWrapper.offsetWidth

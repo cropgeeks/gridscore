@@ -21,3 +21,7 @@ All your data is stored in the app and can be exported at any time. This, howeve
 ## Installation and Documentation
 
 There is detailed information about what GridScore can do and how to use it available on the dedicated website: https://cropgeeks.github.io/gridscore/
+
+## GridScore link
+
+GridScore is available at https://ics.hutton.ac.uk/gridscore

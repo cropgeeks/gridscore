@@ -137,6 +137,14 @@ export default {
 
     return db.put('datasets', dataset)
   },
+  updateDatasetMarkers: async function (datasetId, markers) {
+    const db = await this.getDb()
+
+    const dataset = await this.getDataset(datasetId)
+    dataset.markers = markers
+
+    return db.put('datasets', dataset)
+  },
   updateDatasetAndData: async function (update) {
     const db = await this.getDb()
 

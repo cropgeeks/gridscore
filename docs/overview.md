@@ -4,27 +4,18 @@ title: GridScore Overview
 
 # GridScore Overview
 
-<img src="img/screenshot-overview.png" width="900" alt="Overview">
+<img src="img/screenshot-overview.png" style="max-width: 100%;" alt="Overview">
 
-The home screen of GridScore shows the three most common options for new users: `Set up a trial`,  `Load example data` and `View introduction tour`. The first will take you to the <a href="trial-setup.html">trial setup screen</a>, while the second loads an exemplar barley dataset that you can explore to see how GridScore works. The last option highlights the main features of GridScore in a step-by-step tour.
+The home screen of GridScore shows the three most common options for new users: `Set up a trial`, `Import trial`, `Load example data` and `View introduction tour`. The first will take you to the <a href="trial-setup.html">trial setup screen</a> where you are able to set up a new trial from scratch. To import an existing trial, select `Import trial` which takes you to the <a href="importing.html">import screen</a> where you can load existing trials that have been shared with you or import existing data into a trial. To load an exemplar trial, select the `Load example trial` option. This loads a barley dataset that has been scored with GridScore which you can explore to see how GridScore works. The last option highlights the main features of GridScore in a step-by-step tour.
 
 If you have used GridScore before, your trials are listed below. Your most recently used dataset is shown first so you can continue where you left off.
 
-The top menu takes you to the data input screen as well as some visualization screens.
+The top menu takes you to the main sections of GridScore. Those include the data input screen and a selection of data visualizations. Additionally, this is where you can toggle the dark mode as well as switch between interface languages.
 
-The button in the top left toggles the side menu which allows fast and easy switching between your trials.
-
-
-## Sharing
-
-<img src="img/screenshot-sharing.png" width="900" alt="Data sharing">
-
-GridScore can easily share your trial setup as well as all the valuable data you recorded between devices by simply scanning a QR code. Generate a code on device A then scan it on device B and your data has been transfered. Simple as that.
-
-This feature also allows you to set up your trial in the comfort of your office where you can simply copy and paste information into GridScore and then share your trial to a mobile device for when you go out into the field. When you get back, simply share it back to have all your data on your PC.
+The button in the top left toggles the side menu which allows fast and easy switching between your trials. It also gives you access to the GridScore settings.
 
 ## Settings
 
-<img src="img/screenshot-settings.png" width="900" alt="Settings">
+<img src="img/screenshot-settings.png" style="max-width: 100%;" alt="Settings">
 
 Some more advanced settings are located on the dedicated settings screen. Colors, column widths, grid lines as well as many other things can be changed here.

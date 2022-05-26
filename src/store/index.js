@@ -210,6 +210,11 @@ const storeState = {
 
       idb.updateDatasetCornerPoints(state.datasetId, newCornerPoints)
     },
+    ON_MARKERS_CHANGED_MUTATION: function (state, newMarkers) {
+      state.dataset.markers = newMarkers
+
+      idb.updateDatasetMarkers(state.datasetId, newMarkers)
+    },
     ON_BRAPI_CONFIG_CHANGED: function (state, newBrapiConfig) {
       if (newBrapiConfig && newBrapiConfig.url) {
         // Remove trailing slashes
@@ -456,6 +461,9 @@ const storeState = {
     },
     setCornerPoints: function ({ commit }, cornerPoints) {
       commit('ON_CORNER_POINTS_CHANGED_MUTATION', cornerPoints)
+    },
+    setMarkers: function ({ commit }, markers) {
+      commit('ON_MARKERS_CHANGED_MUTATION', markers)
     },
     updateDataset: function ({ commit }, update) {
       commit('ON_DATASET_UPDATED_MUTATION', update)
