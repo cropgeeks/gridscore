@@ -4,9 +4,11 @@
   <img src="https://raw.githubusercontent.com/cropgeeks/gridscore/master/public/img/gridscore2.svg?sanitize=true" width="200" alt="Logo">
 </p>
 
-![GitHub](https://img.shields.io/github/license/cropgeeks/gridscore)
+![GitHub License](https://img.shields.io/github/license/cropgeeks/gridscore)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/cropgeeks/gridscore)
 ![GitHub last commit](https://img.shields.io/github/last-commit/cropgeeks/gridscore)
+![Docker Pulls](https://img.shields.io/docker/pulls/cropgeeks/gridscore)
+[![Docker CI Tag](https://github.com/cropgeeks/gridscore/actions/workflows/docker-ci-multi-arch-tag.yml/badge.svg)](https://github.com/germinateplatform/germinate-vue/actions/workflows/docker-ci-tag.yml)
 [![DOI](https://zenodo.org/badge/270078734.svg)](https://zenodo.org/badge/latestdoi/270078734)
 
 GridScore is a field trial phenotyping app for trait data. It lets you keep track of what's happening in the field on a plot-level basis. This could be anything from plant emergence, flowering date, plant height, flower colour, etc. You can define the layout of your field trial and the traits you want to score. GridScore then presents your data in a table format representing your field layout. Data is recorded by clicking on a specific plot in a field and then entering your data.
