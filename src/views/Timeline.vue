@@ -16,6 +16,7 @@
 import { mapGetters } from 'vuex'
 import MultiTraitTimeline from '@/components/MultiTraitTimeline'
 
+const emitter = require('tiny-emitter/instance')
 const Plotly = require('plotly.js/lib/core')
 
 // Only register the chart types we're actually using to reduce the final bundle size
@@ -169,7 +170,15 @@ export default {
     }
   },
   mounted: function () {
-    this.plot()
+    if (this.storeDatasetId !== undefined && this.storeDatasetId !== null && (!this.$store.state.dataset.data || this.$store.state.dataset.data.length < 1)) {
+      this.$store.dispatch('loadDataset', { datasetId: this.storeDatasetId, redirect: false })
+    } else {
+      this.$nextTick(() => this.plot())
+    }
+    emitter.on('dataset-changed', this.plot)
+  },
+  beforeDestroy: function () {
+    emitter.off('dataset-changed', this.plot)
   }
 }
 </script>

@@ -412,7 +412,7 @@ export default {
   },
   mounted: function () {
     if (this.storeDatasetId !== undefined && this.storeDatasetId !== null && (!this.$store.state.dataset.data || this.$store.state.dataset.data.length < 1)) {
-      this.$store.dispatch('loadDataset', this.storeDatasetId)
+      this.$store.dispatch('loadDataset', { datasetId: this.storeDatasetId, redirect: false })
     } else {
       this.$nextTick(() => this.update())
     }

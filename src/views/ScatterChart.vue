@@ -32,6 +32,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
+const emitter = require('tiny-emitter/instance')
 const Plotly = require('plotly.js/lib/core')
 
 // Only register the chart types we're actually using to reduce the final bundle size
@@ -151,20 +152,31 @@ export default {
       }
 
       Plotly.newPlot('scatter-chart', data, layout, config)
+    },
+    init: function () {
+      this.traits = this.storeTraits.map((t, index) => {
+        return {
+          value: index,
+          text: t.name
+        }
+      })
+      this.traitOne = this.traits.length > 0 ? 0 : null
+      this.traitTwo = this.traitOne
+
+      this.multiTraitOptionsOne = this.getMultiTraitMethods(this.storeTraits[this.traitOne])
+      this.multiTraitOptionsTwo = this.getMultiTraitMethods(this.storeTraits[this.traitTwo])
     }
   },
-  created: function () {
-    this.traits = this.storeTraits.map((t, index) => {
-      return {
-        value: index,
-        text: t.name
-      }
-    })
-    this.traitOne = this.traits.length > 0 ? 0 : null
-    this.traitTwo = this.traitOne
-
-    this.multiTraitOptionsOne = this.getMultiTraitMethods(this.storeTraits[this.traitOne])
-    this.multiTraitOptionsTwo = this.getMultiTraitMethods(this.storeTraits[this.traitTwo])
+  mounted: function () {
+    if (this.storeDatasetId !== undefined && this.storeDatasetId !== null && (!this.$store.state.dataset.data || this.$store.state.dataset.data.length < 1)) {
+      this.$store.dispatch('loadDataset', { datasetId: this.storeDatasetId, redirect: false })
+    } else {
+      this.$nextTick(() => this.init())
+    }
+    emitter.on('dataset-changed', this.init)
+  },
+  beforeDestroy: function () {
+    emitter.off('dataset-changed', this.init)
   }
 }
 </script>

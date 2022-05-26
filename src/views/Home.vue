@@ -92,7 +92,7 @@ export default {
     },
     loadDataset: function () {
       if (this.storeDatasetId !== undefined && this.storeDatasetId !== null) {
-        this.$store.dispatch('loadDataset', this.storeDatasetId)
+        this.$store.dispatch('loadDataset', { datasetId: this.storeDatasetId, redirect: true })
       }
     },
     updateDatasets: function () {
@@ -119,7 +119,7 @@ export default {
       })
     },
     onDatasetSelected: function (datasetId) {
-      this.$store.dispatch('loadDataset', datasetId)
+      this.$store.dispatch('loadDataset', { datasetId: this.storeDatasetId, redirect: true })
     },
     onResetClicked: function (dataset) {
       this.$bvModal.msgBoxConfirm(this.$t('modalTextResetDataset'), {

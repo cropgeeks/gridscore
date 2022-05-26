@@ -46,6 +46,7 @@ import 'leaflet.markercluster'
 
 import { mapGetters } from 'vuex'
 
+const emitter = require('tiny-emitter/instance')
 const fixPer = require('fix-perspective')
 
 export default {
@@ -72,6 +73,7 @@ export default {
     ...mapGetters([
       'storeCols',
       'storeCornerPoints',
+      'storeDatasetId',
       'storeGeolocation',
       'storeRows',
       'storeTraits'
@@ -240,6 +242,15 @@ export default {
         map.addLayer(markers)
       }
     }
+  },
+  mounted: function () {
+    if (this.storeDatasetId !== undefined && this.storeDatasetId !== null && (!this.$store.state.dataset.data || this.$store.state.dataset.data.length < 1)) {
+      this.$store.dispatch('loadDataset', { datasetId: this.storeDatasetId, redirect: false })
+    }
+    emitter.on('dataset-changed', this.loadMap)
+  },
+  beforeDestroy: function () {
+    emitter.off('dataset-changed', this.loadMap)
   }
 }
 </script>

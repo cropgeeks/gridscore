@@ -95,7 +95,8 @@ const storeState = {
     ON_RUN_COUNT_CHANGED_MUTATION: function (state, newRunCount) {
       state.runCount = newRunCount
     },
-    ON_DATASET_LOAD_MUTATION: function (state, datasetId) {
+    ON_DATASET_LOAD_MUTATION: function (state, event) {
+      const datasetId = event.datasetId
       state.datasetId = datasetId
       if (datasetId) {
         emitter.emit('set-loading', true)
@@ -116,7 +117,7 @@ const storeState = {
                 })
                 .finally(() => {
                   emitter.emit('set-loading', false)
-                  emitter.emit('dataset-changed')
+                  emitter.emit('dataset-changed', event.redirect)
                 })
             } else {
               emitter.emit('set-loading', false)
@@ -150,7 +151,7 @@ const storeState = {
                 })
                 .finally(() => {
                   emitter.emit('set-loading', false)
-                  emitter.emit('dataset-changed')
+                  emitter.emit('dataset-changed', true)
                 })
             })
             .then(() => emitter.emit('datasets-changed'))
@@ -162,7 +163,7 @@ const storeState = {
       idb.resetDatasetData(datasetId)
         .finally(() => {
           emitter.emit('set-loading', false)
-          emitter.emit('dataset-changed')
+          emitter.emit('dataset-changed', true)
           emitter.emit('datasets-changed')
         })
     },
@@ -243,7 +244,7 @@ const storeState = {
                   .finally(() => {
                     emitter.emit('set-loading', false)
                     emitter.emit('datasets-changed')
-                    emitter.emit('dataset-changed')
+                    emitter.emit('dataset-changed', true)
                   })
               } else {
                 emitter.emit('set-loading', false)
@@ -398,8 +399,8 @@ const storeState = {
     setUniqueClientId: function ({ commit }, uniqueClientId) {
       commit('ON_UNIQUE_CLIENT_ID_CHANGED_MUTATION', uniqueClientId)
     },
-    loadDataset: function ({ commit }, datasetId) {
-      commit('ON_DATASET_LOAD_MUTATION', datasetId)
+    loadDataset: function ({ commit }, event) {
+      commit('ON_DATASET_LOAD_MUTATION', event)
     },
     addDataset: function ({ commit }, dataset) {
       commit('ON_DATASET_ADDED_MUTATION', dataset)
@@ -410,7 +411,7 @@ const storeState = {
     resetDataset: function ({ commit }, datasetId) {
       emitter.emit('set-loading', true)
       commit('ON_DATASET_RESET_MUTATION', datasetId)
-      commit('ON_DATASET_LOAD_MUTATION', datasetId)
+      commit('ON_DATASET_LOAD_MUTATION', { datasetId: datasetId, redirect: true })
     },
     addTraitToDataset: function ({ commit }, config) {
       commit('ON_ADD_TRAIT_TO_DATASET_MUTATION', config)
@@ -431,7 +432,7 @@ const storeState = {
         commit('ON_INVERT_VIEW_CHANGED_MUTATION', false)
         commit('ON_INVERT_NUMBERING_X_CHANGED_MUTATION', false)
         commit('ON_INVERT_NUMBERING_Y_CHANGED_MUTATION', false)
-        commit('ON_DATASET_LOAD_MUTATION', null)
+        commit('ON_DATASET_LOAD_MUTATION', { datasetId: null, redirect: true })
       }).finally(() => {
         emitter.emit('set-loading', false)
         emitter.emit('datasets-changed')

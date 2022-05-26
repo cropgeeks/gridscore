@@ -217,7 +217,7 @@ export default {
       return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === ''
     },
     onDatasetSelected: function (datasetId) {
-      this.$store.dispatch('loadDataset', datasetId)
+      this.$store.dispatch('loadDataset', { datasetId: this.storeDatasetId, redirect: true })
       this.sidebarShown = false
       // this.$router.push({ name: 'data', params: { datasetId: datasetId } })
     },
@@ -336,11 +336,14 @@ export default {
         this.datasets = ds
       })
     },
-    navigateToDataset: function () {
+    navigateToDataset: function (redirect) {
       this.$store.dispatch('setVisibleTraits', null)
-      const route = this.$router.currentRoute
-      if (route.name !== 'dataset' || (route.params && (route.params.datasetId !== this.storeDatasetId))) {
-        this.$router.push({ name: 'data' })
+
+      if (redirect) {
+        const route = this.$router.currentRoute
+        if (route.name !== 'dataset' || (route.params && (route.params.datasetId !== this.storeDatasetId))) {
+          this.$router.push({ name: 'data' })
+        }
       }
     },
     navigateHome: function () {

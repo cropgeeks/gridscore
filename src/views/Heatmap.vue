@@ -20,6 +20,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
+const emitter = require('tiny-emitter/instance')
 const Plotly = require('plotly.js/lib/core')
 
 // Only register the chart types we're actually using to reduce the final bundle size
@@ -274,18 +275,29 @@ export default {
 
         Plotly.newPlot('heatmap-chart', data, layout, config)
       }
+    },
+    init: function () {
+      this.traits = this.storeTraits.map((t, index) => {
+        return {
+          value: index,
+          text: t.name
+        }
+      })
+      this.trait = this.traits.length > 0 ? 0 : null
+
+      this.multiTraitOptions = this.getMultiTraitMethods(this.storeTraits[this.trait])
     }
   },
   mounted: function () {
-    this.traits = this.storeTraits.map((t, index) => {
-      return {
-        value: index,
-        text: t.name
-      }
-    })
-    this.trait = this.traits.length > 0 ? 0 : null
-
-    this.multiTraitOptions = this.getMultiTraitMethods(this.storeTraits[this.trait])
+    if (this.storeDatasetId !== undefined && this.storeDatasetId !== null && (!this.$store.state.dataset.data || this.$store.state.dataset.data.length < 1)) {
+      this.$store.dispatch('loadDataset', { datasetId: this.storeDatasetId, redirect: false })
+    } else {
+      this.$nextTick(() => this.init())
+    }
+    emitter.on('dataset-changed', this.init)
+  },
+  beforeDestroy: function () {
+    emitter.off('dataset-changed', this.init)
   }
 }
 </script>
