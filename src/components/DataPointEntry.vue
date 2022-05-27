@@ -8,7 +8,9 @@
                     :description="formDescriptions ? formDescriptions[index] : null">
         <!-- Show the trait name along with the type and its color as the label -->
         <template v-slot:label>
-          <span :style="{ color: storeTraitColors[mapping.index % storeTraitColors.length] }"><BIconCircleFill /> {{ mapping.trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(mapping.trait) }}</b-badge></span>
+          <span :style="{ color: storeTraitColors[mapping.index % storeTraitColors.length] }">
+            <BIconCircleFill v-if="values[index] !== undefined && values[index] !== null && values[index] !== ''" /><BIconCircle v-else /> {{ mapping.trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(mapping.trait) }}</b-badge>
+          </span>
         </template>
 
         <b-input-group>
@@ -76,7 +78,7 @@ import VideoModal from '@/components/modals/VideoModal'
 import DataEntryInput from '@/components/DataEntryInput'
 import MultiTraitValueModal from '@/components/modals/MultiTraitValueModal'
 import { mapGetters } from 'vuex'
-import { BIconCameraFill, BIconCircleFill, BIconMic, BIconInfoCircle, BIconChatRightTextFill, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
+import { BIconCameraFill, BIconCircleFill, BIconCircle, BIconMic, BIconInfoCircle, BIconChatRightTextFill, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
 
 const emitter = require('tiny-emitter/instance')
 
@@ -86,6 +88,7 @@ export default {
   components: {
     BIconCameraFill,
     BIconCircleFill,
+    BIconCircle,
     BIconCaretLeftFill,
     BIconCaretRightFill,
     BIconChatRightTextFill,
@@ -336,7 +339,7 @@ export default {
         this.dateInput = ''
       }
 
-      // If this could be part of a number
+      // If this could be part of a number, append to existing string
       if (event.key === '-' || event.key === '+' || !isNaN(event.key)) {
         this.dateInput += event.key
       }
@@ -359,6 +362,15 @@ export default {
       current.setDate(current.getDate() - 1)
 
       Vue.set(this.values, index, current.toISOString().split('T')[0])
+
+      const diffDays = Math.floor((new Date() - current) / (1000 * 60 * 60 * 24))
+      if (diffDays > -14 && diffDays < 0) {
+        this.speak(this.$tc('ttsDaysIn', Math.abs(diffDays)))
+      } else if (diffDays < 14) {
+        this.speak(this.$tc('ttsDaysAgo', Math.abs(diffDays)))
+      } else {
+        this.speak(current.toISOString().split('T')[0])
+      }
     },
     setDatePlusOne: function (index) {
       let current = this.values[index]
@@ -372,6 +384,15 @@ export default {
       current.setDate(current.getDate() + 1)
 
       Vue.set(this.values, index, current.toISOString().split('T')[0])
+
+      const diffDays = Math.floor((new Date() - current) / (1000 * 60 * 60 * 24))
+      if (diffDays > -14 && diffDays < 0) {
+        this.speak(this.$tc('ttsDaysIn', Math.abs(diffDays)))
+      } else if (diffDays < 14) {
+        this.speak(this.$tc('ttsDaysAgo', Math.abs(diffDays)))
+      } else {
+        this.speak(current.toISOString().split('T')[0])
+      }
     },
     resetDate: function (index) {
       Vue.set(this.values, index, null)
@@ -380,6 +401,8 @@ export default {
       Vue.set(this.values, index, this.getTodayString())
 
       this.traverseForm(index + 1)
+
+      this.speak(this.$tc('ttsDaysAgo', 0))
     },
     getToday: function () {
       const today = new Date()
@@ -411,6 +434,8 @@ export default {
     },
     speak: function (text) {
       if (this.textSynth) {
+        this.textSynth.cancel()
+
         const utterance = new SpeechSynthesisUtterance(text)
         utterance.rate = 1.2
         this.textSynth.speak(utterance)

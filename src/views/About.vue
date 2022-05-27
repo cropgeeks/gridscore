@@ -31,18 +31,20 @@
       </div>
       <p>{{ $t('pageAboutParagraphOne') }}</p>
       <p v-html="$t('pageAboutParagraphTwo')" />
+      <p><BIconInfoCircleFill /> <span v-html="$t('pageAboutDocumentationLink')" /></p>
       <p><BIconGithub/> <span v-html="$t('pageAboutGitHubLink')" /></p>
     </b-container>
   </div>
 </template>
 
 <script>
-import { BIconGithub } from 'bootstrap-vue'
+import { BIconGithub, BIconInfoCircleFill } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 
 export default {
   components: {
-    BIconGithub
+    BIconGithub,
+    BIconInfoCircleFill
   },
   computed: {
     /** Mapgetters exposing the store configuration */
