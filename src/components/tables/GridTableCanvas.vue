@@ -24,7 +24,7 @@
                :markedRows="markedRows"
                ref="rowHead"
                @row-marked="onRowMarked" />
-    <canvas class="cell d-block" ref="dataCanvas" :width="scaledCanvasWidth" :height="scaledCanvasHeight" />
+    <canvas id="main-canvas" class="cell d-block" ref="dataCanvas" :width="scaledCanvasWidth" :height="scaledCanvasHeight" />
     <VScroll :height="canvasHeight" :width="vScrollWidth" :y="origin.y" :cellHeight="cellHeight" ref="vScroll" />
     <div />
     <HScroll :height="hScrollHeight" :width="canvasWidth" :x="origin.x" :cellWidth="cellWidth" ref="hScroll" />
@@ -348,7 +348,6 @@ export default {
           this.ctx.scale(scale, scale)
           this.ctx.textBaseline = 'middle'
           this.ctx.textAlign = 'center'
-          this.ctx.imageSmoothingEnabled = false
           this.ctx.font = `${this.fontSize}px sans-serif`
 
           this.drag = false
@@ -478,7 +477,12 @@ export default {
 
             this.origin.x = newX
             this.origin.y = newY
-            this.updateFast(cvdx, cvdy)
+
+            if (requestAnimationFrame in window) {
+              requestAnimationFrame(() => this.updateFast(cvdx, cvdy))
+            } else {
+              this.updateFast(cvdx, cvdy)
+            }
           } else {
             if (this.flingInterval) {
               clearInterval(this.flingInterval)
@@ -518,7 +522,11 @@ export default {
 
             this.dragPosition = ev
 
-            this.updateFast(cvdx, cvdy)
+            if (requestAnimationFrame in window) {
+              requestAnimationFrame(() => this.updateFast(cvdx, cvdy))
+            } else {
+              this.updateFast(cvdx, cvdy)
+            }
 
             this.lastMove = now
           }
@@ -946,5 +954,9 @@ export default {
 }
 .grid .cell:hover {
   cursor: pointer;
+}
+.grid #main-canvas {
+  image-rendering: pixelated;
+  image-rendering: optimizespeed;
 }
 </style>
