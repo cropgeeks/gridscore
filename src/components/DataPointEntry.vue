@@ -272,8 +272,6 @@ export default {
               result += event.results[i][0].transcript
             }
             this.comment = result
-
-            console.log(result)
           }
           this.speechRecognition.onspeechend = event => {
             this.speechRecognition.stop()

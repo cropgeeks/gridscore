@@ -43,14 +43,8 @@ export default {
     onSubmit: function () {
       const cornerPoints = this.$refs.map.getCornerPoints()
       const markers = this.$refs.markerSetup.getMarkerConfig()
-      if (cornerPoints && cornerPoints.length === 4) {
-        this.$store.dispatch('setCornerPoints', cornerPoints)
-      }
-      if (markers) {
-        this.$store.dispatch('setMarkers', markers)
-      } else {
-        this.$store.dispatch('setMarkers', null)
-      }
+
+      this.$store.dispatch('setCornerPointsAndMarkers', { cornerPoints, markers })
 
       this.hide()
     },

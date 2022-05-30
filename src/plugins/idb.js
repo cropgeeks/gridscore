@@ -129,19 +129,12 @@ export default {
 
     return db.put('datasets', dataset)
   },
-  updateDatasetCornerPoints: async function (datasetId, cornerPoints) {
+  updateDatasetCornerPointsAndMarkers: async function (datasetId, newData) {
     const db = await this.getDb()
 
     const dataset = await this.getDataset(datasetId)
-    dataset.cornerPoints = cornerPoints
-
-    return db.put('datasets', dataset)
-  },
-  updateDatasetMarkers: async function (datasetId, markers) {
-    const db = await this.getDb()
-
-    const dataset = await this.getDataset(datasetId)
-    dataset.markers = markers
+    dataset.cornerPoints = newData.cornerPoints
+    dataset.markers = newData.markers
 
     return db.put('datasets', dataset)
   },

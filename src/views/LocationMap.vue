@@ -82,7 +82,7 @@ export default {
       const result = {}
 
       this.storeTraits.forEach((t, i) => {
-        if (this.selectedLocation.values[i] !== null) {
+        if (this.selectedLocation && this.selectedLocation.values[i] !== null) {
           result[t.name] = {
             value: this.selectedLocation.values[i],
             date: this.selectedLocation.dates[i]

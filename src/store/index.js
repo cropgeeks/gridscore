@@ -205,15 +205,13 @@ const storeState = {
     ON_UNIQUE_CLIENT_ID_CHANGED_MUTATION: function (state, newUniqueClientId) {
       state.uniqueClientId = newUniqueClientId
     },
-    ON_CORNER_POINTS_CHANGED_MUTATION: function (state, newCornerPoints) {
-      state.dataset.cornerPoints = newCornerPoints
+    ON_CORNER_POINTS_AND_MARKERS_CHANGED_MUTATION: function (state, newData) {
+      if (newData.cornerPoints && newData.cornerPoints.length === 4) {
+        state.dataset.cornerPoints = newData.cornerPoints
+      }
+      state.dataset.markers = newData.markers
 
-      idb.updateDatasetCornerPoints(state.datasetId, newCornerPoints)
-    },
-    ON_MARKERS_CHANGED_MUTATION: function (state, newMarkers) {
-      state.dataset.markers = newMarkers
-
-      idb.updateDatasetMarkers(state.datasetId, newMarkers)
+      idb.updateDatasetCornerPointsAndMarkers(state.datasetId, newData)
     },
     ON_BRAPI_CONFIG_CHANGED: function (state, newBrapiConfig) {
       if (newBrapiConfig && newBrapiConfig.url) {
@@ -459,11 +457,8 @@ const storeState = {
     setTraits: function ({ commit }, traits) {
       commit('ON_TRAITS_CHANGED_MUTATION', traits)
     },
-    setCornerPoints: function ({ commit }, cornerPoints) {
-      commit('ON_CORNER_POINTS_CHANGED_MUTATION', cornerPoints)
-    },
-    setMarkers: function ({ commit }, markers) {
-      commit('ON_MARKERS_CHANGED_MUTATION', markers)
+    setCornerPointsAndMarkers: function ({ commit }, cornerPointsAndMarkers) {
+      commit('ON_CORNER_POINTS_AND_MARKERS_CHANGED_MUTATION', cornerPointsAndMarkers)
     },
     updateDataset: function ({ commit }, update) {
       commit('ON_DATASET_UPDATED_MUTATION', update)
