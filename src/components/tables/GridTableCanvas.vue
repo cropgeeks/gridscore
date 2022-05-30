@@ -472,16 +472,16 @@ export default {
             const newX = Math.round(Math.max(Math.min(0, this.origin.x + velocityX), -(this.storeCols * this.cellWidth - this.canvasWidth)))
             const newY = Math.round(Math.max(Math.min(0, this.origin.y + velocityY), -(this.storeRows * this.cellHeight - this.canvasHeight)))
 
-            const cvdx = this.origin.x - newX
-            const cvdy = this.origin.y - newY
+            // const cvdx = this.origin.x - newX
+            // const cvdy = this.origin.y - newY
 
             this.origin.x = newX
             this.origin.y = newY
 
             if (requestAnimationFrame in window) {
-              requestAnimationFrame(() => this.updateFast(cvdx, cvdy))
+              requestAnimationFrame(() => this.update())
             } else {
-              this.updateFast(cvdx, cvdy)
+              this.update()
             }
           } else {
             if (this.flingInterval) {
@@ -514,8 +514,8 @@ export default {
             const newX = Math.round(Math.max(Math.min(0, this.originStart.x + deltaX), -(this.storeCols * this.cellWidth - this.canvasWidth)))
             const newY = Math.round(Math.max(Math.min(0, this.originStart.y + deltaY), -(this.storeRows * this.cellHeight - this.canvasHeight)))
 
-            const cvdx = this.origin.x - newX
-            const cvdy = this.origin.y - newY
+            // const cvdx = this.origin.x - newX
+            // const cvdy = this.origin.y - newY
 
             this.origin.x = newX
             this.origin.y = newY
@@ -523,9 +523,9 @@ export default {
             this.dragPosition = ev
 
             if (requestAnimationFrame in window) {
-              requestAnimationFrame(() => this.updateFast(cvdx, cvdy))
+              requestAnimationFrame(() => this.update())
             } else {
-              this.updateFast(cvdx, cvdy)
+              this.update()
             }
 
             this.lastMove = now
@@ -564,7 +564,6 @@ export default {
       const rowCount = Math.ceil(Math.abs(cvdy) / this.cellHeight) + 2
       const colCount = Math.ceil(Math.abs(cvdx) / this.cellWidth) + 2
 
-      console.log(rowCount, colCount)
       // Prevent drawing cells twice
       const done = new Set()
 
@@ -625,12 +624,12 @@ export default {
 
       this.updateMarkers()
 
-      if (this.$refs.colHead) {
-        this.$refs.colHead.reset()
-      }
-      if (this.$refs.rowHead) {
-        this.$refs.rowHead.reset()
-      }
+      // if (this.$refs.colHead) {
+      //   this.$refs.colHead.reset()
+      // }
+      // if (this.$refs.rowHead) {
+      //   this.$refs.rowHead.reset()
+      // }
 
       if (this.storeUseGps && this.highlightPosition) {
         this.updateUserPosition()
@@ -956,7 +955,11 @@ export default {
   cursor: pointer;
 }
 .grid #main-canvas {
-  image-rendering: pixelated;
-  image-rendering: optimizespeed;
+  image-rendering: optimizeSpeed;             /* Older versions of FF          */
+  image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
+  image-rendering: -webkit-optimize-contrast; /* Safari                        */
+  image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
+  image-rendering: pixelated;                 /* Awesome future-browsers       */
+  -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
 }
 </style>
