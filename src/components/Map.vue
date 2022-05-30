@@ -132,17 +132,6 @@ export default {
       return lines
     }
   },
-  watch: {
-    locations: {
-      deep: true,
-      handler: function (newValue) {
-        // If the locations change, update the map
-        if (newValue) {
-          this.updateBounds()
-        }
-      }
-    }
-  },
   methods: {
     setCorner: function (index) {
       this.$emit('set-corner', { corner: index, location: this.clickedLocation })
@@ -162,8 +151,6 @@ export default {
       // If the bounds are valid, move the map
       if (bounds.isValid()) {
         this.$refs.fieldMap.fitBounds(bounds.pad(0.1))
-      } else if (bounds.getCenter()) {
-        this.$refs.fieldMap.panTo(bounds.getCenter())
       }
     },
     invalidateSize: function () {
@@ -199,6 +186,8 @@ export default {
     map.on('popupclose', () => { this.clickedLocation = null })
 
     L.control.layers(baseMaps).addTo(map)
+
+    this.updateBounds()
   }
 }
 </script>

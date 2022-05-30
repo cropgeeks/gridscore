@@ -65,7 +65,8 @@ export default {
   },
   data: function () {
     return {
-      selectedLocation: null
+      selectedLocation: null,
+      bounds: null
     }
   },
   computed: {
@@ -158,9 +159,13 @@ export default {
         }
       }
       return lines
+    }
+  },
+  methods: {
+    log: function (event) {
+      console.log(event.latlng)
     },
-    /** The bounds of the map */
-    bounds: function () {
+    updateBounds: function () {
       const b = L.latLngBounds()
 
       if (this.locations) {
@@ -174,15 +179,10 @@ export default {
       // }
 
       if (b.isValid()) {
-        return b.pad(0.1)
+        this.bounds = b.pad(0.1)
       } else {
-        return null
+        this.bounds = null
       }
-    }
-  },
-  methods: {
-    log: function (event) {
-      console.log(event.latlng)
     },
     loadMap: function () {
       // Add OSM as the default
@@ -214,7 +214,10 @@ export default {
 
       this.updateMarkers()
 
-      this.$nextTick(() => window.scrollTo(0, document.body.scrollHeight))
+      this.$nextTick(() => {
+        window.scrollTo(0, document.body.scrollHeight)
+        this.updateBounds()
+      })
     },
     updateMarkers: function () {
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
