@@ -348,6 +348,7 @@ export default {
           this.ctx.scale(scale, scale)
           this.ctx.textBaseline = 'middle'
           this.ctx.textAlign = 'center'
+          this.ctx.imageSmoothingEnabled = false
           this.ctx.font = `${this.fontSize}px sans-serif`
 
           this.drag = false
