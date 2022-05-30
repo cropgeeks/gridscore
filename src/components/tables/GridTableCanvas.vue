@@ -543,7 +543,7 @@ export default {
       }
     },
     updateFast: function (cvdx, cvdy) {
-      this.ctx.drawImage(this.$refs.dataCanvas, 0, 0, this.canvasWidth, this.canvasHeight, -cvdx, -cvdy, this.canvasWidth, this.canvasHeight)
+      this.ctx.drawImage(this.$refs.dataCanvas, 0, 0, this.scaledCanvasWidth, this.scaledCanvasHeight, -cvdx, -cvdy, this.canvasWidth, this.canvasHeight)
 
       const minCol = Math.max(0, Math.floor(Math.abs(this.origin.x) / this.cellWidth))
       const maxCol = Math.min(minCol + Math.ceil(this.canvasWidth / this.cellWidth) + 2, this.storeCols)
