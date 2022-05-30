@@ -22,23 +22,6 @@
         </VueTypeaheadBootstrap>
       </b-form>
     </div>
-    <template v-if="storeNavigationMode === 'jump'">
-      <b-button class="btn-circle" id="jump-navigation" variant="primary"><BIconArrowsMove /></b-button>
-
-      <b-popover ref="navigationPopover" target="jump-navigation" triggers="click blur" placement="left" :variant="storeDarkMode ? 'dark' : null">
-        <div class="grid-direction-grid p-2">
-          <div><b-button @click="moveCanvas('topleft')"><BIconArrowUpLeft /></b-button></div>
-          <div><b-button @click="moveCanvas('top')"><BIconArrowUp /></b-button></div>
-          <div><b-button @click="moveCanvas('topright')"><BIconArrowUpRight /></b-button></div>
-          <div><b-button @click="moveCanvas('left')"><BIconArrowLeft /></b-button></div>
-          <div><b-button @click="$refs.navigationPopover.$emit('close')"><BIconSlashCircle /></b-button></div>
-          <div><b-button @click="moveCanvas('right')"><BIconArrowRight /></b-button></div>
-          <div><b-button @click="moveCanvas('bottomleft')"><BIconArrowDownLeft /></b-button></div>
-          <div><b-button @click="moveCanvas('bottom')"><BIconArrowDown /></b-button></div>
-          <div><b-button @click="moveCanvas('bottomright')"><BIconArrowDownRight /></b-button></div>
-        </div>
-      </b-popover>
-    </template>
     <div class="d-flex flex-row align-items-end top-banner">
       <b-button @click="$router.push({ name: 'settings' })" class="mr-1" v-b-tooltip="$t('tooltipSettings')" v-if="storeTraits && storeTraits.length > 0">
         <BIconGearFill /> <span class="d-none d-lg-inline-block">{{ $t('tooltipSettings') }}</span>
@@ -113,6 +96,24 @@
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
     <BarcodeScannerModal ref="barcodeScannerModal" @code-scanned="searchByBarcode" />
     <BarcodeViewerModal ref="barcodeViewModal" :text="storeDatasetUuid" v-if="storeDatasetUuid" />
+
+    <template v-if="storeNavigationMode === 'jump'">
+      <b-button class="btn-circle" id="jump-navigation" variant="primary"><BIconArrowsMove /></b-button>
+
+      <b-popover ref="navigationPopover" target="jump-navigation" triggers="click blur" placement="left" :variant="storeDarkMode ? 'dark' : null">
+        <div class="grid-direction-grid p-2">
+          <div><b-button @click="moveCanvas('topleft')"><BIconArrowUpLeft /></b-button></div>
+          <div><b-button @click="moveCanvas('top')"><BIconArrowUp /></b-button></div>
+          <div><b-button @click="moveCanvas('topright')"><BIconArrowUpRight /></b-button></div>
+          <div><b-button @click="moveCanvas('left')"><BIconArrowLeft /></b-button></div>
+          <div><b-button @click="$refs.navigationPopover.$emit('close')"><BIconSlashCircle /></b-button></div>
+          <div><b-button @click="moveCanvas('right')"><BIconArrowRight /></b-button></div>
+          <div><b-button @click="moveCanvas('bottomleft')"><BIconArrowDownLeft /></b-button></div>
+          <div><b-button @click="moveCanvas('bottom')"><BIconArrowDown /></b-button></div>
+          <div><b-button @click="moveCanvas('bottomright')"><BIconArrowDownRight /></b-button></div>
+        </div>
+      </b-popover>
+    </template>
   </div>
 </template>
 

@@ -24,7 +24,10 @@
                :markedRows="markedRows"
                ref="rowHead"
                @row-marked="onRowMarked" />
-    <canvas id="main-canvas" class="cell d-block" ref="dataCanvas" :width="scaledCanvasWidth" :height="scaledCanvasHeight" />
+    <div class="cell d-block position-relative">
+      <canvas id="main-canvas" class="position-absolute" ref="dataCanvas" :width="scaledCanvasWidth" :height="scaledCanvasHeight" />
+      <canvas id="user-position-canvas" class="position-absolute" ref="userCanvas" :width="scaledCanvasWidth" :height="scaledCanvasHeight" />
+    </div>
     <VScroll :height="canvasHeight" :width="vScrollWidth" :y="origin.y" :cellHeight="cellHeight" ref="vScroll" />
     <div />
     <HScroll :height="hScrollHeight" :width="canvasWidth" :x="origin.x" :cellWidth="cellWidth" ref="hScroll" />
@@ -91,12 +94,15 @@ export default {
     }
   },
   watch: {
-    highlightPosition: function () {
-      // TODO: Only update relevant cell + directly adjacent cells
-      if (this.followUser) {
-        this.scrollTo(this.highlightPosition.x, 100 - this.highlightPosition.y)
-      } else {
-        this.update()
+    highlightPosition: {
+      deep: true,
+      handler: function (newValue) {
+        // TODO: Only update relevant cell + directly adjacent cells
+        if (this.followUser) {
+          this.scrollTo(newValue.x, 100 - newValue.y)
+        } else {
+          this.updateUserPosition()
+        }
       }
     },
     traitStats: function () {
@@ -147,7 +153,12 @@ export default {
     /** The row the user is currently in */
     highlightRow: function () {
       if (this.storeUseGps && this.highlightPosition) {
-        return this.storeRows - Math.ceil(this.storeRows * this.highlightPosition.y / 100.0)
+        const result = this.storeRows - Math.ceil(this.storeRows * this.highlightPosition.y / 100.0)
+        if (result >= 0 && result <= this.storeRows) {
+          return result
+        } else {
+          return null
+        }
       } else {
         return null
       }
@@ -155,7 +166,12 @@ export default {
     /** The column the user is currently in */
     highlightCol: function () {
       if (this.storeUseGps && this.highlightPosition) {
-        return Math.floor(this.storeCols * this.highlightPosition.x / 100.0)
+        const result = Math.floor(this.storeCols * this.highlightPosition.x / 100.0)
+        if (result >= 0 && result <= this.storeCols) {
+          return result
+        } else {
+          return null
+        }
       } else {
         return null
       }
@@ -283,7 +299,7 @@ export default {
       return this.storeDarkMode ? '#1f1f1f' : '#e0e0e0'
     },
     fillStyleHighlight: function () {
-      return this.storeDarkMode ? '#1e1032' : '#e1efcd'
+      return this.storeDarkMode ? '#833471' : '#A3CB38'
     },
     fillStyleMarked: function () {
       return this.storeDarkMode ? '#415971' : '#c6d2de'
@@ -308,9 +324,9 @@ export default {
 
       this.updateMarkers()
 
-      if (this.storeUseGps && this.highlightPosition) {
-        this.updateUserPosition()
-      }
+      // if (this.storeUseGps && this.highlightPosition) {
+      //   this.updateUserPosition()
+      // }
     },
     onRowMarked: function (row) {
       this.markedRows[row] = !this.markedRows[row]
@@ -324,9 +340,9 @@ export default {
 
       this.updateMarkers()
 
-      if (this.storeUseGps && this.highlightPosition) {
-        this.updateUserPosition()
-      }
+      // if (this.storeUseGps && this.highlightPosition) {
+      //   this.updateUserPosition()
+      // }
     },
     init: function () {
       if (this.isInitting) {
@@ -336,12 +352,17 @@ export default {
 
       const scale = window.devicePixelRatio
       const c = this.$refs.dataCanvas
+      const uc = this.$refs.userCanvas
       c.width = this.scaledCanvasWidth
       c.height = this.scaledCanvasHeight
+      uc.width = this.scaledCanvasWidth
+      uc.height = this.scaledCanvasHeight
 
       this.$nextTick(() => {
         c.style.width = this.canvasWidth + 'px'
         c.style.height = this.canvasHeight + 'px'
+        uc.style.width = this.canvasWidth + 'px'
+        uc.style.height = this.canvasHeight + 'px'
 
         this.$nextTick(() => {
           this.ctx = c.getContext('2d', { alpha: false })
@@ -349,6 +370,9 @@ export default {
           this.ctx.textBaseline = 'middle'
           this.ctx.textAlign = 'center'
           this.ctx.font = `${this.fontSize}px sans-serif`
+
+          this.uctx = uc.getContext('2d', { alpha: true })
+          this.uctx.scale(scale, scale)
 
           this.drag = false
           this.dragStart = null
@@ -659,15 +683,29 @@ export default {
       }
     },
     updateUserPosition: function () {
-      this.ctx.save()
-      this.ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, this.highlightX * window.devicePixelRatio, this.highlightY * window.devicePixelRatio)
-      if (this.highlightPosition && this.highlightPosition.heading) {
-        this.ctx.rotate(((this.highlightPosition.heading + 45) % 360) * Math.PI / 180)
-      } else {
-        this.ctx.rotate(-45 * Math.PI / 180)
+      this.uctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+
+      if (this.highlightRow !== null && this.highlightCol !== null) {
+        this.uctx.fillStyle = this.fillStyleHighlight
+        // Calculate x and y of this grid cell
+        const x = this.origin.x + this.cellWidth * this.highlightCol
+        const y = this.origin.y + this.cellHeight * this.highlightRow
+
+        // Fill the background
+        this.uctx.globalAlpha = 0.3
+        this.uctx.fillRect(x, y, this.cellWidth, this.cellHeight)
+        this.uctx.globalAlpha = 1.0
       }
-      this.ctx.drawImage(this.userPositionImg, -8, -8)
-      this.ctx.restore()
+
+      this.uctx.save()
+      this.uctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, this.highlightX * window.devicePixelRatio, this.highlightY * window.devicePixelRatio)
+      if (this.highlightPosition && this.highlightPosition.heading) {
+        this.uctx.rotate(((this.highlightPosition.heading + 45) % 360) * Math.PI / 180)
+      } else {
+        this.uctx.rotate(-45 * Math.PI / 180)
+      }
+      this.uctx.drawImage(this.userPositionImg, -8, -8)
+      this.uctx.restore()
     },
     fittingString: function (str, maxWidth) {
       let width = this.ctx.measureText(str).width
@@ -703,10 +741,11 @@ export default {
       }
 
       let count = 0
-      if (row === this.highlightRow && col === this.highlightCol) {
-        count = 4
-        this.ctx.fillStyle = this.fillStyleHighlight
-      } else if ((this.markedRows && this.markedRows[row]) || (this.markedColumns && this.markedColumns[col])) {
+      // if (row === this.highlightRow && col === this.highlightCol) {
+      //   count = 4
+      //   this.ctx.fillStyle = this.fillStyleHighlight
+      // } else
+      if ((this.markedRows && this.markedRows[row]) || (this.markedColumns && this.markedColumns[col])) {
         count = 3
         this.ctx.fillStyle = this.fillStyleMarked
       } else {
@@ -801,6 +840,12 @@ export default {
 
       this.$nextTick(() => {
         this.init()
+        if (this.$refs.colHead) {
+          this.$refs.colHead.reset()
+        }
+        if (this.$refs.rowHead) {
+          this.$refs.rowHead.reset()
+        }
         if (this.$refs.vScroll) {
           this.$refs.vScroll.reset()
         }
@@ -954,12 +999,7 @@ export default {
 .grid .cell:hover {
   cursor: pointer;
 }
-.grid #main-canvas {
-  image-rendering: optimizeSpeed;             /* Older versions of FF          */
-  image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
-  image-rendering: -webkit-optimize-contrast; /* Safari                        */
-  image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
-  image-rendering: pixelated;                 /* Awesome future-browsers       */
-  -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
+.grid #user-position-canvas {
+  pointer-events: none;
 }
 </style>
