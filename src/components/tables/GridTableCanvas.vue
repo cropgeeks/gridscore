@@ -333,7 +333,6 @@ export default {
         return
       }
       this.isInitting = true
-      this.data = new Map(this.$store.getters.storeData)
 
       const scale = window.devicePixelRatio
       const c = this.$refs.dataCanvas
@@ -384,20 +383,30 @@ export default {
       })
     },
     onMouseWheel: function (e) {
+      let newX = this.origin.x
+      let newY = this.origin.y
+
       if (e.deltaX) {
-        this.origin.x = Math.round(Math.max(Math.min(0, this.origin.x - e.deltaX), -(this.storeCols * this.cellWidth - this.canvasWidth)))
+        newX = Math.round(Math.max(Math.min(0, this.origin.x - e.deltaX), -(this.storeCols * this.cellWidth - this.canvasWidth)))
       } else if (e.shiftKey) {
-        this.origin.x = Math.round(Math.max(Math.min(0, this.origin.x - e.deltaY), -(this.storeCols * this.cellWidth - this.canvasWidth)))
+        newX = Math.round(Math.max(Math.min(0, this.origin.x - e.deltaY), -(this.storeCols * this.cellWidth - this.canvasWidth)))
       } else {
-        this.origin.y = Math.round(Math.max(Math.min(0, this.origin.y - e.deltaY), -(this.storeRows * this.cellHeight - this.canvasHeight)))
+        newY = Math.round(Math.max(Math.min(0, this.origin.y - e.deltaY), -(this.storeRows * this.cellHeight - this.canvasHeight)))
 
         // Prevent scrolling up the page while the table hasn't reached the top yet
-        if (e.deltaY < 0 && this.origin.y !== 0) {
+        if (e.deltaY < 0 && newY !== 0) {
           e.preventDefault()
           e.stopPropagation()
         }
       }
-      this.update()
+
+      const cvdx = this.origin.x - newX
+      const cvdy = this.origin.y - newY
+
+      this.origin.x = newX
+      this.origin.y = newY
+
+      this.updateFast(cvdx, cvdy)
     },
     onMouseDown: function (e) {
       // Stop any fling motion
@@ -460,9 +469,15 @@ export default {
             const velocityX = (1 - Math.pow(1 - i, 5)) * deltaX
             const velocityY = (1 - Math.pow(1 - i, 5)) * deltaY
             // Adjust the origin accordingly
-            this.origin.y = Math.round(Math.max(Math.min(0, this.origin.y + velocityY), -(this.storeRows * this.cellHeight - this.canvasHeight)))
-            this.origin.x = Math.round(Math.max(Math.min(0, this.origin.x + velocityX), -(this.storeCols * this.cellWidth - this.canvasWidth)))
-            this.update()
+            const newX = Math.round(Math.max(Math.min(0, this.origin.x + velocityX), -(this.storeCols * this.cellWidth - this.canvasWidth)))
+            const newY = Math.round(Math.max(Math.min(0, this.origin.y + velocityY), -(this.storeRows * this.cellHeight - this.canvasHeight)))
+
+            const cvdx = this.origin.x - newX
+            const cvdy = this.origin.y - newY
+
+            this.origin.x = newX
+            this.origin.y = newY
+            this.updateFast(cvdx, cvdy)
           } else {
             if (this.flingInterval) {
               clearInterval(this.flingInterval)
@@ -491,13 +506,18 @@ export default {
           if (!this.lastMove || (now - this.lastMove) > 20) {
             const deltaX = Math.round(ev.x - this.dragStart.x)
             const deltaY = Math.round(ev.y - this.dragStart.y)
+            const newX = Math.round(Math.max(Math.min(0, this.originStart.x + deltaX), -(this.storeCols * this.cellWidth - this.canvasWidth)))
+            const newY = Math.round(Math.max(Math.min(0, this.originStart.y + deltaY), -(this.storeRows * this.cellHeight - this.canvasHeight)))
 
-            this.origin.x = Math.round(Math.max(Math.min(0, this.originStart.x + deltaX), -(this.storeCols * this.cellWidth - this.canvasWidth)))
-            this.origin.y = Math.round(Math.max(Math.min(0, this.originStart.y + deltaY), -(this.storeRows * this.cellHeight - this.canvasHeight)))
+            const cvdx = this.origin.x - newX
+            const cvdy = this.origin.y - newY
+
+            this.origin.x = newX
+            this.origin.y = newY
 
             this.dragPosition = ev
 
-            this.update()
+            this.updateFast(cvdx, cvdy)
 
             this.lastMove = now
           }
@@ -522,6 +542,48 @@ export default {
         }
       }
     },
+    updateFast: function (cvdx, cvdy) {
+      this.ctx.drawImage(this.$refs.dataCanvas, 0, 0, this.canvasWidth, this.canvasHeight, -cvdx, -cvdy, this.canvasWidth, this.canvasHeight)
+
+      const minCol = Math.max(0, Math.floor(Math.abs(this.origin.x) / this.cellWidth))
+      const maxCol = Math.min(minCol + Math.ceil(this.canvasWidth / this.cellWidth) + 2, this.storeCols)
+      const minRow = Math.max(0, Math.floor(Math.abs(this.origin.y) / this.cellHeight))
+      const maxRow = Math.min(minRow + Math.ceil(this.canvasHeight / this.cellHeight) + 2, this.storeRows)
+
+      const rowCount = Math.ceil(Math.abs(cvdy) / this.cellHeight) + 2
+      const colCount = Math.ceil(Math.abs(cvdx) / this.cellWidth) + 2
+
+      console.log(rowCount, colCount)
+      // Prevent drawing cells twice
+      const done = new Set()
+
+      if (cvdy !== 0) {
+        for (let y = 0; y <= rowCount; y++) {
+          const row = cvdy > 0 ? (maxRow - y - 1) : (minRow + y - 1)
+          for (let col = minCol; col < maxCol; col++) {
+            done.add(`${row}-${col}`)
+            this.updateCell(row, col)
+          }
+        }
+      }
+
+      if (cvdx !== 0) {
+        for (let x = 0; x <= colCount; x++) {
+          const col = cvdx > 0 ? (maxCol - x - 1) : (minCol + x - 1)
+          for (let row = minRow; row < maxRow; row++) {
+            if (!done.has(`${row}-${col}`)) {
+              this.updateCell(row, col)
+            }
+          }
+        }
+      }
+
+      this.updateMarkers()
+
+      if (this.storeUseGps && this.highlightPosition) {
+        this.updateUserPosition()
+      }
+    },
     update: function () {
       if (!this.ctx) {
         return
@@ -533,7 +595,7 @@ export default {
 
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
 
-      if (!this.data || this.data.size < 1) {
+      if (!this.$store.getters.storeData || this.$store.getters.storeData.size < 1) {
         return
       }
 
@@ -546,7 +608,7 @@ export default {
       // Draw all cells
       for (let row = minRow; row < maxRow; row++) {
         for (let col = minCol; col < maxCol; col++) {
-          this.updateCell(row, col, this.data.get(`${row}-${col}`))
+          this.updateCell(row, col)
         }
       }
 
@@ -619,14 +681,12 @@ export default {
       this.ctx.drawImage(this.bookmarkImg, x, y)
     },
     updateDataPoint: function (row, col) {
-      this.data.set(`${row}-${col}`, this.$store.getters.storeData.get(`${row}-${col}`))
-
-      this.updateCell(row, col, this.data.get(`${row}-${col}`))
+      this.updateCell(row, col)
 
       this.updateMarkers()
     },
-    updateCell: function (row, col, data) {
-      const cell = data || this.$store.getters.storeData.get(`${row}-${col}`)
+    updateCell: function (row, col) {
+      const cell = this.$store.getters.storeData.get(`${row}-${col}`)
 
       if (!cell) {
         return
@@ -759,10 +819,16 @@ export default {
       this.update()
     },
     scrollBy: function (x, y) {
-      this.origin.x = Math.round(Math.max(Math.min(0, this.origin.x + x), -(this.storeCols * this.cellWidth - this.canvasWidth)))
-      this.origin.y = Math.round(Math.max(Math.min(0, this.origin.y + y), -(this.storeRows * this.cellHeight - this.canvasHeight)))
+      const newX = Math.round(Math.max(Math.min(0, this.origin.x + x), -(this.storeCols * this.cellWidth - this.canvasWidth)))
+      const newY = Math.round(Math.max(Math.min(0, this.origin.y + y), -(this.storeRows * this.cellHeight - this.canvasHeight)))
 
-      this.update()
+      const cvdx = this.origin.x - newX
+      const cvdy = this.origin.y - newY
+
+      this.origin.x = newX
+      this.origin.y = newY
+
+      this.updateFast(cvdx, cvdy)
     },
     moveInDirection: function (direction) {
       switch (direction) {
