@@ -18,3 +18,6 @@ Clicking on one of the markers shows the data recorded for this plant/plot in a 
 The current position of the user is highlighted both on the location map as well as the main data view. Depending on the strength and accuracy of the GPS signal, this will give you a more or less accurate idea of where you are currently standing in relation to the trial. Both views update the user position as you move around the trial.
 
 
+## Changing trial corner points and markers
+
+You can change the trial corner points and markers as defined in the <a href="trial-setup.html">Trial Setup</a> step by clicking on the icon in the top right corner of the map. This opens a modal dialog where you can change the settings and then save your updates.

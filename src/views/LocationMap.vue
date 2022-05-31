@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>{{ $t('pageLocationsTitle') }}</h1>
+    <h1>{{ $t('pageLocationsTitle') }} <small><a href="#" class="text-secondary" @click="$refs.helpModal.show()"><BIconQuestionCircleFill /></a></small></h1>
     <p>{{ $t('pageLocationsText') }}</p>
     <b-row class="location-map">
       <LMap :zoom="3" :bounds="bounds" ref="locationMap" @ready="loadMap" @click="log">
@@ -32,14 +32,17 @@
       </div>
       <FieldLayoutModal ref="fieldLayoutModal" />
     </b-row>
+
+    <HelpModal url="https://cropgeeks.github.io/gridscore/geographic-data.html" ref="helpModal" />
   </div>
 </template>
 
 <script>
 import FieldLayoutModal from '@/components/modals/FieldLayoutModal'
 
-import { BIconBoundingBox, BIconCalendar3, BIconGeoAlt, BIconGeoFill } from 'bootstrap-vue'
+import { BIconBoundingBox, BIconCalendar3, BIconGeoAlt, BIconGeoFill, BIconQuestionCircleFill } from 'bootstrap-vue'
 import { LMap, LControl, LPolygon, LPolyline, LMarker, LIcon } from 'vue2-leaflet'
+import HelpModal from '@/components/modals/HelpModal'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet.markercluster'
@@ -55,7 +58,9 @@ export default {
     BIconCalendar3,
     BIconGeoAlt,
     BIconGeoFill,
+    BIconQuestionCircleFill,
     FieldLayoutModal,
+    HelpModal,
     LControl,
     LMap,
     LMarker,
