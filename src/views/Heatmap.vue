@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>{{ $t('pageHeatmapTitle') }}</h1>
+    <h1>{{ $t('pageHeatmapTitle') }} <small><a href="#" class="text-secondary" @click="$refs.helpModal.show()"><BIconQuestionCircleFill /></a></small></h1>
     <p>{{ $t('pageHeatmapText') }}</p>
     <div v-if="storeDatasetId && storeTraits && storeTraits.length > 0">
       <!-- Trait selection box -->
@@ -14,11 +14,17 @@
       <div id="heatmap-chart"/>
     </div>
     <h3 v-else>{{ $t('labelNoData') }}</h3>
+
+    <HelpModal url="https://cropgeeks.github.io/gridscore/visualizing-data.html#heatmap" ref="helpModal" />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+
+import { BIconQuestionCircleFill } from 'bootstrap-vue'
+
+import HelpModal from '@/components/modals/HelpModal'
 
 const emitter = require('tiny-emitter/instance')
 const Plotly = require('plotly.js/lib/core')
@@ -32,6 +38,10 @@ Plotly.register([
  * Component that shows a heatmap for the selected trait
  */
 export default {
+  components: {
+    BIconQuestionCircleFill,
+    HelpModal
+  },
   data: function () {
     return {
       traits: [],

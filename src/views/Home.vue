@@ -12,6 +12,7 @@
       <b-button class="mx-2 mb-3" :to="{ name: 'import' }"><BIconCloudDownloadFill /> {{ $t('buttonImportTrial') }}</b-button>
       <b-button class="mx-2 mb-3" @click="loadExampleData"><BIconFileSpreadsheet /> {{ $t('buttonLoadExampleData') }}</b-button>
       <b-button class="mx-2 mb-3" @click="startTour"><BIconPlayFill /> {{ $t('buttonStartIntroductionTour') }}</b-button>
+      <b-button class="mx-2 mb-3" @click="$refs.helpModal.show()"><BIconQuestionCircleFill /> {{ $t('buttonHelp') }}</b-button>
     </div>
 
     <div v-if="datasets && datasets.length > 0" class="mt-3">
@@ -43,23 +44,28 @@
       </b-row>
     </div>
     <AddTraitModal :dataset="selectedDataset" ref="addTraitModal" />
+
+    <HelpModal url="https://cropgeeks.github.io/gridscore/" ref="helpModal" />
   </b-container>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import AddTraitModal from '@/components/modals/AddTraitModal'
+import HelpModal from '@/components/modals/HelpModal'
 import idb from '@/plugins/idb'
-import { BIconJournalPlus, BIconFileSpreadsheet, BIconCloudDownloadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
+import { BIconJournalPlus, BIconFileSpreadsheet, BIconQuestionCircleFill, BIconCloudDownloadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
 
 const emitter = require('tiny-emitter/instance')
 
 export default {
   components: {
     AddTraitModal,
+    HelpModal,
     BIconJournalPlus,
     BIconFileSpreadsheet,
     BIconPlayFill,
+    BIconQuestionCircleFill,
     BIconCloudDownloadFill,
     BIconCalendarDate,
     BIconGear,

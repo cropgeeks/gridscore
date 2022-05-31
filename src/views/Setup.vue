@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <h1><b-button :to="{ name: 'home' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleSetup') }}</h1>
+    <h1><b-button :to="{ name: 'home' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleSetup') }} <small><a href="#" class="text-secondary" @click="$refs.helpModal.show()"><BIconQuestionCircleFill /></a></small></h1>
     <hr />
 
     <b-form @submit.prevent="onSubmit" id="settings-form">
@@ -129,6 +129,8 @@
     <TraitConfigurationModal :trait="traitToConfigure" v-on:config-changed="updateTraitConfig" ref="traitConfigModal" />
     <!-- Modal for trait import via BrAPI -->
     <BrapiTraitImportModal ref="brapiTraitImportModal" @traits-selected="loadBrapiTraits" />
+
+    <HelpModal url="https://cropgeeks.github.io/gridscore/trial-setup.html" ref="helpModal" />
   </b-container>
 </template>
 
@@ -136,11 +138,12 @@
 import FieldMap from '@/components/FieldMap'
 import BrapiTraitImportModal from '@/components/modals/BrapiTraitImportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
+import HelpModal from '@/components/modals/HelpModal'
 import IconBrapi from '@/components/IconBrapi'
 import MarkerSetup from '@/components/MarkerSetup'
 
 import { mapGetters } from 'vuex'
-import { BIconGear, BIconArrowLeft, BIconPlus, BIconSignpost2, BIconX, BIconLayoutThreeColumns, BIconTextLeft, BIconGrid3x3, BIconJournalPlus, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
+import { BIconGear, BIconArrowLeft, BIconPlus, BIconSignpost2, BIconX, BIconLayoutThreeColumns, BIconQuestionCircleFill, BIconTextLeft, BIconGrid3x3, BIconJournalPlus, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
 
 /**
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
@@ -219,6 +222,7 @@ export default {
     BIconX,
     BIconLayoutThreeColumns,
     BIconSignpost2,
+    BIconQuestionCircleFill,
     BIconTextLeft,
     BIconGrid3x3,
     BIconBoundingBox,
@@ -230,7 +234,8 @@ export default {
     FieldMap,
     BrapiTraitImportModal,
     TraitConfigurationModal,
-    MarkerSetup
+    MarkerSetup,
+    HelpModal
   },
   methods: {
     tabber: function (event) {

@@ -30,6 +30,13 @@ GridScore supports selecting a plant/plot by scanning a representative barcode. 
 
 If you are not using a barcode scanner, leave this option disabled.
 
+### `Navigation mode`
+
+By default, you will be able to navigate the main data view of GridScore by scrolling/panning the view either with a mouse/touchpad or a touchscreen.
+This mode (called `Drag/scroll`) gives you the most flexibility when exploring the field plan. However, in this mode it's quite easy to scroll the view accidentally. The `Jump` mode helps with this situation by disabling scrolling/panning and instead offering a dedicated button that shows a directional pad which is used to move the view into one of 8 directions, one plant/plot at a time.
+
+In addition to helping prevent accidental navigation, the `Jump` mode is also recommended to be used on older devices with poor performance on the `Drag/scroll` mode as it drastically reduces the number of times the view has to be re-rendered.
+
 ## Colors
 
 GridScore is a very visual tool. It uses colors to represent traits and whether the information for a certain trait has been scored or not. By default, we chose a color scheme that shows good performance on color-blind safety checks as well as being aesthetically pleasing. The color palette can be changed by adding and removing colors.

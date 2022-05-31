@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>{{ $t('pageTimelineTitle') }}</h1>
+    <h1>{{ $t('pageTimelineTitle') }} <small><a href="#" class="text-secondary" @click="$refs.helpModal.show()"><BIconQuestionCircleFill /></a></small></h1>
     <p>{{ $t('pageTimelineText') }}</p>
     <div id="timeseries-chart" class="time-chart" v-if="storeDatasetId && storeTraits && storeTraits.length > 0"/>
     <h3 v-else>{{ $t('labelNoData') }}</h3>
@@ -9,12 +9,17 @@
       <h1>{{ $t('pageTimelineMultiTitle') }}</h1>
       <MultiTraitTimeline :trait="mt" v-for="mt in multiTraits" :key="`mt-${mt.name}`" />
     </div>
+    <HelpModal url="https://cropgeeks.github.io/gridscore/visualizing-data.html#timeline" ref="helpModal" />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+
+import { BIconQuestionCircleFill } from 'bootstrap-vue'
+
 import MultiTraitTimeline from '@/components/MultiTraitTimeline'
+import HelpModal from '@/components/modals/HelpModal'
 
 const emitter = require('tiny-emitter/instance')
 const Plotly = require('plotly.js/lib/core')
@@ -29,7 +34,9 @@ Plotly.register([
  */
 export default {
   components: {
-    MultiTraitTimeline
+    BIconQuestionCircleFill,
+    MultiTraitTimeline,
+    HelpModal
   },
   watch: {
     storeLocale: function () {

@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <h1><b-button @click="onSubmit(true)"><BIconArrowLeft /></b-button> {{ $t('modalTitleSettings') }}</h1>
+    <h1><b-button @click="onSubmit(true)"><BIconArrowLeft /></b-button> {{ $t('modalTitleSettings') }} <small><a href="#" class="text-secondary" @click="$refs.helpModal.show()"><BIconQuestionCircleFill /></a></small></h1>
     <hr />
     <b-form @submit.prevent="onSubmit" class="settings-form">
       <b-row>
@@ -84,12 +84,16 @@
     </b-form>
 
     <b-button @click="onSubmit(false)" variant="primary" class="mt-3">{{ $t('buttonSave') }}</b-button>
+
+    <HelpModal url="https://cropgeeks.github.io/gridscore/settings.html" ref="helpModal" />
   </b-container>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { BIconArrowClockwise, BIconPlus, BIconX, BIconSlashCircle, BIconArrowLeft, BIconExclamationTriangleFill } from 'bootstrap-vue'
+import { BIconArrowClockwise, BIconPlus, BIconX, BIconSlashCircle, BIconQuestionCircleFill, BIconArrowLeft, BIconExclamationTriangleFill } from 'bootstrap-vue'
+
+import HelpModal from '@/components/modals/HelpModal'
 
 /**
  * Modal to let the user change some basic settings like truncation of variety names.
@@ -101,7 +105,9 @@ export default {
     BIconArrowClockwise,
     BIconSlashCircle,
     BIconArrowLeft,
-    BIconExclamationTriangleFill
+    BIconExclamationTriangleFill,
+    BIconQuestionCircleFill,
+    HelpModal
   },
   data: function () {
     return {

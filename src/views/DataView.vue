@@ -69,7 +69,7 @@
         </div>
       </b-dropdown>
 
-      <b-dropdown v-b-tooltip="$t('widgetTraitSelectorTitle')" class="trait-dropdown">
+      <b-dropdown v-b-tooltip="$t('widgetTraitSelectorTitle')" class="trait-dropdown mr-1">
         <template #button-content>
           <BIconCircleHalf /> <span class="d-none d-lg-inline-block">{{ $t('widgetTraitSelectorTitle') }}</span>
         </template>
@@ -87,6 +87,8 @@
         </b-dropdown-item>
       </b-dropdown>
 
+      <b-button @click="$refs.helpModal.show()"><BIconQuestionCircleFill /></b-button>
+
       <b-button @click="$router.push({ name: 'export' })" class="ml-auto">
         <BIconDownload /> <span class="d-none d-lg-inline-block">{{ $t('buttonExport') }}</span>
       </b-button>
@@ -96,6 +98,7 @@
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
     <BarcodeScannerModal ref="barcodeScannerModal" @code-scanned="searchByBarcode" />
     <BarcodeViewerModal ref="barcodeViewModal" :text="storeDatasetUuid" v-if="storeDatasetUuid" />
+    <HelpModal url="https://cropgeeks.github.io/gridscore/collecting-data.html" ref="helpModal" />
 
     <template v-if="storeNavigationMode === 'jump'">
       <b-button class="btn-circle" id="jump-navigation" variant="primary"><BIconArrowsMove /></b-button>
@@ -122,7 +125,8 @@ import GridTableCanvas from '@/components/tables/GridTableCanvas'
 import DataPointModal from '@/components/modals/DataPointModal'
 import BarcodeScannerModal from '@/components/modals/BarcodeScannerModal'
 import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
-import { BIconCircleFill, BIconGearFill, BIconSearch, BIconArrowsMove, BIconSlashCircle, BIconCloudDownloadFill, BIconCircleHalf, BIconCircle, BIconCloudUploadFill, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
+import HelpModal from '@/components/modals/HelpModal'
+import { BIconCircleFill, BIconGearFill, BIconSearch, BIconArrowsMove, BIconQuestionCircleFill, BIconSlashCircle, BIconCloudDownloadFill, BIconCircleHalf, BIconCircle, BIconCloudUploadFill, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap'
 
@@ -185,12 +189,14 @@ export default {
     BIconArrowDownRight,
     BIconGeoAltFill,
     BIconCloudDownloadFill,
+    BIconQuestionCircleFill,
     BIconCloudUploadFill,
     BarcodeScannerModal,
     BarcodeViewerModal,
     GridTableCanvas,
     DataPointModal,
-    VueTypeaheadBootstrap
+    VueTypeaheadBootstrap,
+    HelpModal
   },
   computed: {
     /** Mapgetters exposing the store configuration */

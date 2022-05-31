@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>{{ $t('pageStatsTitle') }}</h1>
+    <h1>{{ $t('pageStatsTitle') }} <small><a href="#" class="text-secondary" @click="$refs.helpModal.show()"><BIconQuestionCircleFill /></a></small></h1>
     <p>{{ $t('pageStatsText') }}</p>
 
     <template v-if="storeTraits && storeTraits.length > 0">
@@ -12,13 +12,17 @@
         <div class="stats-chart" :ref="`trait-chart-${index}`" />
       </div>
     </template>
+
+    <HelpModal url="https://cropgeeks.github.io/gridscore/visualizing-data.html#trait-statistics" ref="helpModal" />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 
-import { BIconCircleFill } from 'bootstrap-vue'
+import { BIconCircleFill, BIconQuestionCircleFill } from 'bootstrap-vue'
+
+import HelpModal from '@/components/modals/HelpModal'
 
 const emitter = require('tiny-emitter/instance')
 const Plotly = require('plotly.js/lib/core')
@@ -31,7 +35,9 @@ Plotly.register([
 
 export default {
   components: {
-    BIconCircleFill
+    BIconCircleFill,
+    BIconQuestionCircleFill,
+    HelpModal
   },
   computed: {
     /** Mapgetters exposing the store configuration */

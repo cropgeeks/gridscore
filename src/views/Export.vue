@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <h1><b-button :to="{ name: 'data' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleExport') }}</h1>
+    <h1><b-button :to="{ name: 'data' }"><BIconArrowLeft /></b-button> {{ $t('modalTitleExport') }} <small><a href="#" class="text-secondary" @click="$refs.helpModal.show()"><BIconQuestionCircleFill /></a></small></h1>
     <hr />
 
     <!-- Show a loading indicator while the export is generated -->
@@ -92,13 +92,17 @@
         </div>
       </b-tab>
     </b-tabs>
+
+    <HelpModal url="https://cropgeeks.github.io/gridscore/exporting-data.html" ref="helpModal" />
   </b-container>
 </template>
 
 <script>
-import { BIconDownload, BIconArrowLeft, BIconTags, BIconFileEarmarkSpreadsheet, BIconGrid3x3 } from 'bootstrap-vue'
+import { BIconDownload, BIconArrowLeft, BIconTags, BIconFileEarmarkSpreadsheet, BIconQuestionCircleFill, BIconGrid3x3 } from 'bootstrap-vue'
 
 import { mapGetters } from 'vuex'
+
+import HelpModal from '@/components/modals/HelpModal'
 
 const emitter = require('tiny-emitter/instance')
 
@@ -108,7 +112,9 @@ export default {
     BIconArrowLeft,
     BIconTags,
     BIconFileEarmarkSpreadsheet,
-    BIconGrid3x3
+    BIconQuestionCircleFill,
+    BIconGrid3x3,
+    HelpModal
   },
   data: function () {
     return {

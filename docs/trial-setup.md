@@ -2,7 +2,7 @@
 title: GridScore Trial Setup
 ---
 
-# GridScore Trial Setup
+# Trial Setup
 
 GridScore allows you to define as many trials as you want and keep all the data on your device or share it with others.
 

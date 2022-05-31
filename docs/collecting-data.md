@@ -2,7 +2,7 @@
 title: GridScore Collecting Data
 ---
 
-# GridScore Collecting Data
+# Collecting Data
 
 Once your trial is set up, it's time to collect some data. Select your dataset from the home screen or the side menu.
 

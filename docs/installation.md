@@ -2,7 +2,7 @@
 title: GridScore Installation
 ---
 
-# GridScore Installation
+# Installation
 
 GridScore is a so-called Progressive Web App (PWA), which means that it's basically a website, but on phones and tablets it can be installed to work offline. The mechanism for installing a PWA on your device will vary depending on the operating system. On Android a banner will appear at the bottom of the screen prompting you to install the application. On iOS, press the share icon and then add the app to your home screen.
 

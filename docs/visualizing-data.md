@@ -2,7 +2,7 @@
 title: GridScore Visualizing Data
 ---
 
-# GridScore Visualizing Data
+# Visualizing Data
 
 GridScore can visualize your trials data as you collect it right there on your phone or tablet. You can also look at these visualizations or export them for use in presentations or publications when you're back at your desk.
 
