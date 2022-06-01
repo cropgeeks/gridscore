@@ -98,7 +98,7 @@ export default {
       this.$emit('config-changed', {
         min: this.min === '' ? null : this.min,
         max: this.max === '' ? null : this.max,
-        categories: this.categories ? this.categories.split('\n') : null
+        categories: this.categories ? this.categories.split('\n').filter(c => c !== undefined && c !== null && c !== '') : null
       })
 
       this.hide()

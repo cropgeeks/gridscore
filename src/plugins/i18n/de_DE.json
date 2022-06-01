@@ -145,6 +145,7 @@
   "formSelectOption": "Option auswählen",
   "formSelectOptionNavigationModeScroll": "Ziehen/Scrollen",
   "formSelectOptionNavigationModeJump": "Springen",
+  "formLabelImageTagTraitSelector": "Merkmale zum taggen auswählen (optional)",
   "formSelectMarkersTopLeft": "Oben links",
   "formSelectMarkersTopRight": "Oben rechts",
   "formSelectMarkersBottomLeft": "Unten links",

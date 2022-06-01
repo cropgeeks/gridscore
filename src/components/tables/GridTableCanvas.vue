@@ -853,7 +853,11 @@ export default {
           this.$refs.hScroll.reset()
         }
         this.$nextTick(() => {
-          this.update()
+          if (requestAnimationFrame in window) {
+            requestAnimationFrame(() => this.update())
+          } else {
+            this.update()
+          }
           this.isResetting = false
         })
       })
@@ -871,7 +875,11 @@ export default {
         this.origin.y = Math.round(-(this.storeRows * this.cellHeight - this.canvasHeight) * y / 100.0)
       }
 
-      this.update()
+      if (requestAnimationFrame in window) {
+        requestAnimationFrame(() => this.update())
+      } else {
+        this.update()
+      }
     },
     scrollBy: function (x, y) {
       const newX = Math.round(Math.max(Math.min(0, this.origin.x + x), -(this.storeCols * this.cellWidth - this.canvasWidth)))
@@ -987,14 +995,16 @@ export default {
 <style scoped>
 .grid {
   height: 100vh;
+  height: 100svh;
   max-height: 100vh;
+  max-height: 100svh;
   display: grid;
   grid-template-columns: min-content 1fr min-content;
   grid-template-rows: min-content 1fr min-content;
   grid-template-areas:
-    "one two three"
-    "four five six"
-    "seven eight nine"
+    "tl colHeaders tr"
+    "rowHeaders dataView vScroll"
+    "bl hScroll br"
 }
 .grid .cell:hover {
   cursor: pointer;

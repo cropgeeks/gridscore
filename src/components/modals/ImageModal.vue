@@ -9,7 +9,11 @@
     <!-- Preview the image -->
     <b-img fluid rounded :src="imageData" class="image" v-if="imageData" />
     <!-- Input for selecting (or taking) the image -->
-    <b-form-file v-model="imageFile" accept="image/*" capture class="form" />
+    <b-form-file v-model="imageFile" accept="image/*" capture class="file-selector" />
+
+    <b-form-group class="mt-2" label-for="trait-selector" :label="$t('formLabelImageTagTraitSelector')">
+      <b-form-select :options="traitOptions" multiple v-model="trait" id="trait-selector" />
+    </b-form-group>
 
     <!-- Show image date if available -->
     <b-badge v-if="imageDate"><BIconCalendar3 /> {{ imageDate.toLocaleString() }}</b-badge><br/>
@@ -19,6 +23,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 import exifr from 'exifr/dist/lite.umd.js'
 import { BIconCalendar3 } from 'bootstrap-vue'
 
@@ -32,13 +38,43 @@ export default {
       imageData: null,
       imageDate: null,
       imageGps: null,
-      supportsSaving: false
+      supportsSaving: false,
+      trait: null
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'storeTraits'
+    ]),
+    traitOptions: function () {
+      if (this.storeTraits) {
+        return this.storeTraits.map((t, i) => {
+          return {
+            value: i,
+            text: t.name
+          }
+        })
+      } else {
+        return []
+      }
     }
   },
   props: {
     /** The variety name to use as the title */
     name: {
       type: String,
+      default: null
+    },
+    row: {
+      type: Number,
+      default: 0
+    },
+    col: {
+      type: Number,
+      default: 0
+    },
+    preferredTrait: {
+      type: Number,
       default: null
     }
   },
@@ -127,7 +163,7 @@ export default {
         } else {
           const dl = document.createElement('a')
           dl.setAttribute('href', this.imageData)
-          dl.setAttribute('download', `${this.getDateTime(this.imageDate)}_${this.name}.${this.imageFile.name.split('.').pop()}`)
+          dl.setAttribute('download', `${this.getDateTime(this.imageDate)}_${this.name}_${this.row + 1}_${this.col + 1}_${this.trait !== null ? this.trait.map(t => this.storeTraits[t].name).join('-') : ''}.${this.imageFile.name.split('.').pop()}`)
           dl.click()
         }
       }
@@ -143,6 +179,13 @@ export default {
       this.imageDate = null
       this.imageGps = null
       this.supportsSaving = window.showSaveFilePicker !== undefined
+
+      if (this.preferredTrait !== null) {
+        this.trait = [this.preferredTrait]
+      } else {
+        this.trait = []
+      }
+
       this.$nextTick(() => this.$refs.imageModal.show())
     },
     /**
@@ -160,7 +203,7 @@ export default {
   border-bottom-right-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
 }
-.image-modal .form:nth-child(2) label {
+.image-modal .file-selector:nth-child(2) label {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }

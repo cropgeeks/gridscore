@@ -14,8 +14,9 @@
         </template>
 
         <b-input-group>
-          <b-input-group-prepend v-if="mapping.trait.type === 'int'">
-            <b-button @click="decrease(index)">-</b-button>
+          <b-input-group-prepend>
+            <b-button @click="takeImage(index)"><BIconCameraFill /></b-button>
+            <b-button @click="decrease(index)" v-if="mapping.trait.type === 'int'">-</b-button>
           </b-input-group-prepend>
           <DataEntryInput :index="index" :values="values" :trait="mapping.trait" :formState="formState"
                           @enter="traverseForm(index + 1)"
@@ -55,12 +56,12 @@
 
     <b-button-group id="tag-buttons">
       <!-- Show a button for image tagging -->
-      <b-button @click="$refs.imageModal.show()"><BIconCameraFill/> {{ $t('buttonTakePhoto') }}</b-button>
+      <b-button @click="takeImage(null)"><BIconCameraFill/> {{ $t('buttonTakePhoto') }}</b-button>
       <!-- Show a button for video tagging -->
       <b-button @click="$refs.videoModal.show()"><BIconCameraVideoFill/> {{ $t('buttonTakeVideo') }}</b-button>
     </b-button-group>
     <!-- Image tagging modal -->
-    <ImageModal :name="name" ref="imageModal" />
+    <ImageModal :row="row" :col="col" :preferredTrait="preferredTrait" :name="name" ref="imageModal" />
     <!-- Video tagging modal -->
     <VideoModal :name="name" ref="videoModal" />
     <!-- Modal showing all previously recorded values of a multi trait -->
@@ -139,6 +140,7 @@ export default {
       dateInput: '',
       dateInputIndex: null,
       multiTraitIndex: null,
+      preferredTrait: null,
       tourSteps: [{
         title: () => this.$t('tourTitleDataEntryStart'),
         text: () => this.$t('tourTextDataEntryStart'),
@@ -212,6 +214,15 @@ export default {
     }
   },
   methods: {
+    takeImage: function (index) {
+      if (index !== null) {
+        this.preferredTrait = this.visibleTraitMapping[index].index
+      } else {
+        this.preferredTrait = null
+      }
+
+      this.$nextTick(() => this.$refs.imageModal.show())
+    },
     showTour: function () {
       this.$refs.dataEntryTour.start()
     },
@@ -281,40 +292,44 @@ export default {
       }
     },
     decrease: function (index) {
+      let newValue
       if (this.values && this.values[index] !== null && this.values[index] !== '') {
-        let newValue = this.values[index] - 1
-        if (this.storeTraits[index].restrictions) {
-          const min = this.storeTraits[index].restrictions.min
-          const max = this.storeTraits[index].restrictions.max
-          if (min !== undefined && min !== null) {
-            newValue = Math.max(min, newValue)
-          }
-          if (max !== undefined && max !== null) {
-            newValue = Math.min(max, newValue)
-          }
-        }
-        Vue.set(this.values, index, newValue)
+        newValue = this.values[index] - 1
       } else {
-        Vue.set(this.values, index, -1)
+        newValue = -1
       }
+
+      if (this.storeTraits[index].restrictions) {
+        const min = this.storeTraits[index].restrictions.min
+        const max = this.storeTraits[index].restrictions.max
+        if (min !== undefined && min !== null) {
+          newValue = Math.max(min, newValue)
+        }
+        if (max !== undefined && max !== null) {
+          newValue = Math.min(max, newValue)
+        }
+      }
+      Vue.set(this.values, index, newValue)
     },
     increment: function (index) {
+      let newValue
       if (this.values && this.values[index] !== null && this.values[index] !== '') {
-        let newValue = this.values[index] + 1
-        if (this.storeTraits[index].restrictions) {
-          const min = this.storeTraits[index].restrictions.min
-          const max = this.storeTraits[index].restrictions.max
-          if (min !== undefined && min !== null) {
-            newValue = Math.max(min, newValue)
-          }
-          if (max !== undefined && max !== null) {
-            newValue = Math.min(max, newValue)
-          }
-        }
-        Vue.set(this.values, index, newValue)
+        newValue = this.values[index] + 1
       } else {
-        Vue.set(this.values, index, 1)
+        newValue = 1
       }
+
+      if (this.storeTraits[index].restrictions) {
+        const min = this.storeTraits[index].restrictions.min
+        const max = this.storeTraits[index].restrictions.max
+        if (min !== undefined && min !== null) {
+          newValue = Math.max(min, newValue)
+        }
+        if (max !== undefined && max !== null) {
+          newValue = Math.min(max, newValue)
+        }
+      }
+      Vue.set(this.values, index, newValue)
     },
     handleDateInput: function (index) {
       if (this.dateInput.length > 0 && !isNaN(this.dateInput)) {

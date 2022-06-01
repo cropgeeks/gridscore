@@ -146,6 +146,7 @@
   "formSelectOption": "Select option",
   "formSelectOptionNavigationModeScroll": "Drag/Scroll",
   "formSelectOptionNavigationModeJump": "Jump",
+  "formLabelImageTagTraitSelector": "Select traits for tagging (optional)",
   "formSelectMultiTraitVizTypeLast": "Use last value per plot",
   "formSelectMultiTraitVizTypeAvg": "Use average value per plot",
   "formSelectMultiTraitVizTypeSum": "Use sum per plot",
