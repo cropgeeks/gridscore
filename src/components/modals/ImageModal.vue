@@ -145,7 +145,7 @@ export default {
         if (this.supportsSaving) {
           // create a new handle
           const newHandle = await window.showSaveFilePicker({
-            suggestedName: `${this.getDateTime(this.imageDate)}_${this.name}.${this.imageFile.name.split('.').pop()}`,
+            suggestedName: `${this.getDateTime(this.imageDate)}_${this.name}_${this.row + 1}_${this.col + 1}_${this.trait !== null ? this.trait.map(t => this.storeTraits[t].name).join('-') : ''}.${this.imageFile.name.split('.').pop()}`,
             excludeAcceptAllOption: true,
             types: [{
               description: 'Image file',
