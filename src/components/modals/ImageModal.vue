@@ -12,7 +12,7 @@
     <b-form-file v-model="imageFile" accept="image/*" capture class="file-selector" />
 
     <b-form-group class="mt-2" label-for="trait-selector" :label="$t('formLabelImageTagTraitSelector')">
-      <b-form-select :options="traitOptions" multiple v-model="trait" id="trait-selector" />
+      <b-form-select :options="traitOptions" multiple v-model="traitIds" id="trait-selector" />
     </b-form-group>
 
     <!-- Show image date if available -->
@@ -39,7 +39,7 @@ export default {
       imageDate: null,
       imageGps: null,
       supportsSaving: false,
-      trait: null
+      traitIds: null
     }
   },
   computed: {
@@ -145,7 +145,7 @@ export default {
         if (this.supportsSaving) {
           // create a new handle
           const newHandle = await window.showSaveFilePicker({
-            suggestedName: `${this.getDateTime(this.imageDate)}_${this.name}_${this.row + 1}_${this.col + 1}_${this.trait !== null ? this.trait.map(t => this.storeTraits[t].name).join('-') : ''}.${this.imageFile.name.split('.').pop()}`,
+            suggestedName: `${this.getDateTime(this.imageDate)}_${this.name}_${this.row + 1}_${this.col + 1}_${this.traitIds !== null ? this.traitIds.map(t => this.storeTraits[t].name).join('-') : ''}.${this.imageFile.name.split('.').pop()}`,
             excludeAcceptAllOption: true,
             types: [{
               description: 'Image file',
@@ -163,7 +163,7 @@ export default {
         } else {
           const dl = document.createElement('a')
           dl.setAttribute('href', this.imageData)
-          dl.setAttribute('download', `${this.getDateTime(this.imageDate)}_${this.name}_${this.row + 1}_${this.col + 1}_${this.trait !== null ? this.trait.map(t => this.storeTraits[t].name).join('-') : ''}.${this.imageFile.name.split('.').pop()}`)
+          dl.setAttribute('download', `${this.getDateTime(this.imageDate)}_${this.name}_${this.row + 1}_${this.col + 1}_${this.traitIds !== null ? this.traitIds.map(t => this.storeTraits[t].name).join('-') : ''}.${this.imageFile.name.split('.').pop()}`)
           dl.click()
         }
       }
@@ -181,9 +181,9 @@ export default {
       this.supportsSaving = window.showSaveFilePicker !== undefined
 
       if (this.preferredTrait !== null) {
-        this.trait = [this.preferredTrait]
+        this.traitIds = [this.preferredTrait]
       } else {
-        this.trait = []
+        this.traitIds = []
       }
 
       this.$nextTick(() => this.$refs.imageModal.show())

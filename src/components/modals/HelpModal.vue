@@ -1,6 +1,7 @@
 <template>
   <b-modal :title="$t('modalTitleHelp')"
            :ok-title="$t('buttonClose')"
+           ok-only
            no-fade
            size="xl"
            ref="helpModal">
