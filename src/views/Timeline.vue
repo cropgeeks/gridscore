@@ -91,10 +91,14 @@ export default {
       // For each field cell
       storeData.forEach((c, k) => {
         c.dates.forEach((d, i) => {
+          let date = d
+          if (this.storeTraits[i].mType === 'multi') {
+            date = this.extractMultiTraitDatum(i, this.storeTraits[i].mType, 'last', c, false)
+          }
           // If it exists
-          if (d) {
+          if (date) {
             // Get the current count for that trait and date
-            let count = mapping[i][d]
+            let count = mapping[i][date]
 
             // Increment it
             if (!count) {
@@ -104,7 +108,7 @@ export default {
             }
 
             // Put it back
-            mapping[i][d] = count
+            mapping[i][date] = count
           }
         })
       })
