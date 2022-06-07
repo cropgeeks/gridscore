@@ -249,6 +249,7 @@ export default {
           }]
         }
 
+        // Get the axis ticks based on inversion state
         const xTicks = this.storeInvertNumberingX ? Array.from(Array(cols).keys()).map(i => cols - i) : Array.from(Array(cols).keys()).map(i => i + 1)
         const yTicks = this.storeInvertNumberingY ? Array.from(Array(rows).keys()).map(i => i + 1) : Array.from(Array(rows).keys()).map(i => rows - i)
 

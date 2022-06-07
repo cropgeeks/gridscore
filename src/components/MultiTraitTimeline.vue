@@ -77,7 +77,7 @@ export default {
 
       const layout = {
         hovermode: 'x',
-        height: 500,
+        height: 500 + traces.length * 5,
         autosize: true,
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'transparent',
