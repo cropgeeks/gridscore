@@ -34,6 +34,21 @@
                     <BIconGear />
                   </template>
                   <b-dropdown-item @click="onAddTraitClicked(dataset)"><BIconTags /> {{ $t('buttonAddTrait') }}</b-dropdown-item>
+                  <template v-if="dataset.uuid">
+                    <b-dropdown-item-button @click="onLoad(dataset)"><BIconCloudDownloadFill /> {{ $t('tooltipLoad') }}</b-dropdown-item-button>
+                    <b-dropdown-item-button @click="onSave(dataset)"><BIconCloudUploadFill /> {{ $t('tooltipSave') }}</b-dropdown-item-button>
+                    <b-dropdown-item-button @click="onShowQRCodeClicked(dataset)" class="mr-1">
+                      <!-- TODO: Replace with bootstrap-vue icon once new version is released -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-qr-code" viewBox="0 0 16 16">
+                        <path d="M2 2h2v2H2V2Z"/>
+                        <path d="M6 0v6H0V0h6ZM5 1H1v4h4V1ZM4 12H2v2h2v-2Z"/>
+                        <path d="M6 10v6H0v-6h6Zm-5 1v4h4v-4H1Zm11-9h2v2h-2V2Z"/>
+                        <path d="M10 0v6h6V0h-6Zm5 1v4h-4V1h4ZM8 1V0h1v2H8v2H7V1h1Zm0 5V4h1v2H8ZM6 8V7h1V6h1v2h1V7h5v1h-4v1H7V8H6Zm0 0v1H2V8H1v1H0V7h3v1h3Zm10 1h-1V7h1v2Zm-1 0h-1v2h2v-1h-1V9Zm-4 0h2v1h-1v1h-1V9Zm2 3v-1h-1v1h-1v1H9v1h3v-2h1Zm0 0h3v1h-2v1h-1v-2Zm-4-1v1h1v-2H7v1h2Z"/>
+                        <path d="M7 12h1v3h4v1H7v-4Zm9 2v2h-3v-1h2v-1h1Z"/>
+                      </svg> {{ $t('tooltipShowSharingCode') }}
+                    </b-dropdown-item-button>
+                  </template>
+                  <b-dropdown-divider />
                   <b-dropdown-item @click="onResetClicked(dataset)"><BIconArrowCounterclockwise /> {{ $t('buttonResetDataset') }}</b-dropdown-item>
                   <b-dropdown-item @click="onDeleteClicked(dataset)" variant="danger"><BIconTrash /> {{ $t('buttonDeleteDataset') }}</b-dropdown-item>
                 </b-dropdown>
@@ -44,6 +59,7 @@
       </b-row>
     </div>
     <AddTraitModal :dataset="selectedDataset" ref="addTraitModal" />
+    <BarcodeViewerModal ref="barcodeViewModal" :text="selectedDataset.uuid" v-if="selectedDataset && selectedDataset.uuid" />
 
     <HelpModal url="https://cropgeeks.github.io/gridscore/" ref="helpModal" />
   </b-container>
@@ -52,21 +68,24 @@
 <script>
 import { mapGetters } from 'vuex'
 import AddTraitModal from '@/components/modals/AddTraitModal'
+import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
 import HelpModal from '@/components/modals/HelpModal'
 import idb from '@/plugins/idb'
-import { BIconJournalPlus, BIconFileSpreadsheet, BIconQuestionCircleFill, BIconCloudDownloadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
+import { BIconJournalPlus, BIconFileSpreadsheet, BIconQuestionCircleFill, BIconCloudDownloadFill, BIconCloudUploadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
 
 const emitter = require('tiny-emitter/instance')
 
 export default {
   components: {
     AddTraitModal,
+    BarcodeViewerModal,
     HelpModal,
     BIconJournalPlus,
     BIconFileSpreadsheet,
     BIconPlayFill,
     BIconQuestionCircleFill,
     BIconCloudDownloadFill,
+    BIconCloudUploadFill,
     BIconCalendarDate,
     BIconGear,
     BIconTrash,
@@ -153,10 +172,78 @@ export default {
             }
           })
     },
+    onShowQRCodeClicked: function (dataset) {
+      this.selectedDataset = dataset
+
+      this.$nextTick(() => this.$refs.barcodeViewModal.show())
+    },
     onAddTraitClicked: function (dataset) {
       this.selectedDataset = dataset
 
       this.$nextTick(() => this.$refs.addTraitModal.show())
+    },
+    onLoad: function (dataset) {
+      this.$bvModal.msgBoxConfirm(this.$t('modalTextReplaceDatasets'), {
+          title: this.$t('modalTitleReplaceDatasets'),
+          okTitle: this.$t('buttonReplace'),
+          cancelTitle: this.$t('buttonCancel')
+        }).then(value => {
+          if (value) {
+            this.loadData(dataset)
+          }
+        })
+    },
+    onSave: function (dataset) {
+      this.$bvModal.msgBoxConfirm(this.$t('modalTextSaveToServerWarning'), {
+          title: this.$t('modalTitleSaveToServerWarning'),
+          okTitle: this.$t('buttonSave'),
+          cancelTitle: this.$t('buttonCancel')
+        }).then(value => {
+          if (value) {
+            this.sendData(dataset)
+          }
+        })
+    },
+    loadData: function (dataset) {
+      emitter.emit('set-loading', true)
+      this.getConfigFromSharing(dataset.uuid)
+        .then(result => {
+          if (result) {
+            result.id = dataset.id
+            this.$store.dispatch('updateDataset', result)
+          }
+        })
+        .catch(err => {
+          this.serverError = this.getErrorMessage(err)
+        })
+        .finally(() => emitter.emit('set-loading', false))
+    },
+    sendData: function (dataset) {
+      emitter.emit('set-loading', true)
+
+      idb.getDatasetData(dataset.id)
+        .then(data => {
+          const ds = JSON.parse(JSON.stringify(dataset))
+          ds.data = new Map()
+
+          for (let i = 0; i < data.length; i++) {
+            const dp = data[i]
+            ds.data.set(`${dp.row}-${dp.col}`, dp)
+          }
+
+          return ds
+        })
+        .then((dataCopy) => {
+          this.postConfigForSharing(dataCopy, dataCopy.data, dataCopy.uuid, dataCopy.rows, dataCopy.cols)
+            .then(result => {
+              // TODO
+            })
+            .finally(() => emitter.emit('set-loading', false))
+        })
+        .finally(() => {
+          emitter.emit('set-loading', false)
+          emitter.emit('dataset-changed', event.redirect)
+        })
     }
   },
   created: function () {
