@@ -23,3 +23,4 @@ There are a few sub-pages that contain specific information about how GridScore 
 - <a href="visualizing-data.html">Visualizing data</a>
 - <a href="geographic-data.html">Geographic data</a>
 - <a href="exporting-data.html">Exporting data</a>
+- <a href="workflow.html">Workflow when using multiple devices</a>

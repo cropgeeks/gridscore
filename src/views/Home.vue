@@ -20,9 +20,9 @@
       <b-row>
         <b-col cols=12 sm=6 lg=3 v-for="dataset in datasets" :key="`dataset-${dataset.id}`" class="mb-3">
           <b-card :title="`${dataset.id} - ${dataset.name}`" class="h-100" :bg-variant="dataset.id === storeDatasetId ? 'light' : null">
-            <b-card-text><BIconLayoutThreeColumns rotate="90" /> {{ $t('formLabelSettingsRows') }} {{ dataset.rows }}</b-card-text>
-            <b-card-text><BIconLayoutThreeColumns /> {{ $t('formLabelSettingsCols') }} {{ dataset.cols }}</b-card-text>
-            <b-card-text><BIconTags /> {{ $t('formLabelTraits') }} {{ dataset.traits.length }}</b-card-text>
+            <b-card-text><BIconLayoutThreeColumns rotate="90" /> {{ $tc('formLabelRowCount', dataset.rows) }}</b-card-text>
+            <b-card-text><BIconLayoutThreeColumns /> {{ $tc('formLabelColCount', dataset.cols) }}</b-card-text>
+            <b-card-text><BIconTags /> {{ $tc('formLabelTraits', dataset.traits.length) }}</b-card-text>
             <b-card-text v-if="dataset.lastUpdatedOn"><BIconCalendarDate /> {{ new Date(dataset.lastUpdatedOn).toLocaleString() }}</b-card-text>
 
             <template #footer>
