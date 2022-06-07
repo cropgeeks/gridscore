@@ -57,6 +57,8 @@ export default {
       'storeDatasetName',
       'storeDatasetId',
       'storeDarkMode',
+      'storeInvertNumberingX',
+      'storeInvertNumberingY',
       'storeLocale',
       'storeRows',
       'storeTraitColors',
@@ -247,6 +249,9 @@ export default {
           }]
         }
 
+        const xTicks = this.storeInvertNumberingX ? Array.from(Array(cols).keys()).map(i => cols - i) : Array.from(Array(cols).keys()).map(i => i + 1)
+        const yTicks = this.storeInvertNumberingY ? Array.from(Array(rows).keys()).map(i => i + 1) : Array.from(Array(rows).keys()).map(i => rows - i)
+
         const layout = {
           margin: { autoexpand: true },
           autosize: true,
@@ -257,20 +262,18 @@ export default {
             showgrid: false,
             tickmode: 'array',
             tickvals: Array.from(Array(cols).keys()).map(i => i + 1),
+            ticktext: xTicks,
             title: { text: this.$t('chartLabelHeatmapCol'), font: { color: this.storeDarkMode ? 'white' : 'black' } },
-            tickfont: { color: this.storeDarkMode ? 'white' : 'black' },
-            range: [0, cols + 1]
+            tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
           },
           yaxis: {
             showgrid: false,
             tickmode: 'array',
             tickvals: Array.from(Array(rows).keys()).map(i => i + 1),
-            ticktext: Array.from(Array(rows).keys()).map(i => '' + (rows - i)),
+            ticktext: yTicks,
             title: { text: this.$t('chartLabelHeatmapRow'), font: { color: this.storeDarkMode ? 'white' : 'black' } },
-            tickfont: { color: this.storeDarkMode ? 'white' : 'black' },
-            range: [0, rows + 1]
-          },
-          annotations: []
+            tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
+          }
         }
 
         const filename = this.traits[this.trait].text.replace(/[^a-z0-9]/gi, '-').toLowerCase()
