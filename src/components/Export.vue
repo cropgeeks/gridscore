@@ -2,9 +2,9 @@
   <b-form @submit.prevent id="import-export-form">
     <b-button @click="exportJson">{{ storeDatasetUuid ? $t('buttonImportExportSave') : $t('buttonImportExportShare') }}</b-button>
 
-    <div v-show="serverUuid !== null">
+    <div v-show="storeDatasetUuid">
       <p class="text-info mt-3">{{ $t('modalTextExportQR') }}</p>
-      <StyledQRCode :text="serverUuid" />
+      <StyledQRCode :text="storeDatasetUuid" />
     </div>
     <p class="text-danger" v-if="serverError">{{ serverError }}</p>
   </b-form>
@@ -15,7 +15,7 @@ import StyledQRCode from '@/components/StyledQRCode'
 
 import { mapGetters } from 'vuex'
 
-const emitter = require('tiny-emitter/instance')
+import api from '@/mixin/api'
 
 export default {
   components: {
@@ -23,18 +23,19 @@ export default {
   },
   data: function () {
     return {
-      serverUuid: null,
       serverError: null
     }
   },
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
+      'storeDatasetId',
       'storeDatasetUuid',
       'storeRows',
       'storeCols'
     ])
   },
+  mixins: [api],
   methods: {
     reset: function () {
       this.serverUuid = null
@@ -47,38 +48,12 @@ export default {
       }
 
       if (this.storeDatasetUuid) {
-        // Ask for confirmation, because this will overwrite what's on the server
-        this.$bvModal.msgBoxConfirm(this.$t('modalTextSaveToServerWarning'), {
-          title: this.$t('modalTitleSaveToServerWarning'),
-          okTitle: this.$t('buttonSave'),
-          cancelTitle: this.$t('buttonCancel')
-        }).then(value => {
-          if (value) {
-            this.sendData()
-          }
-        })
+        this.onSave(this.storeDatasetId)
       } else {
-        this.sendData()
+        this.sendData(this.$store.state.dataset, uuid => {
+          this.$store.dispatch('setDatasetUuid', uuid)
+        })
       }
-    },
-    sendData: function () {
-      emitter.emit('set-loading', true)
-      const dataCopy = JSON.parse(JSON.stringify(this.$store.state.dataset))
-
-      this.postConfigForSharing(dataCopy, this.$store.state.dataset.data, this.serverUuid, this.storeRows, this.storeCols)
-        .then(result => {
-          if (result && result.data) {
-            this.serverUuid = result.data
-
-            this.$store.dispatch('setDatasetUuid', result.data)
-          } else {
-            this.serverUuid = null
-          }
-        })
-        .catch(err => {
-          this.serverError = this.getErrorMessage(err)
-        })
-        .finally(() => emitter.emit('set-loading', false))
     }
   },
   mounted: function () {

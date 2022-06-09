@@ -134,6 +134,7 @@ const storeState = {
       emitter.emit('set-loading', true)
       idb.addDataset(newDataset)
         .then(dsId => {
+          newDataset.id = dsId
           state.datasetId = dsId
           idb.setDatasetData(dsId, newDataset.data)
             .then(() => {

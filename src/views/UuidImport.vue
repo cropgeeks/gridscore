@@ -21,6 +21,8 @@
 import YesNoCancelModal from '@/components/modals/YesNoCancelModal'
 import idb from '@/plugins/idb'
 
+import api from '@/mixin/api'
+
 /**
  * Component that handles data configuration sharing via a UUID QR code
  */
@@ -34,6 +36,7 @@ export default {
       serverError: null
     }
   },
+  mixins: [api],
   methods: {
     getConfig: function () {
       this.getConfigFromSharing(this.uuid)

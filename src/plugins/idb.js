@@ -60,6 +60,14 @@ export default {
 
     return db.get('datasets', datasetId)
   },
+  getAllDatasetsWithUuid: async function () {
+    const db = await this.getDb()
+
+    return db.getAll('datasets')
+      .then(ds => {
+        return ds.filter(ds => ds.uuid)
+      })
+  },
   getDatasetData: async function (datasetId) {
     const db = await this.getDb()
 

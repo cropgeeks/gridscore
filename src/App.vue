@@ -94,6 +94,8 @@ import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconMoon, BIconSun, BIconDi
 import idb from '@/plugins/idb'
 import { Detector } from '@/plugins/browser-detect.js'
 
+import api from '@/mixin/api'
+
 const emitter = require('tiny-emitter/instance')
 
 export default {
@@ -212,6 +214,7 @@ export default {
       'storePlausible'
     ])
   },
+  mixins: [api],
   methods: {
     isLocalhost: function () {
       return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === ''
@@ -487,6 +490,18 @@ export default {
     } else {
       this.enablePlausible()
     }
+
+    idb.getAllDatasetsWithUuid()
+      .then(datasets => {
+        this.getDatasetUpdatesAvailable(datasets)
+          .then(result => {
+            if (result && result.data) {
+              const updatesAvailable = datasets.filter((u, i) => result.data[i])
+
+              console.log(updatesAvailable)
+            }
+          })
+      })
   },
   destroyed: function () {
     if (this.geolocationWatchId && navigator.geolocation) {

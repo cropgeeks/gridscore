@@ -59,7 +59,7 @@
       </b-row>
     </div>
     <AddTraitModal :dataset="selectedDataset" ref="addTraitModal" />
-    <BarcodeViewerModal ref="barcodeViewModal" :text="selectedDataset.uuid" v-if="selectedDataset && selectedDataset.uuid" />
+    <BarcodeViewerModal ref="barcodeViewModal" :text="selectedDataset.uuid" :title="selectedDataset.name" v-if="selectedDataset && selectedDataset.uuid" />
 
     <HelpModal url="https://cropgeeks.github.io/gridscore/" ref="helpModal" />
   </b-container>
@@ -71,6 +71,7 @@ import AddTraitModal from '@/components/modals/AddTraitModal'
 import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
 import HelpModal from '@/components/modals/HelpModal'
 import idb from '@/plugins/idb'
+import api from '@/mixin/api'
 import { BIconJournalPlus, BIconFileSpreadsheet, BIconQuestionCircleFill, BIconCloudDownloadFill, BIconCloudUploadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
 
 const emitter = require('tiny-emitter/instance')
@@ -105,6 +106,7 @@ export default {
       'storeDatasetId'
     ])
   },
+  mixins: [api],
   methods: {
     startTour: function () {
       emitter.emit('show-introduction-tour')
@@ -181,69 +183,6 @@ export default {
       this.selectedDataset = dataset
 
       this.$nextTick(() => this.$refs.addTraitModal.show())
-    },
-    onLoad: function (dataset) {
-      this.$bvModal.msgBoxConfirm(this.$t('modalTextReplaceDatasets'), {
-          title: this.$t('modalTitleReplaceDatasets'),
-          okTitle: this.$t('buttonReplace'),
-          cancelTitle: this.$t('buttonCancel')
-        }).then(value => {
-          if (value) {
-            this.loadData(dataset)
-          }
-        })
-    },
-    onSave: function (dataset) {
-      this.$bvModal.msgBoxConfirm(this.$t('modalTextSaveToServerWarning'), {
-          title: this.$t('modalTitleSaveToServerWarning'),
-          okTitle: this.$t('buttonSave'),
-          cancelTitle: this.$t('buttonCancel')
-        }).then(value => {
-          if (value) {
-            this.sendData(dataset)
-          }
-        })
-    },
-    loadData: function (dataset) {
-      emitter.emit('set-loading', true)
-      this.getConfigFromSharing(dataset.uuid)
-        .then(result => {
-          if (result) {
-            result.id = dataset.id
-            this.$store.dispatch('updateDataset', result)
-          }
-        })
-        .catch(err => {
-          this.serverError = this.getErrorMessage(err)
-        })
-        .finally(() => emitter.emit('set-loading', false))
-    },
-    sendData: function (dataset) {
-      emitter.emit('set-loading', true)
-
-      idb.getDatasetData(dataset.id)
-        .then(data => {
-          const ds = JSON.parse(JSON.stringify(dataset))
-          ds.data = new Map()
-
-          for (let i = 0; i < data.length; i++) {
-            const dp = data[i]
-            ds.data.set(`${dp.row}-${dp.col}`, dp)
-          }
-
-          return ds
-        })
-        .then((dataCopy) => {
-          this.postConfigForSharing(dataCopy, dataCopy.data, dataCopy.uuid, dataCopy.rows, dataCopy.cols)
-            .then(result => {
-              // TODO
-            })
-            .finally(() => emitter.emit('set-loading', false))
-        })
-        .finally(() => {
-          emitter.emit('set-loading', false)
-          emitter.emit('dataset-changed', event.redirect)
-        })
     }
   },
   created: function () {

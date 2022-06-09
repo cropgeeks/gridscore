@@ -31,8 +31,8 @@
       <b-dropdown v-if="storeDatasetUuid" class="mr-1" v-b-tooltip="$t('tooltipShare')">
         <template v-slot:button-content><BIconShareFill /> <span class="d-none d-lg-inline-block">{{ $t('tooltipShare') }}</span></template>
 
-        <b-dropdown-item-button @click="onLoad" class="mr-1"><BIconCloudDownloadFill /> {{ $t('tooltipLoad') }}</b-dropdown-item-button>
-        <b-dropdown-item-button @click="onSave" class="mr-1"><BIconCloudUploadFill /> {{ $t('tooltipSave') }}</b-dropdown-item-button>
+        <b-dropdown-item-button @click="onLoad(storeDatasetId)" class="mr-1"><BIconCloudDownloadFill /> {{ $t('tooltipLoad') }}</b-dropdown-item-button>
+        <b-dropdown-item-button @click="onSave(storeDatasetId)" class="mr-1"><BIconCloudUploadFill /> {{ $t('tooltipSave') }}</b-dropdown-item-button>
         <b-dropdown-item-button @click="$refs.barcodeViewModal.show()" class="mr-1">
           <!-- TODO: Replace with bootstrap-vue icon once new version is released -->
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-qr-code" viewBox="0 0 16 16">
@@ -97,7 +97,7 @@
     <GridTableCanvas @cell-clicked="onCellClicked" :traitStats="storeShowStatsInTable ? traitStats : null" v-if="storeTraits && storeTraits.length > 0" :highlightPosition="userPosition" ref="canvas" />
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
     <BarcodeScannerModal ref="barcodeScannerModal" @code-scanned="searchByBarcode" />
-    <BarcodeViewerModal ref="barcodeViewModal" :text="storeDatasetUuid" v-if="storeDatasetUuid" />
+    <BarcodeViewerModal ref="barcodeViewModal" :text="storeDatasetUuid" :title="storeDatasetName" v-if="storeDatasetUuid" />
     <HelpModal url="https://cropgeeks.github.io/gridscore/collecting-data.html" ref="helpModal" />
 
     <template v-if="storeNavigationMode === 'jump'">
@@ -129,6 +129,8 @@ import HelpModal from '@/components/modals/HelpModal'
 import { BIconCircleFill, BIconGearFill, BIconSearch, BIconArrowsMove, BIconQuestionCircleFill, BIconSlashCircle, BIconCloudDownloadFill, BIconCircleHalf, BIconCircle, BIconCloudUploadFill, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap'
+
+import api from '@/mixin/api'
 
 const emitter = require('tiny-emitter/instance')
 const fixPer = require('fix-perspective')
@@ -207,6 +209,7 @@ export default {
       'storeDarkMode',
       'storeDatasetId',
       'storeDatasetUuid',
+      'storeDatasetName',
       'storeGeolocation',
       'storeRows',
       'storeShowStatsInTable',
@@ -244,6 +247,7 @@ export default {
       }
     }
   },
+  mixins: [api],
   methods: {
     searchByBarcode: function (code) {
       this.searchTerm = code
@@ -364,56 +368,6 @@ export default {
         Object.freeze(tempStats)
 
         this.traitStats = tempStats
-      }
-    },
-    onLoad: function () {
-      this.$bvModal.msgBoxConfirm(this.$t('modalTextReplaceDatasets'), {
-          title: this.$t('modalTitleReplaceDatasets'),
-          okTitle: this.$t('buttonReplace'),
-          cancelTitle: this.$t('buttonCancel')
-        }).then(value => {
-          if (value) {
-            this.loadData()
-          }
-        })
-    },
-    onSave: function () {
-      this.$bvModal.msgBoxConfirm(this.$t('modalTextSaveToServerWarning'), {
-          title: this.$t('modalTitleSaveToServerWarning'),
-          okTitle: this.$t('buttonSave'),
-          cancelTitle: this.$t('buttonCancel')
-        }).then(value => {
-          if (value) {
-            this.sendData()
-          }
-        })
-    },
-    loadData: function () {
-      emitter.emit('set-loading', true)
-      this.getConfigFromSharing(this.storeDatasetUuid)
-        .then(result => {
-          if (result) {
-            result.id = this.storeDatasetId
-            this.$store.dispatch('updateDataset', result)
-          }
-        })
-        .catch(err => {
-          this.serverError = this.getErrorMessage(err)
-        })
-        .finally(() => emitter.emit('set-loading', false))
-    },
-    sendData: function () {
-      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
-      if (storeData) {
-        emitter.emit('set-loading', true)
-        const dataset = this.$store.state.dataset
-        const dataCopy = JSON.parse(JSON.stringify(dataset))
-
-        this.postConfigForSharing(dataCopy, storeData, this.storeDatasetUuid, this.storeRows, this.storeCols)
-          .catch(err => {
-            this.serverError = this.getErrorMessage(err)
-          })
-          .finally(() => emitter.emit('set-loading', false))
       }
     }
   },

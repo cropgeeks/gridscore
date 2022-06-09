@@ -104,6 +104,8 @@ import { mapGetters } from 'vuex'
 
 import HelpModal from '@/components/modals/HelpModal'
 
+import api from '@/mixin/api'
+
 const emitter = require('tiny-emitter/instance')
 
 export default {
@@ -361,6 +363,7 @@ export default {
       return result
     }
   },
+  mixins: [api],
   methods: {
     exportToGerminateFormat: function () {
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null

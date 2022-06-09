@@ -1,5 +1,6 @@
 <template>
   <b-modal :ok-title="$t('buttonClose')"
+           :title="title"
            ok-only
            no-fade
            ref="barcodeViewerModal">
@@ -16,6 +17,10 @@ export default {
   },
   props: {
     text: {
+      type: String,
+      default: null
+    },
+    title: {
       type: String,
       default: null
     }
