@@ -81,6 +81,8 @@
         <p class="text-muted mt-3" v-if="$t('modalTextLoading')">{{ $t('modalTextLoading') }}</p>
       </div>
     </b-modal>
+
+    <CitationModal ref="citationModal" />
   </div>
 </template>
 
@@ -89,6 +91,7 @@ import Vue from 'vue'
 import { VuePlausible } from 'vue-plausible'
 import { mapGetters } from 'vuex'
 import Tour from '@/components/Tour'
+import CitationModal from '@/components/modals/CitationModal'
 import { loadLanguageAsync } from '@/plugins/i18n'
 import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconMoon, BIconSun, BIconDice3, BIconBarChartSteps, BIconGearFill, BIconCalendarDate, BIconGridFill, BIconTrash, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
 import idb from '@/plugins/idb'
@@ -115,6 +118,7 @@ export default {
     BIconPlus,
     BIconMoon,
     BIconSun,
+    CitationModal,
     Tour
   },
   data: function () {
@@ -211,7 +215,8 @@ export default {
       'storeLocale',
       'storeUniqueClientId',
       'storeRunCount',
-      'storePlausible'
+      'storePlausible',
+      'storeCitationModalShownLast'
     ])
   },
   mixins: [api],
@@ -400,7 +405,7 @@ export default {
         } catch (err) {
           this.wakeLock = null
         }
-      } else if (this.wakeLock !== null && !acquire) {
+      } else if (this.wakeLock && !acquire) {
         // Release it
         this.wakeLock.release()
         this.wakeLock = null
@@ -491,17 +496,18 @@ export default {
       this.enablePlausible()
     }
 
-    idb.getAllDatasetsWithUuid()
-      .then(datasets => {
-        this.getDatasetUpdatesAvailable(datasets)
-          .then(result => {
-            if (result && result.data) {
-              const updatesAvailable = datasets.filter((u, i) => result.data[i])
+    // Show the citation modal if it hasn't been shown for at least 30 days.
+    const now = new Date()
+    if (!this.storeCitationModalShownLast) {
+      this.$store.dispatch('setCitationModalShownLast', now)
+    } else {
+      const lastDate = new Date(this.storeCitationModalShownLast)
+      const dateDiff = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24))
 
-              console.log(updatesAvailable)
-            }
-          })
-      })
+      if (dateDiff >= 30) {
+        this.$refs.citationModal.show()
+      }
+    }
   },
   destroyed: function () {
     if (this.geolocationWatchId && navigator.geolocation) {

@@ -31,20 +31,22 @@
       </div>
       <p>{{ $t('pageAboutParagraphOne') }}</p>
       <p v-html="$t('pageAboutParagraphTwo')" />
-      <p><BIconInfoCircleFill /> <span v-html="$t('pageAboutDocumentationLink')" /></p>
-      <p><BIconGithub/> <span v-html="$t('pageAboutGitHubLink')" /></p>
+      <p class="d-flex"><BIconInfoCircleFill class="mt-1" /> <span class="ml-3" v-html="$t('pageAboutDocumentationLink')" /></p>
+      <p class="d-flex"><BIconGithub class="mt-1" /> <span class="ml-3" v-html="$t('pageAboutGitHubLink')" /></p>
+      <p class="d-flex"><BIconNewspaper class="mt-1" /> <span class="ml-3" v-html="$t('modalTextCitation')" /></p>
     </b-container>
   </div>
 </template>
 
 <script>
-import { BIconGithub, BIconInfoCircleFill } from 'bootstrap-vue'
+import { BIconGithub, BIconInfoCircleFill, BIconNewspaper } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 
 export default {
   components: {
     BIconGithub,
-    BIconInfoCircleFill
+    BIconInfoCircleFill,
+    BIconNewspaper
   },
   computed: {
     /** Mapgetters exposing the store configuration */

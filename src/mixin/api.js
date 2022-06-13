@@ -59,7 +59,10 @@ export default {
         .catch(err => {
           this.serverError = this.getErrorMessage(err)
         })
-        .finally(() => emitter.emit('set-loading', false))
+        .finally(() => {
+          emitter.emit('dataset-loaded-remotely', dataset.id)
+          emitter.emit('set-loading', false)
+        })
     },
     sendDataById: function (datasetId) {
       idb.getDataset(datasetId)

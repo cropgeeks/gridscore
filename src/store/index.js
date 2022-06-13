@@ -49,6 +49,7 @@ const storeState = {
     visibleTraits: null,
     navigationMode: 'scroll',
     ignoreEmptyCells: true,
+    citationModalShownLast: null,
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600'],
     plausible: {
       plausibleDomain: null,
@@ -89,7 +90,8 @@ const storeState = {
     storeTraitColors: (state) => state.traitColors,
     storeVisibleTraits: (state) => state.visibleTraits,
     storePlausible: (state) => state.plausible,
-    storeNavigationMode: (state) => state.navigationMode
+    storeNavigationMode: (state) => state.navigationMode,
+    storeCitationModalShownLast: (state) => state.citationModalShownLast
   },
   mutations: {
     ON_RUN_COUNT_CHANGED_MUTATION: function (state, newRunCount) {
@@ -394,6 +396,14 @@ const storeState = {
       } else {
         state.navigationMode = newNavigationMode
       }
+    },
+    ON_CITATION_MODAL_SHOWN_LAST_MUTATION: function (state, newCitationModalShownLast) {
+      const newValue = newCitationModalShownLast ? newCitationModalShownLast.toISOString() : null
+      if (!state.citationModalShownLast) {
+        Vue.set(state, 'citationModalShownLast', newValue)
+      } else {
+        state.citationModalShownLast = newValue
+      }
     }
   },
   actions: {
@@ -532,6 +542,9 @@ const storeState = {
     },
     setNavigationMode: function ({ commit }, navigationMode) {
       commit('ON_NAVIGATION_MODE_CHANGED_MUTATION', navigationMode)
+    },
+    setCitationModalShownLast: function ({ commit }, citationModalShownLast) {
+      commit('ON_CITATION_MODAL_SHOWN_LAST_MUTATION', citationModalShownLast)
     }
   },
   plugins: [createPersistedState({

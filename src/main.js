@@ -30,7 +30,8 @@ import {
   ProgressPlugin,
   JumbotronPlugin,
   SidebarPlugin,
-  EmbedPlugin
+  EmbedPlugin,
+  ToastPlugin
 } from 'bootstrap-vue'
 
 import router from '@/router'
@@ -82,6 +83,7 @@ Vue.use(PopoverPlugin)
 Vue.use(SpinnerPlugin)
 Vue.use(JumbotronPlugin)
 Vue.use(ProgressPlugin)
+Vue.use(ToastPlugin)
 Vue.mixin(mixin)
 
 // Set base URL based on environment

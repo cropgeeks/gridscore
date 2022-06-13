@@ -20,6 +20,11 @@
       <b-row>
         <b-col cols=12 sm=6 lg=3 v-for="dataset in datasets" :key="`dataset-${dataset.id}`" class="mb-3">
           <b-card :title="`${dataset.id} - ${dataset.name}`" class="h-100" :bg-variant="dataset.id === storeDatasetId ? 'light' : null">
+            <a href="#" @click.prevent="onLoad(dataset)" v-if="datasetsWithUpdates.includes(dataset.id)">
+              <div class="card-corner" v-b-tooltip="$t('tooltipDatasetUpdateAvailable')" />
+              <BIconArrowRepeat class="card-corner-icon" />
+            </a>
+
             <b-card-text><BIconLayoutThreeColumns rotate="90" /> {{ $tc('formLabelRowCount', dataset.rows) }}</b-card-text>
             <b-card-text><BIconLayoutThreeColumns /> {{ $tc('formLabelColCount', dataset.cols) }}</b-card-text>
             <b-card-text><BIconTags /> {{ $tc('formLabelTraits', dataset.traits.length) }}</b-card-text>
@@ -72,7 +77,7 @@ import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
 import HelpModal from '@/components/modals/HelpModal'
 import idb from '@/plugins/idb'
 import api from '@/mixin/api'
-import { BIconJournalPlus, BIconFileSpreadsheet, BIconQuestionCircleFill, BIconCloudDownloadFill, BIconCloudUploadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
+import { BIconJournalPlus, BIconFileSpreadsheet, BIconArrowRepeat, BIconQuestionCircleFill, BIconCloudDownloadFill, BIconCloudUploadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
 
 const emitter = require('tiny-emitter/instance')
 
@@ -81,6 +86,7 @@ export default {
     AddTraitModal,
     BarcodeViewerModal,
     HelpModal,
+    BIconArrowRepeat,
     BIconJournalPlus,
     BIconFileSpreadsheet,
     BIconPlayFill,
@@ -97,7 +103,8 @@ export default {
   data: function () {
     return {
       selectedDataset: null,
-      datasets: []
+      datasets: [],
+      datasetsWithUpdates: []
     }
   },
   computed: {
@@ -183,21 +190,76 @@ export default {
       this.selectedDataset = dataset
 
       this.$nextTick(() => this.$refs.addTraitModal.show())
+    },
+    checkDatasetsForUpdates: function () {
+      idb.getAllDatasetsWithUuid()
+        .then(datasets => {
+          this.getDatasetUpdatesAvailable(datasets)
+            .then(result => {
+              if (result && result.data) {
+                const updatesAvailable = datasets.filter((u, i) => result.data[i])
+
+                if (updatesAvailable) {
+                  this.updateDatasetsWithUpdates(updatesAvailable.map(ds => ds.id))
+                } else {
+                  this.updateDatasetsWithUpdates([])
+                }
+              }
+            })
+        })
+        .catch(() => {
+          this.updateDatasetsWithUpdates([])
+        })
+    },
+    updateDatasetsWithUpdates: function (datasetIds) {
+      this.datasetsWithUpdates = datasetIds
+
+      if (datasetIds && datasetIds.length > 0) {
+        this.$bvToast.toast(this.$tc('toastTextUpdatesAvailable', datasetIds.length), {
+          title: this.$t('toastTitleUpdatesAvailable'),
+          variant: 'info',
+          toaster: 'b-toaster-bottom-center'
+        })
+      }
     }
   },
   created: function () {
     this.updateDatasets()
 
+    this.checkDatasetsForUpdates()
+
     emitter.on('datasets-changed', this.updateDatasets)
+    emitter.on('datasets-have-updates', this.updateDatasetsWithUpdates)
+    emitter.on('dataset-loaded-remotely', this.checkDatasetsForUpdates)
   },
   destroyed: function () {
     emitter.off('datasets-changed', this.updateDatasets)
+    emitter.off('datasets-have-updates', this.updateDatasetsWithUpdates)
+    emitter.off('dataset-loaded-remotely', this.checkDatasetsForUpdates)
   }
 }
 </script>
 
-<style>
+<style scoped>
 .about-header-logo {
   max-height: 200px;
+}
+
+.card-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 50px;
+  border-top: 50px solid #888;
+  border-top-color: var(--info);
+  border-left: 50px solid transparent;
+}
+.card-corner-icon {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  color: white;
+  pointer-events: none;
 }
 </style>
