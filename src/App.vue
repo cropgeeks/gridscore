@@ -234,6 +234,8 @@ export default {
           .then(value => {
             if (value) {
               this.$store.dispatch('deleteDataset', datasetId)
+
+              this.plausibleEvent('dataset-delete')
             }
           })
     },
@@ -245,6 +247,8 @@ export default {
       loadLanguageAsync(language.locale).then(() => {
         this.$i18n.locale = language.locale
         this.$store.dispatch('setLocale', language.locale)
+
+        this.plausibleEvent('locale-change', { locale: language.locale })
       })
     },
     startGeoTracking: function () {
@@ -370,6 +374,8 @@ export default {
     },
     showIntroductionTour: function () {
       this.$refs.tour.start()
+
+      this.plausibleEvent('introduction-show')
     },
     setLoading: function (visible) {
       if (visible) {
@@ -418,7 +424,7 @@ export default {
           domain: this.storePlausible.plausibleDomain,
           hashMode: this.storePlausible.plausibleHashMode || true,
           apiHost: this.storePlausible.plausibleApiHost,
-          trackLocalhost: false
+          trackLocalhost: true
         })
 
         this.$nextTick(() => {

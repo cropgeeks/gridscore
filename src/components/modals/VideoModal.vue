@@ -65,6 +65,8 @@ export default {
           // Use current date as fallback as this is required for the filename
           this.videoDate = new Date()
         }
+
+        this.plausibleEvent('data-input', { type: 'video' })
       }
     }
   },

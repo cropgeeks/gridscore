@@ -80,6 +80,8 @@ export default {
           if (result) {
             this.config = result
             this.importExport()
+
+            this.plausibleEvent('dataset-load', { format: 'qr' })
           }
         })
         .catch(err => {

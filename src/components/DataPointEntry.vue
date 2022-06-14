@@ -290,6 +290,8 @@ export default {
           }
         }
       }
+
+      this.plausibleEvent('data-input', { type: 'speech-recognition' })
     },
     decrease: function (index) {
       let newValue

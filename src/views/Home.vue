@@ -64,7 +64,7 @@
       </b-row>
     </div>
     <b-card bg-variant="light" class="my-5" v-if="!storeHideCitationMessage">
-      <b-card-title><span>{{ $t('modalTitleCitation') }}</span><button type="button" @click.prevent="$store.dispatch('setHideCitationMessage', true)" v-b-tooltip="$t('tooltipDontShowAgain')" aria-label="Close" class="close">×</button></b-card-title>
+      <b-card-title><span>{{ $t('modalTitleCitation') }}</span><button type="button" @click.prevent="hideCitation" v-b-tooltip="$t('tooltipDontShowAgain')" aria-label="Close" class="close">×</button></b-card-title>
       <div v-html="$t('modalTextCitation')" />
     </b-card>
     <AddTraitModal :dataset="selectedDataset" ref="addTraitModal" />
@@ -120,11 +120,18 @@ export default {
   },
   mixins: [api],
   methods: {
+    hideCitation: function () {
+      this.$store.dispatch('setHideCitationMessage', true)
+
+      this.plausibleEvent('citation-hide')
+    },
     startTour: function () {
       emitter.emit('show-introduction-tour')
     },
     loadExampleData: function () {
       this.$store.dispatch('addDataset', require('@/example-data.json'))
+
+      this.plausibleEvent('example-load')
     },
     redirect: function () {
       this.$router.push({ name: 'data' })
@@ -170,6 +177,8 @@ export default {
           .then(value => {
             if (value) {
               this.$store.dispatch('resetDataset', dataset.id)
+
+              this.plausibleEvent('dataset-reset')
             }
           })
     },
@@ -183,6 +192,8 @@ export default {
           .then(value => {
             if (value) {
               this.$store.dispatch('deleteDataset', dataset.id)
+
+              this.plausibleEvent('dataset-delete')
             }
           })
     },
@@ -190,11 +201,15 @@ export default {
       this.selectedDataset = dataset
 
       this.$nextTick(() => this.$refs.barcodeViewModal.show())
+
+      this.plausibleEvent('qr-code-show')
     },
     onAddTraitClicked: function (dataset) {
       this.selectedDataset = dataset
 
       this.$nextTick(() => this.$refs.addTraitModal.show())
+
+      this.plausibleEvent('dataset-update', { type: 'trait' })
     },
     checkDatasetsForUpdates: function () {
       idb.getAllDatasetsWithUuid()

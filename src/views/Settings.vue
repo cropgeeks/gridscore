@@ -62,9 +62,6 @@
           <b-form-group :label="$t('formLabelSettingsInvertNumberingY')" label-for="invert-numbering-y" :description="$t('formDescriptionSettingsInvertNumberingY')">
             <b-form-checkbox v-model="tempInvertNumberingY" switch id="invert-numbering-y">{{ $t('buttonToggleInvertNumberingY') }}</b-form-checkbox>
           </b-form-group>
-          <!-- <b-form-group :label="$t('formLabelSettingsGridLinesEvery')" label-for="grid-lines-every">
-            <b-form-select :options="validGridLines" v-model="tempGridLinesEvery" id="grid-lines-every" />
-          </b-form-group> -->
           <b-form-group :label="$t('formLabelSettingsColumnWidth')" :description="$t('formDescriptionSettingsColumnWidth')" label-for="column-width">
             <b-input-group>
               <b-form-input v-model.number="tempColumnWidth" type="number" id="column-width" />
@@ -121,12 +118,10 @@ export default {
       tempShowStatsInTable: false,
       tempHideToggledTraits: false,
       tempHideMarkers: false,
-      tempGridLinesEvery: 5,
       tempColumnWidth: null,
       tempColors: [],
       tempNavigationMode: null,
-      newColor: 'black',
-      validGridLines: [2, 3, 4, 5]
+      newColor: 'black'
     }
   },
   computed: {
@@ -135,7 +130,6 @@ export default {
       'storeColumnWidth',
       'storeContinuousInput',
       'storeDatasetId',
-      'storeGridLinesEvery',
       'storeHideToggledTraits',
       'storeHideMarkers',
       'storeIgnoreEmptyCells',
@@ -169,7 +163,6 @@ export default {
       this.tempUseGps = this.storeUseGps
       this.tempUseSpeech = this.storeUseSpeech
       this.tempContinuousInput = this.storeContinuousInput
-      this.tempGridLinesEvery = this.storeGridLinesEvery
       this.tempInvertView = this.storeInvertView
       this.tempColumnWidth = this.storeColumnWidth
       this.tempInvertNumberingX = this.storeInvertNumberingX
@@ -221,46 +214,56 @@ export default {
       // Dispatch to the store
       if (this.tempUseGps !== this.storeUseGps) {
         this.$store.dispatch('setUseGps', this.tempUseGps)
+        this.plausibleEvent('settings-change', { param: `'use-gps': ${this.tempUseGps}` })
       }
       if (this.tempUseSpeech !== this.storeUseSpeech) {
         this.$store.dispatch('setUseSpeech', this.tempUseSpeech)
+        this.plausibleEvent('settings-change', { param: `'use-speech': ${this.tempUseSpeech}` })
       }
       if (this.tempContinuousInput !== this.storeContinuousInput) {
         this.$store.dispatch('setContinuousInput', this.tempContinuousInput)
-      }
-      if (this.tempGridLinesEvery !== this.storeGridLinesEvery) {
-        this.$store.dispatch('setGridLinesEvery', this.tempGridLinesEvery)
+        this.plausibleEvent('settings-change', { param: `'continuous-input': ${this.tempContinuousInput}` })
       }
       if (this.tempInvertView !== this.storeInvertView) {
         this.$store.dispatch('setInvertView', this.tempInvertView)
+        this.plausibleEvent('settings-change', { param: `'invert-view': ${this.tempInvertView}` })
       }
       if (this.tempInvertNumberingX !== this.storeInvertNumberingX) {
         this.$store.dispatch('setInvertNumberingX', this.tempInvertNumberingX)
+        this.plausibleEvent('settings-change', { param: `'invert-numbering-x': ${this.tempInvertNumberingX}` })
       }
       if (this.tempInvertNumberingY !== this.storeInvertNumberingY) {
         this.$store.dispatch('setInvertNumberingY', this.tempInvertNumberingY)
+        this.plausibleEvent('settings-change', { param: `'invert-numbering-y': ${this.tempInvertNumberingY}` })
       }
       if (this.tempShowStatsInTable !== this.storeShowStatsInTable) {
         this.$store.dispatch('setShowStatsInTable', this.tempShowStatsInTable)
+        this.plausibleEvent('settings-change', { param: `'show-stats-in-table': ${this.tempShowStatsInTable}` })
       }
       if (this.tempHideToggledTraits !== this.storeHideToggledTraits) {
         this.$store.dispatch('setHideToggledTraits', this.tempHideToggledTraits)
+        this.plausibleEvent('settings-change', { param: `'hide-toggled-traits': ${this.tempHideToggledTraits}` })
       }
       if (this.tempHideMarkers !== this.storeHideMarkers) {
         this.$store.dispatch('setHideMarkers', this.tempHideMarkers)
+        this.plausibleEvent('settings-change', { param: `'hide-markers': ${this.tempHideMarkers}` })
       }
       if (this.tempColumnWidth !== this.storeColumnWidth) {
         this.$store.dispatch('setColumnWidth', this.tempColumnWidth)
+        this.plausibleEvent('settings-change', { param: `'column-width': ${this.tempColumnWidth}` })
       }
       if (this.tempIgnoreEmptyCells !== this.storeIgnoreEmptyCells) {
         this.$store.dispatch('setIgnoreEmptyCells', this.tempIgnoreEmptyCells)
+        this.plausibleEvent('settings-change', { param: `'ignore-empty-cells': ${this.tempIgnoreEmptyCells}` })
       }
       if (this.tempNavigationMode !== this.storeNavigationMode) {
         this.$store.dispatch('setNavigationMode', this.tempNavigationMode)
+        this.plausibleEvent('settings-change', { param: `'navigation-mode': ${this.tempNavigationMode}` })
       }
 
       if (this.tempColors.length !== this.storeTraitColors.length || !this.tempColors.every((value, index) => value === this.storeTraitColors[index])) {
         this.$store.dispatch('setTraitColors', this.tempColors)
+        this.plausibleEvent('settings-change', { param: `'trait-colors': ${this.tempColors}` })
       }
 
       if (this.storeDatasetId) {

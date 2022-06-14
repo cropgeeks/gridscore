@@ -235,6 +235,8 @@ export default {
 
       // Store the data in the database
       this.$store.dispatch('updateDataset', reformatted)
+
+      this.plausibleEvent('dataset-load', { format: 'file' })
     },
     isValidDate: function (s) {
       // Assumes s is "yyyy-mm-dd"

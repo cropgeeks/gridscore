@@ -112,6 +112,8 @@ export default {
               }
             }
           })
+
+        this.plausibleEvent('data-input', { type: 'image' })
       }
     }
   },

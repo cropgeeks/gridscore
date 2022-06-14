@@ -31,6 +31,15 @@ export default {
     ])
   },
   methods: {
+    plausibleEvent: function (name, props) {
+      if (this.$plausible) {
+        if (props) {
+          this.$plausible.trackEvent(name, { props: props })
+        } else {
+          this.$plausible.trackEvent(name)
+        }
+      }
+    },
     getErrorMessage: function (err) {
       if (err && err.response && err.response.status) {
         switch (err.response.status) {

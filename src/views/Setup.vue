@@ -454,6 +454,14 @@ export default {
             }
             dataset.data = data
             this.$store.dispatch('addDataset', dataset)
+
+            this.plausibleEvent('dataset-setup', {
+              rows: dataset.rows,
+              cols: dataset.cols,
+              traits: dataset.traits.length,
+              markers: dataset.markers !== null,
+              cornerPoints: dataset.cornerPoints !== null
+            })
           }
         })
       }

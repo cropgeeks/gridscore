@@ -324,6 +324,8 @@ export default {
 
       this.updateMarkers()
 
+      this.plausibleEvent('data-view-updated', { type: 'column-marked' })
+
       // if (this.storeUseGps && this.highlightPosition) {
       //   this.updateUserPosition()
       // }
@@ -339,6 +341,8 @@ export default {
       }
 
       this.updateMarkers()
+
+      this.plausibleEvent('data-view-updated', { type: 'row-marked' })
 
       // if (this.storeUseGps && this.highlightPosition) {
       //   this.updateUserPosition()

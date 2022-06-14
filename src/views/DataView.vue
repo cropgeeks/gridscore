@@ -252,6 +252,8 @@ export default {
     searchByBarcode: function (code) {
       this.searchTerm = code
 
+      this.plausibleEvent('data-search', { type: 'barcode' })
+
       this.$nextTick(() => this.openDataInput())
     },
     scrollTo: function (corner) {
@@ -266,6 +268,9 @@ export default {
         if (this.searchTermLowerCase === null) {
           return
         }
+
+        this.plausibleEvent('data-search', { type: 'input' })
+
         this.$store.state.dataset.data.forEach((c, k) => {
           if (c.name !== undefined && c.name !== null && c.name.toLowerCase() === this.searchTermLowerCase) {
             this.$nextTick(() => {

@@ -52,6 +52,8 @@ export default {
       } else {
         this.sendData(this.$store.state.dataset, uuid => {
           this.$store.dispatch('setDatasetUuid', uuid)
+
+          this.plausibleEvent('dataset-share')
         })
       }
     }

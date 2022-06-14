@@ -21,7 +21,7 @@
         </b-form>
         <!-- Link to actually download the data -->
         <div v-if="text && (text !== $t('labelNoData'))">
-          <BIconDownload /> <a :href="getHrefData" :download="getFilenameData"> {{ $t('linkExport') }}</a>
+          <BIconDownload /> <a :href="getHrefData" :download="getFilenameData" @click="plausibleEvent('dataset-export', { format: 'data' })"> {{ $t('linkExport') }}</a>
         </div>
 
         <hr />
@@ -35,7 +35,7 @@
         </b-form>
         <!-- Link to actually download the data -->
         <div v-if="datesText && (datesText !== $t('labelNoData'))">
-          <BIconDownload /> <a :href="getHrefDates" :download="getFilenameDates"> {{ $t('linkExport') }}</a>
+          <BIconDownload /> <a :href="getHrefDates" :download="getFilenameDates" @click="plausibleEvent('dataset-export', { format: 'dates' })"> {{ $t('linkExport') }}</a>
         </div>
       </b-tab>
       <!-- Tab for the trait definitions -->
@@ -53,7 +53,7 @@
         </b-form>
         <!-- Link to actually download the data -->
         <div v-if="traits && (traits !== $t('labelNoData'))">
-          <BIconDownload /> <a :href="getHrefTraits" :download="getFilenameTraits"> {{ $t('linkExport') }}</a>
+          <BIconDownload /> <a :href="getHrefTraits" :download="getFilenameTraits" @click="plausibleEvent('dataset-export', { format: 'traits' })"> {{ $t('linkExport') }}</a>
         </div>
       </b-tab>
       <b-tab>
@@ -74,7 +74,7 @@
         </b-form>
         <!-- Link to actually download the data -->
         <div v-if="fieldPlan && (fieldPlan !== $t('labelNoData'))">
-          <BIconDownload /> <a :href="getHrefFieldPlant" :download="getFilenameFieldPlan"> {{ $t('linkExport') }}</a>
+          <BIconDownload /> <a :href="getHrefFieldPlant" :download="getFilenameFieldPlan" @click="plausibleEvent('dataset-export', { format: 'field-plan' })"> {{ $t('linkExport') }}</a>
         </div>
       </b-tab>
       <b-tab>
@@ -385,6 +385,8 @@ export default {
               } else {
                 this.germinateTemplateFile = null
               }
+
+              this.plausibleEvent('dataset-export', { format: 'germinate' })
             })
             .catch(() => {
               // TODO

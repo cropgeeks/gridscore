@@ -46,6 +46,13 @@ export default {
 
       this.$store.dispatch('setCornerPointsAndMarkers', { cornerPoints, markers })
 
+      if (cornerPoints) {
+        this.plausibleEvent('dataset-update', { type: 'corners' })
+      }
+      if (markers) {
+        this.plausibleEvent('dataset-update', { type: 'markers' })
+      }
+
       this.hide()
     },
     /**
