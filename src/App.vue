@@ -424,7 +424,7 @@ export default {
           domain: this.storePlausible.plausibleDomain,
           hashMode: this.storePlausible.plausibleHashMode || true,
           apiHost: this.storePlausible.plausibleApiHost,
-          trackLocalhost: true
+          trackLocalhost: false
         })
 
         this.$nextTick(() => {
