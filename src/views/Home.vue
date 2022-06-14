@@ -63,6 +63,10 @@
         </b-col>
       </b-row>
     </div>
+    <b-card bg-variant="light" class="my-5" v-if="!storeHideCitationMessage">
+      <b-card-title><span>{{ $t('modalTitleCitation') }}</span><button type="button" @click.prevent="$store.dispatch('setHideCitationMessage', true)" v-b-tooltip="$t('tooltipDontShowAgain')" aria-label="Close" class="close">×</button></b-card-title>
+      <div v-html="$t('modalTextCitation')" />
+    </b-card>
     <AddTraitModal :dataset="selectedDataset" ref="addTraitModal" />
     <BarcodeViewerModal ref="barcodeViewModal" :text="selectedDataset.uuid" :title="selectedDataset.name" v-if="selectedDataset && selectedDataset.uuid" />
 
@@ -110,7 +114,8 @@ export default {
   computed: {
     /** Mapgetters exposing the store configuration */
     ...mapGetters([
-      'storeDatasetId'
+      'storeDatasetId',
+      'storeHideCitationMessage'
     ])
   },
   mixins: [api],

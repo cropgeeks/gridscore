@@ -49,13 +49,13 @@ const storeState = {
     visibleTraits: null,
     navigationMode: 'scroll',
     ignoreEmptyCells: true,
-    citationModalShownLast: null,
     traitColors: ['#910080', '#ff7c00', '#5ec418', '#00a0f1', '#c5e000', '#ff007a', '#222183', '#c83831', '#fff600'],
     plausible: {
       plausibleDomain: null,
       plausibleHashMode: true,
       plausibleApiHost: null
-    }
+    },
+    hideCitationMessage: false
   },
   getters: {
     storeDarkMode: (state) => state.darkMode,
@@ -91,7 +91,7 @@ const storeState = {
     storeVisibleTraits: (state) => state.visibleTraits,
     storePlausible: (state) => state.plausible,
     storeNavigationMode: (state) => state.navigationMode,
-    storeCitationModalShownLast: (state) => state.citationModalShownLast
+    storeHideCitationMessage: (state) => state.hideCitationMessage
   },
   mutations: {
     ON_RUN_COUNT_CHANGED_MUTATION: function (state, newRunCount) {
@@ -397,12 +397,11 @@ const storeState = {
         state.navigationMode = newNavigationMode
       }
     },
-    ON_CITATION_MODAL_SHOWN_LAST_MUTATION: function (state, newCitationModalShownLast) {
-      const newValue = newCitationModalShownLast ? newCitationModalShownLast.toISOString() : null
-      if (!state.citationModalShownLast) {
-        Vue.set(state, 'citationModalShownLast', newValue)
+    ON_HIDE_CITATION_MESSAGE_CHANGED: function (state, newHideCitationMessage) {
+      if (state.hideCitationMessage === undefined) {
+        Vue.set(state, 'hideCitationMessage', newHideCitationMessage)
       } else {
-        state.citationModalShownLast = newValue
+        state.hideCitationMessage = newHideCitationMessage
       }
     }
   },
@@ -543,8 +542,8 @@ const storeState = {
     setNavigationMode: function ({ commit }, navigationMode) {
       commit('ON_NAVIGATION_MODE_CHANGED_MUTATION', navigationMode)
     },
-    setCitationModalShownLast: function ({ commit }, citationModalShownLast) {
-      commit('ON_CITATION_MODAL_SHOWN_LAST_MUTATION', citationModalShownLast)
+    setHideCitationMessage: function ({ commit }, showCitationMessage) {
+      commit('ON_HIDE_CITATION_MESSAGE_CHANGED', showCitationMessage)
     }
   },
   plugins: [createPersistedState({
