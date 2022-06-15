@@ -63,9 +63,18 @@
         </b-col>
       </b-row>
     </div>
-    <b-card bg-variant="light" class="my-5" v-if="!storeHideCitationMessage">
-      <b-card-title><span>{{ $t('modalTitleCitation') }}</span><button type="button" @click.prevent="hideCitation" v-b-tooltip="$t('tooltipDontShowAgain')" aria-label="Close" class="close">×</button></b-card-title>
-      <div v-html="$t('modalTextCitation')" />
+    <b-card bg-variant="light" class="my-3" v-if="!storeHideCitationMessage" no-body>
+      <b-card-body>
+        <b-row>
+          <b-col cols=12 sm=3 md=2 class="d-flex align-items-center justify-content-center">
+            <BIconNewspaper class="display-1 p-2" />
+          </b-col>
+          <b-col cols=12 sm=9 md=10>
+            <b-card-title><span>{{ $t('modalTitleCitation') }}</span><button type="button" @click.prevent="hideCitation" v-b-tooltip="$t('tooltipDontShowAgain')" aria-label="Close" class="close">×</button></b-card-title>
+            <div v-html="$t('modalTextCitation')" />
+          </b-col>
+        </b-row>
+      </b-card-body>
     </b-card>
     <AddTraitModal :dataset="selectedDataset" ref="addTraitModal" />
     <BarcodeViewerModal ref="barcodeViewModal" :text="selectedDataset.uuid" :title="selectedDataset.name" v-if="selectedDataset && selectedDataset.uuid" />
@@ -81,7 +90,7 @@ import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
 import HelpModal from '@/components/modals/HelpModal'
 import idb from '@/plugins/idb'
 import api from '@/mixin/api'
-import { BIconJournalPlus, BIconFileSpreadsheet, BIconArrowRepeat, BIconQuestionCircleFill, BIconCloudDownloadFill, BIconCloudUploadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
+import { BIconJournalPlus, BIconFileSpreadsheet, BIconNewspaper, BIconArrowRepeat, BIconQuestionCircleFill, BIconCloudDownloadFill, BIconCloudUploadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
 
 const emitter = require('tiny-emitter/instance')
 
@@ -90,6 +99,7 @@ export default {
     AddTraitModal,
     BarcodeViewerModal,
     HelpModal,
+    BIconNewspaper,
     BIconArrowRepeat,
     BIconJournalPlus,
     BIconFileSpreadsheet,
@@ -121,9 +131,19 @@ export default {
   mixins: [api],
   methods: {
     hideCitation: function () {
-      this.$store.dispatch('setHideCitationMessage', true)
+      this.$bvModal.msgBoxConfirm(this.$t('modalTextHideCitation'), {
+          title: this.$t('modalTitleHideCitation'),
+          okTitle: this.$t('buttonYes'),
+          okVariant: 'danger',
+          cancelTitle: this.$t('buttonNo')
+        })
+          .then(value => {
+            if (value) {
+              this.$store.dispatch('setHideCitationMessage', true)
 
-      this.plausibleEvent('citation-hide')
+              this.plausibleEvent('citation-hide')
+            }
+          })
     },
     startTour: function () {
       emitter.emit('show-introduction-tour')

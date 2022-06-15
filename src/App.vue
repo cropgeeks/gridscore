@@ -36,7 +36,7 @@
               <span>{{ language.name }}</span>
             </b-dropdown-item>
           </b-nav-item-dropdown>
-          <b-nav-item :to="{ name: 'about' }"><BIconInfoCircle /> About</b-nav-item>
+          <b-nav-item :to="{ name: 'about' }"><BIconInfoCircle /> {{ $t('menuAbout') }}</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
