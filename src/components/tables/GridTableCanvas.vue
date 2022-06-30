@@ -1,6 +1,6 @@
 <template>
   <div ref="canvasWrapper" class="grid">
-    <div />
+    <div id="top-left" />
     <ColumnHeader :width="canvasWidth"
                   :height="columnHeaderHeight"
                   :traitStats="traitStats"
@@ -97,7 +97,6 @@ export default {
     highlightPosition: {
       deep: true,
       handler: function (newValue) {
-        // TODO: Only update relevant cell + directly adjacent cells
         if (this.followUser) {
           this.scrollTo(newValue.x, 100 - newValue.y)
         } else {
@@ -271,7 +270,7 @@ export default {
       const result = {}
 
       this.storeTraits.forEach((t, index) => {
-        if (!this.storeHideToggledTraits || this.storeVisibleTraits[index]) {
+        if (!this.storeHideToggledTraits || (this.storeVisibleTraits && this.storeVisibleTraits[index])) {
           result[counter++] = index
         }
       })
@@ -803,6 +802,7 @@ export default {
           const hidden = !this.storeHideToggledTraits && this.storeVisibleTraits && !this.storeVisibleTraits[realIndex]
 
           let fill = cell.values[realIndex] !== null
+          const mType = this.storeTraits[realIndex].mType
 
           if (hidden) {
             realIndex = this.storeTraits.length
@@ -812,9 +812,11 @@ export default {
             fill = !fill
           }
 
+          const fillType = mType === 'multi' ? (fill ? 'semi' : 'empty') : (fill ? 'filled' : 'empty')
+
           const targetX = Math.round(extraPadding / 2 + x + this.padding + t * (this.circleRadius + this.padding))
           const targetY = Math.round(y + this.textPartHeight + r * (this.circleRadius * 2 + this.padding))
-          this.$refs.offscreenCanvas.copyToCanvas(realIndex, fill, count, this.ctx, targetX, targetY)
+          this.$refs.offscreenCanvas.copyToCanvas(realIndex, fillType, count, this.ctx, targetX, targetY)
 
           traitCounter++
         }
@@ -831,7 +833,7 @@ export default {
     handleResize: function () {
       this.reset()
     },
-    reset: function () {
+    reset: function (scrollToCorner) {
       if (this.isResetting) {
         return
       }
@@ -862,14 +864,18 @@ export default {
           } else {
             this.update()
           }
+
+          if (scrollToCorner) {
+            this.$nextTick(() => this.scrollToCorner(scrollToCorner))
+          }
           this.isResetting = false
         })
       })
     },
-    onDatasetChanged: function () {
+    onDatasetChanged: function (params) {
       this.origin.x = 0
       this.origin.y = 0
-      this.reset()
+      this.reset((params && params.scrollToCorner) ? params.scrollToCorner : null)
     },
     scrollTo: function (x, y) {
       if (x !== null && x >= 0 && x <= 100) {
@@ -1015,5 +1021,14 @@ export default {
 }
 .grid #user-position-canvas {
   pointer-events: none;
+}
+</style>
+
+<style>
+.grid #top-left {
+  background-color: #ffffff;
+}
+html.dark-mode .grid #top-left {
+  background-color: #000000;
 }
 </style>

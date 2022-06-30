@@ -3,7 +3,7 @@ import { mapGetters } from 'vuex'
 export default {
   data: function () {
     return {
-      gridScoreVersion: '1.10.0',
+      gridScoreVersion: '1.11.0',
       multiTraitMethods: {
         // TODO: Handle dates!
         last: {
@@ -45,6 +45,8 @@ export default {
         switch (err.response.status) {
           case 404:
             return this.$t('axiosErrorConfigNotFound')
+          case 409:
+            return this.$t('axiosErrorConflict')
           case 500:
             return this.$t('axiosErrorGeneric500')
           default:
@@ -104,12 +106,21 @@ export default {
         return null
       }
 
-      const data = isValue ? cell.values : cell.dates
+      let value
+      let date
 
       if (traitMType === 'multi') {
-        return this.multiTraitMethods[multiTraitMethod].call(data[traitIndex])
+        value = this.multiTraitMethods[multiTraitMethod].call(cell.values[traitIndex])
+        date = this.multiTraitMethods[multiTraitMethod].call(cell.dates[traitIndex])
       } else {
-        return data[traitIndex] || null
+        value = cell.values[traitIndex] || null
+        date = cell.dates[traitIndex] || null
+      }
+
+      if (value !== undefined && value !== null) {
+        return isValue ? value : date
+      } else {
+        return null
       }
     }
   }

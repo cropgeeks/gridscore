@@ -58,7 +58,7 @@ export default {
     reset: function () {
       const scale = window.devicePixelRatio
       const width = this.circleCount * this.circleRadius * 2 + this.circleCount + 1
-      const height = this.circleRadius * 20 + this.circleCount + 1
+      const height = this.circleRadius * 30 + this.circleCount + 1
       canvas.width = width * scale
       canvas.height = height * scale
 
@@ -77,11 +77,11 @@ export default {
     /**
      * Draws the trait circle for the given parameters onto the target context
      */
-    copyToCanvas: function (traitIndex, filled, bgIndex, otherCtx, targetX, targetY) {
+    copyToCanvas: function (traitIndex, type, bgIndex, otherCtx, targetX, targetY) {
       // Calculate position of circle on the offscreen canvas
       const w = this.circleRadius * 2
       const sourceX = 1 + traitIndex * (w + 1)
-      const sourceY = 1 + bgIndex * (this.circleRadius * 4 + 1) + (filled ? 0 : w)
+      const sourceY = 1 + bgIndex * (this.circleRadius * 6 + 1) + (type === 'filled' ? 0 : (type === 'empty' ? w : 2 * w))
       // Draw it onto the target
       otherCtx.drawImage(canvas, sourceX * window.devicePixelRatio, sourceY * window.devicePixelRatio, w * window.devicePixelRatio, w * window.devicePixelRatio, targetX, targetY, w, w)
     },
@@ -103,9 +103,9 @@ export default {
         }
 
         // Calculate y position
-        const y = b * (this.circleRadius * 4 + 1)
+        const y = b * (this.circleRadius * 6 + 1)
         // Fill background
-        ctx.fillRect(0, y, this.circleCount * this.circleRadius * 2 + this.circleCount + 1, this.circleRadius * 4 + 2)
+        ctx.fillRect(0, y, this.circleCount * this.circleRadius * 2 + this.circleCount + 1, this.circleRadius * 6 + 2)
         // Draw trait circles
         this.storeTraits.forEach((t, i) => {
           // Filled circle
@@ -119,6 +119,14 @@ export default {
           ctx.beginPath()
           ctx.arc(1 + this.circleRadius + i * (this.circleRadius * 2 + 1), 1 + y + this.circleRadius * 3, this.circleRadius - 0.5, 0, 2 * Math.PI)
           ctx.stroke()
+
+          // Semi circle for multi traits
+          ctx.beginPath()
+          ctx.arc(1 + this.circleRadius + i * (this.circleRadius * 2 + 1), 1 + y + this.circleRadius * 5, this.circleRadius - 0.5, 0, 2 * Math.PI)
+          ctx.stroke()
+          ctx.beginPath()
+          ctx.arc(1 + this.circleRadius + i * (this.circleRadius * 2 + 1), 1 + y + this.circleRadius * 5, this.circleRadius, (Math.PI / 180) * 90, (Math.PI / 180) * 270)
+          ctx.fill()
         })
 
         // Draw the disabled circles
@@ -127,10 +135,19 @@ export default {
         ctx.arc(1 + this.circleRadius + (this.circleCount - 1) * (this.circleRadius * 2 + 1), 1 + y + this.circleRadius, this.circleRadius, 0, 2 * Math.PI)
         ctx.fill()
 
+        // Outlined circle (-0.5px radius so it's the same size as the filled circle)
         ctx.strokeStyle = this.fillStyleHiddenTrait
         ctx.beginPath()
         ctx.arc(1 + this.circleRadius + (this.circleCount - 1) * (this.circleRadius * 2 + 1), 1 + y + this.circleRadius * 3, this.circleRadius - 0.5, 0, 2 * Math.PI)
         ctx.stroke()
+
+        // Semi circle for multi traits
+        ctx.beginPath()
+        ctx.arc(1 + this.circleRadius + (this.circleCount - 1) * (this.circleRadius * 2 + 1), 1 + y + this.circleRadius * 5, this.circleRadius - 0.5, 0, 2 * Math.PI)
+        ctx.stroke()
+        ctx.beginPath()
+        ctx.arc(1 + this.circleRadius + (this.circleCount - 1) * (this.circleRadius * 2 + 1), 1 + y + this.circleRadius * 5, this.circleRadius - 0.5, (Math.PI / 180) * 90, (Math.PI / 180) * 270)
+        ctx.fill()
       }
     }
   },

@@ -9,6 +9,7 @@
 
     <div class="text-center">
       <b-button class="mx-2 mb-3" :to="{ name: 'setup' }"><BIconJournalPlus /> {{ $t('buttonSetupTrial') }}</b-button>
+      <b-button class="mx-2 mb-3" :to="{ name: 'setup-survey' }"><BIconJournalAlbum /> {{ $t('buttonSetupSurvey') }}</b-button>
       <b-button class="mx-2 mb-3" :to="{ name: 'import' }"><BIconCloudDownloadFill /> {{ $t('buttonImportTrial') }}</b-button>
       <b-button class="mx-2 mb-3" @click="loadExampleData"><BIconFileSpreadsheet /> {{ $t('buttonLoadExampleData') }}</b-button>
       <b-button class="mx-2 mb-3" @click="startTour"><BIconPlayFill /> {{ $t('buttonStartIntroductionTour') }}</b-button>
@@ -19,8 +20,8 @@
       <h2>{{ $t('pageHomeDatasetsTitle') }} - <small>{{ $t('pageHomeDatasetsSubtitle') }}</small></h2>
       <b-row>
         <b-col cols=12 sm=6 lg=3 v-for="dataset in datasets" :key="`dataset-${dataset.id}`" class="mb-3">
-          <b-card :title="`${dataset.id} - ${dataset.name}`" class="h-100" :bg-variant="dataset.id === storeDatasetId ? 'light' : null">
-            <a href="#" @click.prevent="onLoad(dataset)" v-if="datasetsWithUpdates.includes(dataset.id)">
+          <b-card :title="`${dataset.id} - ${dataset.name}`" class="h-100" :border-variant="dataset.id === storeDatasetId ? 'info' : null" :bg-variant="dataset.id === storeDatasetId ? 'light' : null">
+            <a href="#" @click.prevent="synchronizeDataset(dataset.id, true)" v-if="datasetsWithUpdates.includes(dataset.id)">
               <div class="card-corner" v-b-tooltip="$t('tooltipDatasetUpdateAvailable')" />
               <BIconArrowRepeat class="card-corner-icon" />
             </a>
@@ -28,6 +29,7 @@
             <b-card-text><BIconLayoutThreeColumns rotate="90" /> {{ $tc('formLabelRowCount', dataset.rows) }}</b-card-text>
             <b-card-text><BIconLayoutThreeColumns /> {{ $tc('formLabelColCount', dataset.cols) }}</b-card-text>
             <b-card-text><BIconTags /> {{ $tc('formLabelTraits', dataset.traits.length) }}</b-card-text>
+            <b-card-text><BIconClipboard /> {{ dataset.datasetType === 'SURVEY' ? $t('widgetDatasetCardDatasetTypeSurvey') : $t('widgetDatasetCardDatasetTypeTrial') }}</b-card-text>
             <b-card-text v-if="dataset.lastUpdatedOn"><BIconCalendarDate /> {{ new Date(dataset.lastUpdatedOn).toLocaleString() }}</b-card-text>
 
             <template #footer>
@@ -40,8 +42,7 @@
                   </template>
                   <b-dropdown-item @click="onAddTraitClicked(dataset)"><BIconTags /> {{ $t('buttonAddTrait') }}</b-dropdown-item>
                   <template v-if="dataset.uuid">
-                    <b-dropdown-item-button @click="onLoad(dataset)"><BIconCloudDownloadFill /> {{ $t('tooltipLoad') }}</b-dropdown-item-button>
-                    <b-dropdown-item-button @click="onSave(dataset)"><BIconCloudUploadFill /> {{ $t('tooltipSave') }}</b-dropdown-item-button>
+                    <b-dropdown-item-button @click="synchronizeDataset(dataset.id, true)" class="mr-1"><BIconCloudCheck /> {{ $t('tooltipSave') }}</b-dropdown-item-button>
                     <b-dropdown-item-button @click="onShowQRCodeClicked(dataset)" class="mr-1">
                       <!-- TODO: Replace with bootstrap-vue icon once new version is released -->
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-qr-code" viewBox="0 0 16 16">
@@ -90,7 +91,7 @@ import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
 import HelpModal from '@/components/modals/HelpModal'
 import idb from '@/plugins/idb'
 import api from '@/mixin/api'
-import { BIconJournalPlus, BIconFileSpreadsheet, BIconNewspaper, BIconArrowRepeat, BIconQuestionCircleFill, BIconCloudDownloadFill, BIconCloudUploadFill, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
+import { BIconJournalPlus, BIconFileSpreadsheet, BIconNewspaper, BIconArrowRepeat, BIconJournalAlbum, BIconClipboard, BIconCloudDownloadFill, BIconQuestionCircleFill, BIconCloudCheck, BIconPlayFill, BIconGear, BIconTags, BIconArrowCounterclockwise, BIconTrash, BIconLayoutThreeColumns, BIconCalendarDate } from 'bootstrap-vue'
 
 const emitter = require('tiny-emitter/instance')
 
@@ -106,8 +107,10 @@ export default {
     BIconPlayFill,
     BIconQuestionCircleFill,
     BIconCloudDownloadFill,
-    BIconCloudUploadFill,
+    BIconJournalAlbum,
+    BIconCloudCheck,
     BIconCalendarDate,
+    BIconClipboard,
     BIconGear,
     BIconTrash,
     BIconTags,

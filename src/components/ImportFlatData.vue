@@ -234,7 +234,7 @@ export default {
       reformatted.data = arrayData
 
       // Store the data in the database
-      this.$store.dispatch('updateDataset', reformatted)
+      this.$store.dispatch('updateDataset', { dataset: reformatted, redirect: true })
 
       this.plausibleEvent('dataset-load', { format: 'file' })
     },

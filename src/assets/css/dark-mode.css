@@ -212,6 +212,10 @@
   background-color: rgb(74, 80, 83);
 }
 
+.dark-mode .custom-switch .custom-control-input:checked~.custom-control-label::after {
+  background-color: rgb(24, 26, 27);
+}
+
 .dark-mode .custom-control-input:checked~.custom-control-label::before {
   color: rgb(232, 230, 227);
   border-color: rgb(54, 100, 146);
@@ -265,6 +269,10 @@
   background-color: rgb(35, 38, 39);
 }
 
+.dark-mode .border {
+  border-color: rgb(56, 61, 63) !important;
+}
+
 .dark-mode .dropdown-item {
   color: rgb(209, 205, 199);
   background-color: transparent;
@@ -297,10 +305,20 @@
   border-color: rgba(140, 130, 115, 0.13);
 }
 
+.dark-mode .card-footer {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-top-color: rgba(140, 130, 115, 0.13);
+}
+
 .dark-mode .form-control {
   color: rgb(181, 175, 166);
   background-color: rgb(24, 26, 27);
   border-color: rgb(60, 65, 68);
+}
+
+.dark-mode .form-control:disabled,
+.dark-mode .form-control[readonly] {
+  background-color: rgb(35, 38, 39);
 }
 
 .dark-mode .modal-content {
@@ -324,6 +342,10 @@
   border-color: rgba(140, 130, 115, 0.15);
 }
 
+.dark-mode .dropdown-divider {
+  border-top-color: rgb(53, 58, 60);
+}
+
 .dark-mode .dropdown-item {
   color: rgb(209, 205, 199);
   background-color: transparent;
@@ -332,6 +354,26 @@
 
 .dark-mode .leaflet-marker-icon {
   color: #333;
+}
+
+.dark-mode .leaflet-bar a,
+.dark-mode .leaflet-bar a:hover {
+  background-color: rgb(24, 26, 27);
+  border-bottom-color: rgb(62, 68, 70);
+  text-decoration-color: initial;
+  color: rgb(232, 230, 227);
+}
+
+.dark-mode .leaflet-control-layers {
+  box-shadow: rgb(0 0 0 / 40%) 0px 1px 5px;
+  background-image: initial;
+  background-color: rgb(24, 26, 27);
+}
+
+.dark-mode .leaflet-control-layers-expanded {
+  color: rgb(200, 195, 188);
+  background-image: initial;
+  background-color: rgb(24, 26, 27);
 }
 
 .dark-mode .list-group-item {
@@ -382,4 +424,33 @@
 .dark-mode .list-group-item {
   background-color: rgb(24, 26, 27);
   border-color: rgba(140, 130, 115, 0.13);
+}
+
+.dark-mode .nav-tabs {
+  border-bottom-color: rgb(56, 61, 63);
+}
+
+.dark-mode .nav-tabs .nav-item.show .nav-link,
+.dark-mode .nav-tabs .nav-link.active {
+  color: rgb(181, 175, 166);
+  background-color: rgb(24, 26, 27);
+  border-color: rgb(56, 61, 63) rgb(56, 61, 63) rgb(48, 52, 54);
+}
+
+.dark-mode .nav-tabs .nav-link:focus,
+.dark-mode .nav-tabs .nav-link:hover {
+  border-color: rgb(53, 58, 60) rgb(53, 58, 60) rgb(56, 61, 63);
+}
+
+.dark-mode ::-webkit-scrollbar {
+  background-color: #202324;
+  color: #aba499;
+}
+
+.dark-mode ::-webkit-scrollbar-corner {
+  background-color: #181a1b;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+  background-color: #454a4d;
 }

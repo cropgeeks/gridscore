@@ -372,7 +372,7 @@ export default {
 
         const dataCopy = JSON.parse(JSON.stringify(this.$store.getters.storeDataset))
 
-          this.postConfigForSharing(dataCopy, storeData, this.storeDatasetUuid, this.storeRows, this.storeCols)
+          this.postConfigForSharing(false, null, dataCopy, storeData, this.storeDatasetUuid, this.storeRows, this.storeCols)
             .then(result => {
               if (result && result.data) {
                 this.$store.commit('ON_DATASET_UUID_CHANGED_MUTATION', result.data)

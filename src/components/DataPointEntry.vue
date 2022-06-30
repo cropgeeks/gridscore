@@ -34,8 +34,8 @@
               <b-button v-b-tooltip="$t('tooltipDataEntryDatePlusOne')" @click="setDatePlusOne(index)"><BIconCaretRightFill /></b-button>
               <b-button v-b-tooltip="$t('tooltipDataEntryDateReset')" variant="danger" @click="resetDate(index)"><BIconSlashCircle /></b-button>
             </template>
-            <b-button v-if="mapping.trait.mType === 'multi' && formDescriptions && formDescriptions[index]" v-b-tooltip="$t('tooltipDataEntryMultiTraitShowValues')" variant="secondary" @click="showMultiTraitModal(index)"><BIconInfoCircle /></b-button>
             <b-button v-if="mapping.trait.type === 'int'" @click="increment(index)">+</b-button>
+            <b-button v-if="mapping.trait.mType === 'multi' && formDescriptions && formDescriptions[index]" v-b-tooltip="$t('tooltipDataEntryMultiTraitShowValues')" variant="secondary" @click="showMultiTraitModal(index)"><BIconInfoCircle /></b-button>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -442,14 +442,16 @@ export default {
         this.comment = dp.comment
 
         this.updateFormDescriptions()
-        this.speak(this.name)
-        this.speak(this.visibleTraitMapping[0].trait.name)
+        this.speak(this.name, false)
+        this.speak(this.visibleTraitMapping[0].trait.name, false)
         this.setFocus()
       }
     },
-    speak: function (text) {
+    speak: function (text, interruptPrev = true) {
       if (this.textSynth) {
-        this.textSynth.cancel()
+        if (interruptPrev) {
+          this.textSynth.cancel()
+        }
 
         const utterance = new SpeechSynthesisUtterance(text)
         utterance.rate = 1.2
@@ -500,7 +502,7 @@ export default {
     onValueChanged: function (event, index) {
       if (event === null || event === undefined || event === '') {
         this.values[index] = null
-        this.dates[index] = null
+        this.dates[index] = this.getTodayString()
       } else {
         let dp
 
@@ -523,14 +525,14 @@ export default {
       // If the input is something that would be considered "empty", reset the value and date
       if (event === null || event === undefined || event === '') {
         this.values[index] = null
-        this.dates[index] = null
+        this.dates[index] = this.getTodayString()
       } else {
         Vue.set(this.values, index, event)
+        Vue.set(this.dates, index, this.getTodayString())
         this.traverseForm(index + 1)
       }
     },
     verify: function (verifyCallback) {
-      // TODO
       this.formState = this.visibleTraitMapping.map((t, i) => {
         if (this.values[i] === '' || this.values[i] === null) {
           return true
@@ -568,16 +570,31 @@ export default {
         // Ignore empty values, set them to null
         if (this.values[i] === '' || this.values[i] === null) {
           this.values[i] = null
-          this.dates[i] = null
+
+          if (this.visibleTraitMapping[i].trait.mType === 'multi') {
+            this.dates[i] = null
+          } else {
+            // Now we need to check whether this used to have a value or not.
+            const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+            const dp = storeData.get(`${this.row}-${this.col}`)
+            const oldValue = dp.values[this.visibleTraitMapping[i].index]
+
+            if (oldValue !== undefined && oldValue !== null) {
+              this.dates[i] = this.getTodayString()
+            } else {
+              this.dates[i] = null
+            }
+          }
           verifyCallback(false)
           return
         }
 
-        if (this.visibleTraitMapping[i].trait.type === 'date') {
-          // If the trait a date, simply set the date to the value
-          this.dates[i] = this.values[i]
-        } else if (this.values[i] !== null && this.dates[i] === null) {
-          // Else, if there is a value and no date, set the date as now
+        // if (this.visibleTraitMapping[i].trait.type === 'date') {
+        //   // If the trait a date, simply set the date to the value
+        //   this.dates[i] = this.values[i]
+        // } else
+        if (this.values[i] !== null && this.dates[i] === null) {
+          // If there is a value and no date, set the date as now
           this.dates[i] = this.getTodayString()
         }
       })

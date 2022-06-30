@@ -47,15 +47,8 @@ export default {
         return
       }
 
-      if (this.storeDatasetUuid) {
-        this.onSave(this.storeDatasetId)
-      } else {
-        this.sendData(this.$store.state.dataset, uuid => {
-          this.$store.dispatch('setDatasetUuid', uuid)
-
-          this.plausibleEvent('dataset-share')
-        })
-      }
+      this.plausibleEvent('dataset-share')
+      this.synchronizeDataset(this.storeDatasetId)
     }
   },
   mounted: function () {

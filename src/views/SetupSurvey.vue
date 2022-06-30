@@ -13,48 +13,24 @@
             </template>
             <b-form-input id="dataset-name" :state="state.datasetName" required autofocus v-model="datasetName" />
           </b-form-group>
-          <!-- Field layout rows -->
-          <b-form-group label-for="rows" :description="$t('formDescriptionSettingsRow')" >
-            <template v-slot:label>
-              <BIconLayoutThreeColumns rotate="90" /><span> {{ $t('formLabelSettingsRows') }}</span>
-            </template>
-            <b-form-input id="rows" :state="state.rows" number type="number" :min="1" required v-model.number="rows" />
-          </b-form-group>
-          <!-- Field layout cols -->
-          <b-form-group label-for="cols" :description="$t('formDescriptionSettingsCol')">
-            <template v-slot:label>
-              <BIconLayoutThreeColumns /><span> {{ $t('formLabelSettingsCols') }}</span>
-            </template>
-            <b-form-input id="cols" :state="state.cols" number type="number" :min="1" required v-model.number="cols" />
-          </b-form-group>
           <!-- Field layout varieties -->
           <b-form-group label-for="varieties">
             <!-- Variety label -->
             <template v-slot:label>
               <div><BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span></div>
-              <template v-if="varietyFormat === 'row'">
-                <!-- Tooltip for the variety label info icon -->
-                <b-tooltip target="variety-label">
-                  <div>{{ $t('tooltipSettingsVarieties') }}</div>
-                  <div><b-img fluid src="img/variety-order.svg" width=75 height=75 /></div>
-                </b-tooltip>
-              </template>
-              <template v-else>
-                <!-- Tooltip for the variety label info icon -->
-                <b-tooltip target="variety-label">
-                  <div>{{ $t('tooltipSettingsVarietiesGrid') }}</div>
-                  <div><b-img fluid src="img/variety-order-grid.svg" width=75 height=75 /></div>
-                </b-tooltip>
-              </template>
-              <b-form-radio-group buttons v-model="varietyFormat">
-                <b-form-radio value="tab"><BIconGrid3x3 /> {{ $t('formLabelSettingsTabMode') }}</b-form-radio>
-                <b-form-radio value="row"><BIconLayoutThreeColumns rotate="90" /> {{ $t('formLabelSettingsRowMode') }}</b-form-radio>
-              </b-form-radio-group>
+              <!-- Tooltip for the variety label info icon -->
+              <b-tooltip target="variety-label">
+                <div>{{ $t('tooltipSettingsVarieties') }}</div>
+                <div><b-img fluid src="img/variety-order.svg" width=75 height=75 /></div>
+              </b-tooltip>
             </template>
             <!-- Variety names input -->
-            <b-form-textarea id="varieties" @keydown.tab.prevent="tabber($event)" :state="state.varieties" rows=6 wrap="off" required :placeholder="(varietyFormat === 'row') ? $t('formPlaceholderVarieties') : $t('formPlaceholderVarietiesGrid')" v-model="varieties" />
+            <b-form-textarea id="varieties" :state="state.varieties" rows=6 wrap="off" required :placeholder="$t('formPlaceholderVarietiesSurvey')" v-model="varieties" />
             <!-- Variety names file loading -->
             <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="varietiesFile" />
+            <b-form-invalid-feedback :state="state.varieties">
+              {{ $t('formFeedbackSetupSurveyVarietyDuplicates') }}
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
         <b-col cols=12 lg=6>
@@ -78,7 +54,7 @@
               <!-- Trait data type selection -->
               <b-input-group class="trait-type-select">
                 <b-form-select v-model="trait.type" :options="traitTypes" />
-                <b-form-select v-model="trait.mType" :options="traitMTypes" v-b-tooltip="{ title: $t('tooltipTraitMType'), boundary: 'window' }" />
+                <b-form-select v-model="trait.mType" :options="traitMTypes" v-b-tooltip.left="$t('tooltipTraitMType')" />
 
                 <template v-slot:append>
                   <b-button-group>
@@ -108,22 +84,9 @@
           <b-button @click="$refs.brapiTraitImportModal.show()" class="mb-3"><IconBrapi /> {{ $t('buttonBrapiTraitImport') }}</b-button>
         </b-col>
       </b-row>
-      <!-- Map used for defining the field's corner points -->
-      <b-button v-b-toggle.collapse-fieldmap id="map-toggle-button"><BIconBoundingBox /> {{ $t('buttonShowFieldMap') }}</b-button>
-      <b-button class="mx-2" v-b-toggle.collapse-markers id="marker-toggle-button"><BIconSignpost2 /> {{ $t('buttonShowMarkerSetup') }}</b-button>
-      <b-collapse accordion="option-accordion" id="collapse-fieldmap" class="mt-2" v-model="mapVisible" @shown="invalidateMap">
-        <b-card>
-          <FieldMap :rows="rows" :cols="cols" :useCurrentDataset="false" ref="map" />
-        </b-card>
-      </b-collapse>
-      <b-collapse accordion="option-accordion" id="collapse-markers" class="mt-2" @shown="$refs.markerSetup.reset()">
-        <b-card>
-          <MarkerSetup :rows="rows" :cols="cols" :useCurrentDataset="false" ref="markerSetup" />
-        </b-card>
-      </b-collapse>
     </b-form>
 
-    <b-button @click="onSubmit" variant="primary" class="mt-3"><BIconJournalPlus /> {{ $t('buttonCreateTrial') }}</b-button>
+    <b-button @click="onSubmit" variant="primary" class="mt-3"><BIconJournalPlus /> {{ $t('buttonCreateSurvey') }}</b-button>
 
     <!-- Modal to show configuration options for a selected trait -->
     <TraitConfigurationModal :trait="traitToConfigure" v-on:config-changed="updateTraitConfig" ref="traitConfigModal" />
@@ -135,15 +98,13 @@
 </template>
 
 <script>
-import FieldMap from '@/components/FieldMap'
 import BrapiTraitImportModal from '@/components/modals/BrapiTraitImportModal'
 import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal'
 import HelpModal from '@/components/modals/HelpModal'
 import IconBrapi from '@/components/IconBrapi'
-import MarkerSetup from '@/components/MarkerSetup'
 
 import { mapGetters } from 'vuex'
-import { BIconGear, BIconArrowLeft, BIconPlus, BIconSignpost2, BIconX, BIconLayoutThreeColumns, BIconQuestionCircleFill, BIconTextLeft, BIconGrid3x3, BIconJournalPlus, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
+import { BIconGear, BIconArrowLeft, BIconPlus, BIconX, BIconQuestionCircleFill, BIconTextLeft, BIconJournalPlus, BIconTags, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
 
 /**
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
@@ -152,16 +113,11 @@ export default {
   data: function () {
     return {
       datasetName: null,
-      rows: 1,
-      cols: 1,
-      markers: null,
       newTraits: null,
       trait: null,
       traitToConfigure: null,
       varieties: null,
       formValidated: false,
-      mapVisible: false,
-      varietyFormat: 'tab',
       traitTypes: [{
         value: 'date',
         text: this.$t('traitTypeDate')
@@ -220,34 +176,18 @@ export default {
     BIconPlus,
     BIconArrowLeft,
     BIconX,
-    BIconLayoutThreeColumns,
-    BIconSignpost2,
     BIconQuestionCircleFill,
     BIconTextLeft,
-    BIconGrid3x3,
-    BIconBoundingBox,
     BIconTags,
     BIconInfoCircle,
     BIconJournalPlus,
     BIconTextareaT,
     IconBrapi,
-    FieldMap,
     BrapiTraitImportModal,
     TraitConfigurationModal,
-    MarkerSetup,
     HelpModal
   },
   methods: {
-    tabber: function (event) {
-      const text = this.varieties
-      const originalSelectionStart = event.target.selectionStart
-      const textStart = text.slice(0, originalSelectionStart)
-      const textEnd = text.slice(originalSelectionStart)
-
-      this.varieties = `${textStart}\t${textEnd}`
-      event.target.value = this.varieties // required to make the cursor stay in place.
-      event.target.selectionEnd = event.target.selectionStart = originalSelectionStart + 1
-    },
     /**
      * Loads the given selected BrAPI traits into the list of new traits for this dataset
      * @param brapiTraits The traits selected in the BrAPI modal dialog
@@ -337,12 +277,6 @@ export default {
       }
     },
     /**
-     * Invalidates the map's size to make sure it's showing all its tiles properly
-     */
-    invalidateMap: function () {
-      this.$nextTick(() => this.$refs.map.invalidateSize())
-    },
-    /**
      * Opens the trait configuration modal and sets the trait at the given index as the selected trait
      * @param index The index of the trait to configure
      */
@@ -390,9 +324,7 @@ export default {
      */
     reset: function () {
       this.datasetName = null
-      this.rows = 1
       this.cols = 1
-      this.markers = null
       this.newTraits = []
       this.varieties = null
       this.formValidated = false
@@ -405,7 +337,9 @@ export default {
       }
       this.trait = null
       this.varietiesFile = null
-      this.mapVisible = false
+    },
+    hasDuplicates: function (varieties) {
+      return varieties.length !== (new Set(varieties)).size
     },
     /**
      * Submit the result and re-create the current dataset with the new configuration.
@@ -415,10 +349,10 @@ export default {
       this.formValidated = true
       this.state = {
         datasetName: this.datasetName !== undefined && this.datasetName !== null && this.datasetName.length > 0,
-        rows: this.rows > 0,
-        cols: this.cols > 0,
+        rows: true,
+        cols: true,
         traits: (this.newTraits !== null) && (this.newTraits.length > 0),
-        varieties: (this.varieties !== null) && (this.varieties.length > 0)
+        varieties: (this.varieties !== null) && (this.varieties.length > 0) && (!this.hasDuplicates(this.varieties.split('\n').map(v => v.trim())))
       }
 
       // If a trait is missing it's configuration, return
@@ -437,13 +371,13 @@ export default {
           if (value === true) {
             const dataset = {
               name: this.datasetName,
-              rows: parseInt(this.rows),
-              cols: parseInt(this.cols),
+              rows: this.varieties.split('\n').map(v => v.trim()).length,
+              cols: 1,
               traits: this.newTraits,
-              varieties: this.varietyFormat === 'row' ? this.varieties.split('\n').map(v => v.trim()) : this.varieties.split('\n').map(r => r.split('\t').map(v => v.trim())).reduce((a, b) => a.concat(b), []),
-              cornerPoints: this.$refs.map.getCornerPoints(),
-              markers: this.$refs.markerSetup ? this.$refs.markerSetup.getMarkerConfig() : null,
-              datasetType: 'TRIAL',
+              varieties: this.varieties.split('\n').map(v => v.trim()),
+              cornerPoints: null,
+              markers: null,
+              datasetType: 'SURVEY',
               lastUpdatedOn: new Date().toISOString()
             }
 
@@ -469,8 +403,8 @@ export default {
               rows: dataset.rows,
               cols: dataset.cols,
               traits: dataset.traits.length,
-              markers: dataset.markers !== null,
-              cornerPoints: dataset.cornerPoints !== null
+              markers: false,
+              cornerPoints: false
             })
           }
         })

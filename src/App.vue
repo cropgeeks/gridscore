@@ -46,30 +46,30 @@
 
       <template>
         <h2 class="px-3">{{ $t('modalTitleSettings') }}</h2>
-        <b-list-group class="rounded-0">
+        <b-list-group flush>
           <b-list-group-item button @click="$router.push({ name: 'settings' })">
             <BIconGearFill /> {{ $t('modalTitleSettings') }}
           </b-list-group-item>
         </b-list-group>
 
         <h2 class="px-3 mt-3">{{ $t('widgetSidebarTitle') }}</h2>
-        <b-list-group class="rounded-0">
-          <b-list-group-item :variant="dataset.id === storeDatasetId ? 'primary' : 'null'" button v-for="dataset in datasets" :key="`dataset-${dataset.id}`" @click="onDatasetSelected(dataset.id)">
+        <b-list-group flush>
+          <b-list-group-item :variant="dataset.id === storeDatasetId ? 'info' : 'null'" button v-for="dataset in datasets" :key="`dataset-${dataset.id}`" @click="onDatasetSelected(dataset.id)">
             <div class="d-flex w-100 justify-content-between align-items-start">
               <h5>{{ dataset.id }} - {{ dataset.name }}</h5>
               <b-btn variant="outline-danger" v-b-tooltip="$t('buttonDelete')" @click.prevent.stop="onDatasetDeleteClicked(dataset.id)"><BIconTrash /></b-btn>
             </div>
             <p v-if="dataset.lastUpdatedOn" class="text-muted">
-              <BIconCalendarDate /> {{ new Date(dataset.lastUpdatedOn).toLocaleString() }}
+              <small><BIconCalendarDate /> {{ new Date(dataset.lastUpdatedOn).toLocaleString() }}</small>
             </p>
           </b-list-group-item>
-          <b-list-group-item variant="info" button @click="$router.push({ name: 'setup' })"><BIconPlus /> {{ $t('buttonAdd') }}</b-list-group-item>
+          <b-list-group-item variant="secondary" button @click="$router.push({ name: 'setup' })"><BIconPlus /> {{ $t('buttonAdd') }}</b-list-group-item>
         </b-list-group>
       </template>
     </b-sidebar>
 
     <!-- The main content -->
-    <b-container fluid :class="$route.name === 'about' ? '' : 'mt-3'">
+    <b-container fluid :class="{ 'mt-3': $route.name !== 'about', 'mb-3': $route.name !== 'data' }">
       <router-view :key="$route.path" />
     </b-container>
 
@@ -343,10 +343,10 @@ export default {
         this.datasets = ds
       })
     },
-    navigateToDataset: function (redirect) {
+    navigateToDataset: function (params) {
       this.$store.dispatch('setVisibleTraits', null)
 
-      if (redirect) {
+      if (params && params.redirect) {
         const route = this.$router.currentRoute
         if (route.name !== 'dataset' || (route.params && (route.params.datasetId !== this.storeDatasetId))) {
           this.$router.push({ name: 'data' })

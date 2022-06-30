@@ -11,97 +11,111 @@ export default {
     }
   },
   methods: {
-    onLoad: function (dataset) {
-      this.$bvModal.msgBoxConfirm(this.$t('modalTextReplaceDatasets'), {
-        title: this.$t('modalTitleReplaceDatasets'),
-        okTitle: this.$t('buttonReplace'),
-        cancelTitle: this.$t('buttonCancel')
-      }).then(value => {
-        if (value) {
-          if (typeof dataset === 'number' || dataset instanceof Number) {
-            this.loadDataById(dataset)
-          } else {
-            this.loadData(dataset)
-          }
-        }
-      })
-    },
-    onSave: function (dataset) {
-      this.$bvModal.msgBoxConfirm(this.$t('modalTextSaveToServerWarning'), {
-        title: this.$t('modalTitleSaveToServerWarning'),
-        okTitle: this.$t('buttonSave'),
-        cancelTitle: this.$t('buttonCancel')
-      }).then(value => {
-        if (value) {
-          if (typeof dataset === 'number' || dataset instanceof Number) {
-            this.sendDataById(dataset)
-          } else {
-            this.sendData(dataset)
-          }
-        }
-      })
-    },
-    loadDataById: function (datasetId) {
-      idb.getDataset(datasetId)
-        .then(dataset => {
-          this.loadData(dataset)
-        })
-    },
-    loadData: function (dataset) {
-      emitter.emit('set-loading', true)
-      this.getConfigFromSharing(dataset.uuid)
-        .then(result => {
-          if (result) {
-            result.id = dataset.id
-            this.$store.dispatch('updateDataset', result)
-          }
-        })
-        .catch(err => {
-          this.serverError = this.getErrorMessage(err)
-        })
-        .finally(() => {
-          emitter.emit('dataset-loaded-remotely', dataset.id)
-          emitter.emit('set-loading', false)
-        })
-    },
-    sendDataById: function (datasetId) {
-      idb.getDataset(datasetId)
-        .then(dataset => {
-          this.sendData(dataset)
-        })
-    },
-    sendData: function (dataset, callback) {
+    synchronizeDataset: function (datasetId, redirect = false, override = false, priority = null) {
       emitter.emit('set-loading', true)
 
-      idb.getDatasetData(dataset.id)
-        .then(data => {
-          const ds = JSON.parse(JSON.stringify(dataset))
-          ds.data = new Map()
+      // First load the dataset from the database
+      idb.getDataset(datasetId)
+        .then(dataset => {
+          // Then load its data
+          idb.getDatasetData(dataset.id)
+            .then(data => {
+              // Reformat it
+              const ds = JSON.parse(JSON.stringify(dataset))
+              ds.data = new Map()
 
-          for (let i = 0; i < data.length; i++) {
-            const dp = data[i]
-            ds.data.set(`${dp.row}-${dp.col}`, dp)
-          }
+              for (let i = 0; i < data.length; i++) {
+                const dp = data[i]
+                ds.data.set(`${dp.row}-${dp.col}`, dp)
+              }
 
-          return ds
+              return ds
+            })
+            .then(dataCopy => {
+              // Send it to the server
+              return this.postConfigForSharing(override, priority, dataCopy, dataCopy.data, dataCopy.uuid, dataCopy.rows, dataCopy.cols)
+            })
+            .then(returnedData => {
+              // This is the updated data
+              if (returnedData && returnedData.data) {
+                // Set the local id to be safe
+                returnedData.data.id = dataset.id
+
+                if (returnedData.data.data) {
+                  // Make sure to parse Multi-trait data/dates correctly
+                  const traits = returnedData.data.traits
+                  returnedData.data.data.forEach(r => {
+                    r.forEach(c => {
+                      if (c.values) {
+                        c.values = c.values.map((dp, i) => {
+                          if (traits[i].mType === 'multi') {
+                            return JSON.parse(dp)
+                          } else {
+                            return dp
+                          }
+                        })
+                      }
+                      if (c.dates) {
+                        c.dates = c.dates.map((dp, i) => {
+                          if (traits[i].mType === 'multi') {
+                            return JSON.parse(dp)
+                          } else {
+                            return dp
+                          }
+                        })
+                      }
+                    })
+                  })
+                } else {
+                  returnedData.data.data = []
+                }
+
+                // Save to database
+                this.$store.dispatch('updateDataset', { dataset: returnedData.data, redirect: redirect })
+              }
+            })
+            .catch(err => {
+              // Conflict due to structural change of trial
+              if (err && err.response) {
+                if (err.response.status === 409) {
+                  this.$bvModal.msgBoxConfirm(this.$t('modalTextConfigConflict'), {
+                    title: this.$t('modalTitleConfigConflict'),
+                    okTitle: this.$t('buttonYes'),
+                    cancelTitle: this.$t('buttonCancel')
+                  }).then(value => {
+                    if (value) {
+                      this.synchronizeDataset(datasetId, redirect, true)
+                    }
+                  })
+                } else if (err.response.status === 428) {
+                  this.$bvModal.msgBoxConfirm(this.$t('modalTextConfigDecisionRequired'), {
+                    title: this.$t('modalTitleConfigDecisionRequired'),
+                    okTitle: this.$t('buttonMine'),
+                    cancelTitle: this.$t('buttonTheirs'),
+                    okVariant: 'primary',
+                    cancelVariant: 'primary',
+                    hideHeaderClose: false
+                  }).then(value => {
+                    if (value !== undefined && value !== null) {
+                      this.synchronizeDataset(datasetId, redirect, false, value ? 'MINE' : 'THEIRS')
+                    }
+                  })
+                } else {
+                  this.serverError = this.getErrorMessage(err)
+                }
+              } else {
+                this.serverError = this.getErrorMessage(err)
+              }
+            })
+            .finally(() => emitter.emit('set-loading', false))
         })
-        .then((dataCopy) => this.postConfigForSharing(dataCopy, dataCopy.data, dataCopy.uuid, dataCopy.rows, dataCopy.cols))
-        .then(result => {
-          if (callback) {
-            callback(result.data)
-          }
-        })
-        .catch(err => {
-          this.serverError = this.getErrorMessage(err)
-        })
-        .finally(() => emitter.emit('set-loading', false))
     },
     /**
      * Sends the currently selected dataset configuration to the server.
      * The server will respond with a UUID that uniquely identifies this configuration allowing to share it with other devices.
      * @returns Promise
      */
-    postConfigForSharing: function (dataset, data, serverUuid, rows, cols) {
+    postConfigForSharing: function (override = false, priority = null, dataset, data, serverUuid, rows, cols) {
       const dataCopy = JSON.parse(JSON.stringify(dataset))
       const arrayData = []
       for (let row = 0; row < rows; row++) {
@@ -127,6 +141,7 @@ export default {
               }
             })
           }
+          delete cellCopy.dsId
           rowData.push(cellCopy)
         }
         arrayData.push(rowData)
@@ -137,7 +152,13 @@ export default {
         dataset.uuid = serverUuid
       }
 
-      return this.axios('config', dataset, 'post')
+      let query = `config?override=${override}`
+
+      if (priority) {
+        query += `&priority=${priority}`
+      }
+
+      return this.axios(query, dataset, 'post')
     },
     /**
      * Retrieves a dataset configuration from the server using a given UUID.
@@ -149,11 +170,12 @@ export default {
         .then(result => {
           if (result && result.data) {
             if (result.data.data) {
+              const traits = result.data.traits
               result.data.data.forEach(r => {
                 r.forEach(c => {
                   if (c.values) {
-                    c.values = c.values.map(dp => {
-                      if (dp !== null && dp.indexOf('[') === 0 && dp.indexOf(']') === dp.length - 1) {
+                    c.values = c.values.map((dp, i) => {
+                      if (traits[i].mType === 'multi') {
                         return JSON.parse(dp)
                       } else {
                         return dp
@@ -161,8 +183,8 @@ export default {
                     })
                   }
                   if (c.dates) {
-                    c.dates = c.dates.map(dp => {
-                      if (dp !== null && dp.indexOf('[') === 0 && dp.indexOf(']') === dp.length - 1) {
+                    c.dates = c.dates.map((dp, i) => {
+                      if (traits[i].mType === 'multi') {
                         return JSON.parse(dp)
                       } else {
                         return dp

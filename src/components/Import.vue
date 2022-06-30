@@ -124,7 +124,7 @@ export default {
       this.$store.dispatch('addDataset', this.config)
     },
     yes: function () {
-      this.$store.dispatch('updateDataset', this.config)
+      this.$store.dispatch('updateDataset', { dataset: this.config, redirect: true })
       // this.$router.push({ name: 'home' })
     },
     no: function () {

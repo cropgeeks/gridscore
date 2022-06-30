@@ -135,7 +135,19 @@ export default {
       }
     },
     onSubmit: function () {
-      this.state.name = this.trait.name !== null
+      if (!this.trait.name || this.trait.name.length < 1) {
+        this.state.name = false
+      } else if (this.dataset.traits.some(nt => nt.name.toLowerCase() === this.trait.name.toLowerCase())) {
+        this.$bvToast.toast(this.$t('toastTextTraitDuplicate'), {
+          title: this.$t('toastTitleTraitDuplicate'),
+          variant: 'danger',
+          toaster: 'b-toaster-top-right'
+        })
+        this.state.name = false
+      } else {
+        this.state.name = true
+      }
+
       this.state.restrictions = null
 
       if (this.trait.type === 'categorical' && (!this.trait.restrictions || !this.trait.restrictions.categories || this.trait.restrictions.categories.length < 1)) {

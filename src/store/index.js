@@ -16,6 +16,34 @@ if (!name) {
 
 let store = null
 
+const loadDataset = function (state, datasetId, event) {
+  idb.getDataset(datasetId)
+    .then(dataset => {
+      if (dataset) {
+        idb.getDatasetData(datasetId)
+          .then(data => {
+            const ds = JSON.parse(JSON.stringify(dataset))
+            ds.data = new Map()
+
+            for (let i = 0; i < data.length; i++) {
+              const dp = data[i]
+              ds.data.set(`${dp.row}-${dp.col}`, dp)
+            }
+
+            state.dataset = ds
+          })
+          .finally(() => {
+            emitter.emit('set-loading', false)
+            emitter.emit('dataset-changed', event)
+          })
+      } else {
+        emitter.emit('set-loading', false)
+        state.dataset = null
+        state.datasetId = null
+      }
+    })
+}
+
 const storeState = {
   state: {
     uniqueClientId: null,
@@ -67,7 +95,9 @@ const storeState = {
     storeDataset: (state) => state.dataset ? state.dataset : null,
     storeDatasetId: (state) => state.datasetId,
     storeDatasetName: (state) => state.dataset ? state.dataset.name : null,
+    storeDatasetComment: (state) => state.dataset ? state.dataset.comment : null,
     storeDatasetUuid: (state) => state.dataset ? state.dataset.uuid : null,
+    storeDatasetType: (state) => state.dataset ? (state.dataset.datasetType || 'TRIAL') : null,
     storeCols: (state) => state.dataset ? state.dataset.cols : null,
     storeCornerPoints: (state) => state.dataset ? state.dataset.cornerPoints : null,
     storeRows: (state) => state.dataset ? state.dataset.rows : null,
@@ -102,31 +132,7 @@ const storeState = {
       state.datasetId = datasetId
       if (datasetId) {
         emitter.emit('set-loading', true)
-        idb.getDataset(datasetId)
-          .then(dataset => {
-            if (dataset) {
-              idb.getDatasetData(datasetId)
-                .then(data => {
-                  const ds = JSON.parse(JSON.stringify(dataset))
-                  ds.data = new Map()
-
-                  for (let i = 0; i < data.length; i++) {
-                    const dp = data[i]
-                    ds.data.set(`${dp.row}-${dp.col}`, dp)
-                  }
-
-                  state.dataset = ds
-                })
-                .finally(() => {
-                  emitter.emit('set-loading', false)
-                  emitter.emit('dataset-changed', event.redirect)
-                })
-            } else {
-              emitter.emit('set-loading', false)
-              state.dataset = null
-              state.datasetId = null
-            }
-          })
+        loadDataset(state, datasetId, event)
       } else {
         state.dataset = null
         state.datasetId = null
@@ -154,7 +160,7 @@ const storeState = {
                 })
                 .finally(() => {
                   emitter.emit('set-loading', false)
-                  emitter.emit('dataset-changed', true)
+                  emitter.emit('dataset-changed', { redirect: true })
                 })
             })
             .then(() => emitter.emit('datasets-changed'))
@@ -164,9 +170,10 @@ const storeState = {
       emitter.emit('set-loading', true)
 
       idb.resetDatasetData(datasetId)
+        .then(() => loadDataset(state, datasetId, { redirect: true }))
         .finally(() => {
           emitter.emit('set-loading', false)
-          emitter.emit('dataset-changed', true)
+          emitter.emit('dataset-changed', { redirect: true })
           emitter.emit('datasets-changed')
         })
     },
@@ -180,6 +187,18 @@ const storeState = {
 
       state.datasetId = null
       state.dataset = null
+    },
+    ON_ADD_GERMPLASM_TO_SURVEY_DATASET_MUTATION: function (state, config) {
+      emitter.emit('set-loading', true)
+
+      idb.addGermplasmToSurveyDataset(config.datasetId, config.germplasm)
+        .then(() => {
+          loadDataset(state, state.datasetId, { redirect: false, scrollToCorner: 'bottomleft' })
+        })
+        .finally(() => {
+          emitter.emit('set-loading', false)
+          emitter.emit('dataset-changed')
+        })
     },
     ON_ADD_TRAIT_TO_DATASET_MUTATION: function (state, config) {
       emitter.emit('set-loading', true)
@@ -230,15 +249,15 @@ const storeState = {
     ON_PLAUSIBLE_CHANGED: function (state, newPlausible) {
       Vue.set(state, 'plausible', newPlausible)
     },
-    ON_DATASET_UPDATED_MUTATION: function (state, newData) {
+    ON_DATASET_UPDATED_MUTATION: function (state, update) {
       emitter.emit('set-loading', true)
-      state.datasetId = newData.id
-      idb.updateDatasetAndData(newData)
+      state.datasetId = update.dataset.id
+      idb.updateDatasetAndData(update.dataset)
         .then(() => {
-          idb.getDataset(newData.id)
+          idb.getDataset(update.dataset.id)
             .then(dataset => {
               if (dataset) {
-                idb.getDatasetData(newData.id)
+                idb.getDatasetData(update.dataset.id)
                   .then(data => {
                     const ds = JSON.parse(JSON.stringify(dataset))
                     ds.data = new Map()
@@ -250,7 +269,7 @@ const storeState = {
                   .finally(() => {
                     emitter.emit('set-loading', false)
                     emitter.emit('datasets-changed')
-                    emitter.emit('dataset-changed', true)
+                    emitter.emit('dataset-changed', { redirect: update.redirect })
                   })
               } else {
                 emitter.emit('set-loading', false)
@@ -381,6 +400,13 @@ const storeState = {
       idb.updateDatasetUuid(state.datasetId, newUuid)
       Vue.set(state.dataset, 'uuid', newUuid)
     },
+    ON_DATASET_COMMENT_CHANGED_MUTATION: function (state, newComment) {
+      if (newComment === '') {
+        newComment = null
+      }
+      idb.updateDatasetComment(state.datasetId, newComment)
+      Vue.set(state.dataset, 'comment', newComment)
+    },
     ON_VISIBLE_TRAITS_CHANGED_MUTATION: function (state, newVisibleTraits) {
       state.visibleTraits = newVisibleTraits
     },
@@ -424,11 +450,14 @@ const storeState = {
     resetDataset: function ({ commit }, datasetId) {
       emitter.emit('set-loading', true)
       commit('ON_DATASET_RESET_MUTATION', datasetId)
-      commit('ON_DATASET_LOAD_MUTATION', { datasetId: datasetId, redirect: true })
     },
     addTraitToDataset: function ({ commit }, config) {
       commit('ON_ADD_TRAIT_TO_DATASET_MUTATION', config)
       commit('ON_VISIBLE_TRAITS_CHANGED_MUTATION', null)
+    },
+    addGermplasmToSurveyDataset: function ({ commit }, config) {
+      commit('ON_ADD_GERMPLASM_TO_SURVEY_DATASET_MUTATION', config)
+      // commit('ON_DATASET_LOAD_MUTATION', { datasetId: config.datasetId, redirect: false })
     },
     resetGridScore: function ({ commit }) {
       emitter.emit('set-loading', true)
@@ -529,6 +558,9 @@ const storeState = {
     },
     setDatasetUuid: function ({ commit }, uuid) {
       commit('ON_DATASET_UUID_CHANGED_MUTATION', uuid)
+    },
+    setDatasetComment: function ({ commit }, comment) {
+      commit('ON_DATASET_COMMENT_CHANGED_MUTATION', comment)
     },
     setVisibleTraits: function ({ commit }, visibleTraits) {
       commit('ON_VISIBLE_TRAITS_CHANGED_MUTATION', visibleTraits)

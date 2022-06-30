@@ -92,7 +92,7 @@ export default {
       this.$store.dispatch('addDataset', this.config)
     },
     yes: function () {
-      this.$store.dispatch('updateDataset', this.config)
+      this.$store.dispatch('updateDataset', { dataset: this.config, redirect: true })
     },
     no: function () {
       delete this.config.id

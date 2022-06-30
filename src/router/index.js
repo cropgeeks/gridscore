@@ -3,6 +3,29 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
+const originalReplace = Router.prototype.replace
+const originalPush = Router.prototype.push
+Router.prototype.replace = function replace (location, onResolve, onReject) {
+  if (onResolve || onReject) {
+    return originalReplace.call(this, location, onResolve, onReject)
+  }
+  return originalReplace.call(this, location).catch(err => {
+    if (err && err.name !== 'NavigationDuplicated' && !err.message.includes('Avoided redundant navigation to current location')) {
+      throw err
+    }
+  })
+}
+Router.prototype.push = function push (location, onResolve, onReject) {
+  if (onResolve || onReject) {
+    return originalPush.call(this, location, onResolve, onReject)
+  }
+  return originalPush.call(this, location).catch(err => {
+    if (err && err.name !== 'NavigationDuplicated' && !err.message.includes('Avoided redundant navigation to current location')) {
+      throw err
+    }
+  })
+}
+
 const router = new Router({
   mode: 'hash',
   scrollBehavior: () => ({ y: 0 }),
@@ -51,6 +74,11 @@ const router = new Router({
       path: '/setup',
       name: 'setup',
       component: () => import('@/views/Setup')
+    },
+    {
+      path: '/setup-survey',
+      name: 'setup-survey',
+      component: () => import('@/views/SetupSurvey')
     },
     {
       path: '/share',

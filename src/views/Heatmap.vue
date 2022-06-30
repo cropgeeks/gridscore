@@ -104,11 +104,15 @@ export default {
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           // If we're dealing with dates or text, check if there is date data, else check if there is value data
-          const dps = (actualTrait.type === 'date' || actualTrait.type === 'text') ? storeData.get(`${row}-${col}`).dates[this.trait] : storeData.get(`${row}-${col}`).values[this.trait]
-          if ((actualTrait.mType === 'multi' && dps !== null && dps.length > 0) ||
+          const cell = storeData.get(`${row}-${col}`)
+
+          if (cell.values[this.trait]) {
+            const dps = (actualTrait.type === 'date' || actualTrait.type === 'text') ? cell.dates[this.trait] : cell.values[this.trait]
+            if ((actualTrait.mType === 'multi' && dps !== null && dps.length > 0) ||
               (actualTrait.mType !== 'multi' && dps !== null)) {
-            hasData = true
-            break outer
+              hasData = true
+              break outer
+            }
           }
         }
       }
@@ -175,7 +179,8 @@ export default {
                 side: 'right',
                 font: { color: this.storeDarkMode ? 'white' : 'black' }
               },
-              tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
+              tickfont: { color: this.storeDarkMode ? 'white' : 'black' },
+              orientation: window.innerWidth < 768 ? 'h' : 'v'
             }
           }]
         } else {

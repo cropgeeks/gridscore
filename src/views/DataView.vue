@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h2>{{ storeDatasetName }} <small><b-button v-b-tooltip="$t('formPlaceholderDatasetComment')" variant="link" class="text-muted" size="sm" @click="$refs.commentModal.show()"><BIconChatLeftText /></b-button></small></h2>
     <div class="d-flex justify-content-between mb-3" v-if="storeTraits && storeTraits.length > 0">
       <p>{{ $t('pageHomeText') }}</p>
       <b-form inline @submit.prevent.stop>
@@ -31,8 +32,7 @@
       <b-dropdown v-if="storeDatasetUuid" class="mr-1" v-b-tooltip="$t('tooltipShare')">
         <template v-slot:button-content><BIconShareFill /> <span class="d-none d-lg-inline-block">{{ $t('tooltipShare') }}</span></template>
 
-        <b-dropdown-item-button @click="onLoad(storeDatasetId)" class="mr-1"><BIconCloudDownloadFill /> {{ $t('tooltipLoad') }}</b-dropdown-item-button>
-        <b-dropdown-item-button @click="onSave(storeDatasetId)" class="mr-1"><BIconCloudUploadFill /> {{ $t('tooltipSave') }}</b-dropdown-item-button>
+        <b-dropdown-item-button @click="synchronizeDataset(storeDatasetId)" class="mr-1"><BIconCloudCheck /> {{ $t('tooltipSave') }}</b-dropdown-item-button>
         <b-dropdown-item-button @click="$refs.barcodeViewModal.show()" class="mr-1">
           <!-- TODO: Replace with bootstrap-vue icon once new version is released -->
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-qr-code" viewBox="0 0 16 16">
@@ -98,7 +98,13 @@
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
     <BarcodeScannerModal ref="barcodeScannerModal" @code-scanned="searchByBarcode" />
     <BarcodeViewerModal ref="barcodeViewModal" :text="storeDatasetUuid" :title="storeDatasetName" v-if="storeDatasetUuid" />
+    <AddGermplasmModal ref="addGermplasmModal" v-if="storeDatasetType === 'SURVEY'" />
     <HelpModal url="https://cropgeeks.github.io/gridscore/collecting-data.html" ref="helpModal" />
+    <CommentModal ref="commentModal" :comment="storeDatasetComment" @change="comment => $store.dispatch('setDatasetComment', comment)" />
+
+    <template v-if="storeDatasetType === 'SURVEY'">
+      <b-button class="btn-circle" id="add-germplasm" variant="primary" v-b-tooltip="$t('buttonAddEntry')" @click="$refs.addGermplasmModal.show()"><BIconPlus /></b-button>
+    </template>
 
     <template v-if="storeNavigationMode === 'jump'">
       <b-button class="btn-circle" id="jump-navigation" variant="primary"><BIconArrowsMove /></b-button>
@@ -121,12 +127,14 @@
 </template>
 
 <script>
+import AddGermplasmModal from '@/components/modals/AddGermplasmModal'
 import GridTableCanvas from '@/components/tables/GridTableCanvas'
 import DataPointModal from '@/components/modals/DataPointModal'
+import CommentModal from '@/components/modals/CommentModal'
 import BarcodeScannerModal from '@/components/modals/BarcodeScannerModal'
 import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
 import HelpModal from '@/components/modals/HelpModal'
-import { BIconCircleFill, BIconGearFill, BIconSearch, BIconArrowsMove, BIconQuestionCircleFill, BIconSlashCircle, BIconCloudDownloadFill, BIconCircleHalf, BIconCircle, BIconCloudUploadFill, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
+import { BIconCircleFill, BIconGearFill, BIconSearch, BIconChatLeftText, BIconArrowsMove, BIconQuestionCircleFill, BIconPlus, BIconSlashCircle, BIconCloudCheck, BIconCircleHalf, BIconCircle, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap'
 
@@ -171,6 +179,8 @@ export default {
     }
   },
   components: {
+    BIconPlus,
+    BIconChatLeftText,
     BIconCircleFill,
     BIconSlashCircle,
     BIconGearFill,
@@ -190,15 +200,16 @@ export default {
     BIconArrowDown,
     BIconArrowDownRight,
     BIconGeoAltFill,
-    BIconCloudDownloadFill,
+    BIconCloudCheck,
     BIconQuestionCircleFill,
-    BIconCloudUploadFill,
     BarcodeScannerModal,
     BarcodeViewerModal,
     GridTableCanvas,
     DataPointModal,
     VueTypeaheadBootstrap,
-    HelpModal
+    HelpModal,
+    AddGermplasmModal,
+    CommentModal
   },
   computed: {
     /** Mapgetters exposing the store configuration */
@@ -210,6 +221,7 @@ export default {
       'storeDatasetId',
       'storeDatasetUuid',
       'storeDatasetName',
+      'storeDatasetComment',
       'storeGeolocation',
       'storeRows',
       'storeShowStatsInTable',
@@ -217,7 +229,8 @@ export default {
       'storeTraits',
       'storeUseGps',
       'storeVisibleTraits',
-      'storeNavigationMode'
+      'storeNavigationMode',
+      'storeDatasetType'
     ]),
     searchTermLowerCase: function () {
       if (this.searchTerm) {
@@ -252,8 +265,6 @@ export default {
     searchByBarcode: function (code) {
       this.searchTerm = code
 
-      this.plausibleEvent('data-search', { type: 'barcode' })
-
       this.$nextTick(() => this.openDataInput())
     },
     scrollTo: function (corner) {
@@ -263,13 +274,11 @@ export default {
     moveCanvas: function (direction) {
       this.$refs.canvas.moveInDirection(direction)
     },
-    openDataInput: function () {
+    openDataInput: function (isBarcode) {
       this.$nextTick(() => {
         if (this.searchTermLowerCase === null) {
           return
         }
-
-        this.plausibleEvent('data-search', { type: 'input' })
 
         this.$store.state.dataset.data.forEach((c, k) => {
           if (c.name !== undefined && c.name !== null && c.name.toLowerCase() === this.searchTermLowerCase) {
@@ -280,11 +289,17 @@ export default {
                 row: rowIndex,
                 col: columnIndex
               })
+
+              this.plausibleEvent('data-search', { type: isBarcode ? 'barcode' : 'input', successful: true })
             })
 
             this.searchTerm = ''
           }
         })
+
+        if (this.searchTerm !== '') {
+          this.plausibleEvent('data-search', { type: isBarcode ? 'barcode' : 'input', successful: false })
+        }
       })
     },
     toggleVisibilityAll: function (select) {
@@ -428,15 +443,24 @@ export default {
 .grid-direction-grid .gps-button {
   grid-column: 1 / span 3;
 }
-#jump-navigation {
+#jump-navigation,
+#add-germplasm {
   position: fixed;
-  right: 1em;
-  bottom: 20%;
   transition: opacity linear 0.1s;
   opacity: 0.66;
 }
+#jump-navigation {
+  right: 1em;
+  bottom: 20%;
+}
+#add-germplasm {
+  left: 1em;
+  bottom: 20%;
+}
 #jump-navigation:hover,
-#jump-navigation:focus {
+#jump-navigation:focus,
+#add-germplasm:hover,
+#add-germplasm:focus {
   opacity: 1;
 }
 .btn-circle {

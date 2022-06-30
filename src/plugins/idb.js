@@ -8,7 +8,7 @@ export default {
       if (db) {
         return resolve(db)
       } else {
-        openDB('gridscore-' + window.location.pathname, 4, {
+        openDB('gridscore-' + window.location.pathname, 6, {
           upgrade: function (db, oldVersion, newVersion, transaction) {
             let datasets
             if (oldVersion < 1) {
@@ -44,6 +44,16 @@ export default {
               // Add a markers column to the datasets
               datasets = transaction.objectStore('datasets')
               datasets.createIndex('markers', 'markers', { unique: false })
+            }
+            if (oldVersion < 5) {
+              // Add a datasetType column to the datasets
+              datasets = transaction.objectStore('datasets')
+              datasets.createIndex('datasetType', 'datasetType', { unique: false })
+            }
+            if (oldVersion < 6) {
+              // Add a comment column to the datasets
+              datasets = transaction.objectStore('datasets')
+              datasets.createIndex('comment', 'comment', { unique: false })
             }
           }
         }).then(db => resolve(db))
@@ -107,6 +117,35 @@ export default {
       return new Promise(resolve => resolve())
     }
   },
+  addGermplasmToSurveyDataset: async function (datasetId, germplasm) {
+    const db = await this.getDb()
+    const dataset = await this.getDataset(datasetId)
+    const data = await this.getDatasetData(datasetId)
+
+    data.push({
+      dsId: datasetId,
+      row: dataset.rows,
+      col: 0,
+      name: germplasm,
+      dates: new Array(dataset.traits.length).fill(null),
+      values: new Array(dataset.traits.length).fill(null),
+      geolocation: null,
+      comment: null
+    })
+
+    dataset.rows++
+
+    return new Promise(resolve => {
+      const tx = db.transaction('data', 'readwrite')
+
+      Promise.all(data.map(cell => tx.store.put(cell)))
+        .then(() => db.put('datasets', dataset))
+        .then(() => {
+          resolve()
+          return tx.done
+        })
+    })
+  },
   addTraitToDataset: async function (datasetId, trait) {
     const db = await this.getDb()
     const dataset = await this.getDataset(datasetId)
@@ -128,6 +167,14 @@ export default {
           return tx.done
         })
     })
+  },
+  updateDatasetComment: async function (datasetId, comment) {
+    const db = await this.getDb()
+
+    const dataset = await this.getDataset(datasetId)
+    dataset.comment = comment
+
+    return db.put('datasets', dataset)
   },
   updateDatasetUuid: async function (datasetId, uuid) {
     const db = await this.getDb()
@@ -167,7 +214,9 @@ export default {
       brapiConfig: dataset.brapiConfig,
       uuid: dataset.uuid,
       markers: dataset.markers,
-      lastUpdatedOn: new Date().toISOString()
+      lastUpdatedOn: new Date().toISOString(),
+      datasetType: dataset.datasetType || 'TRIAL',
+      comment: dataset.comment
     })
   },
   deleteDataset: async function (datasetId) {
@@ -228,7 +277,8 @@ export default {
             dates: d.dates,
             values: d.values,
             geolocation: d.geolocation,
-            comment: d.comment
+            comment: d.comment,
+            isMarked: d.isMarked
           })
         }
       }
