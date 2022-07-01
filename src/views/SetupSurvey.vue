@@ -20,8 +20,7 @@
               <div><BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span></div>
               <!-- Tooltip for the variety label info icon -->
               <b-tooltip target="variety-label">
-                <div>{{ $t('tooltipSettingsVarieties') }}</div>
-                <div><b-img fluid src="img/variety-order.svg" width=75 height=75 /></div>
+                <div>{{ $t('tooltipSettingsSurveyVarieties') }}</div>
               </b-tooltip>
             </template>
             <!-- Variety names input -->
@@ -46,7 +45,7 @@
                 <template v-if="trait.type === 'int' || trait.type === 'float'">
                   <small class="form-text text-muted" v-if="trait.restrictions && ((trait.restrictions.min !== undefined && trait.restrictions.min !== null) || (trait.restrictions.max !== undefined && trait.restrictions.max !== null))">
                     <b-badge v-if="trait.restrictions.min !== null && trait.restrictions.min !== undefined">&ge; {{ trait.restrictions.min }}</b-badge>
-                    <b-badge v-if="trait.restrictions.max !== null && trait.restrictions.max !== undefined">&le; {{ trait.restrictions.max }}</b-badge>
+                    <b-badge class="ml-1" v-if="trait.restrictions.max !== null && trait.restrictions.max !== undefined">&le; {{ trait.restrictions.max }}</b-badge>
                   </small>
                 </template>
               </span>

@@ -1,6 +1,6 @@
 <template>
   <div ref="canvasWrapper" class="grid">
-    <div id="top-left" />
+    <div class="corner" />
     <ColumnHeader :width="canvasWidth"
                   :height="columnHeaderHeight"
                   :traitStats="traitStats"
@@ -12,7 +12,7 @@
                   :markedColumns="markedColumns"
                   ref="colHead"
                   @column-marked="onColumnMarked" />
-    <div />
+    <div class="corner" />
     <RowHeader :width="rowHeaderWidth"
                :height="canvasHeight"
                :traitStats="traitStats"
@@ -29,9 +29,9 @@
       <canvas id="user-position-canvas" class="position-absolute" ref="userCanvas" :width="scaledCanvasWidth" :height="scaledCanvasHeight" />
     </div>
     <VScroll :height="canvasHeight" :width="vScrollWidth" :y="origin.y" :cellHeight="cellHeight" ref="vScroll" />
-    <div />
+    <div class="corner" />
     <HScroll :height="hScrollHeight" :width="canvasWidth" :x="origin.x" :cellWidth="cellWidth" ref="hScroll" />
-    <div />
+    <div class="corner" />
 
     <OffscreenCanvas :circleRadius="circleRadius" ref="offscreenCanvas" />
   </div>
@@ -1025,10 +1025,10 @@ export default {
 </style>
 
 <style>
-.grid #top-left {
+.grid .corner {
   background-color: #ffffff;
 }
-html.dark-mode .grid #top-left {
+html.dark-mode .grid .corner {
   background-color: #000000;
 }
 </style>

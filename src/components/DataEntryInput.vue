@@ -18,7 +18,7 @@
                 :state="formState[index]"
                 @keyup.enter="$emit('enter')"
                 :value="values[index]"
-                @change="(event) => $emit('onValueChanged', event)"
+                @change="(event) => $emit('onValueChanged', +event)"
                 type="number"
                 :min="(trait.restrictions && trait.restrictions.min !== null && trait.restrictions.min !== undefined) ? trait.restrictions.min : null"
                 :max="(trait.restrictions && trait.restrictions.max !== null && trait.restrictions.max !== undefined) ? trait.restrictions.max : null" />
@@ -30,7 +30,7 @@
                 :state="formState[index]"
                 @keyup.enter="$emit('enter')"
                 :value="values[index]"
-                @change="(event) => $emit('onValueChanged', event)"
+                @change="(event) => $emit('onValueChanged', +event)"
                 type="number"
                 :min="(trait.restrictions && trait.restrictions.min !== null && trait.restrictions.min !== undefined) ? trait.restrictions.min : null"
                 :max="(trait.restrictions && trait.restrictions.max !== null && trait.restrictions.max !== undefined) ? trait.restrictions.max : null"

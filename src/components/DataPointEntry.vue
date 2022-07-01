@@ -9,7 +9,13 @@
         <!-- Show the trait name along with the type and its color as the label -->
         <template v-slot:label>
           <span :style="{ color: storeTraitColors[mapping.index % storeTraitColors.length] }">
-            <BIconCircleFill v-if="values[index] !== undefined && values[index] !== null && values[index] !== ''" /><BIconCircle v-else /> {{ mapping.trait.name }}<b-badge variant="light" class="ml-1">{{ getTraitTypeText(mapping.trait) }}</b-badge>
+            <template v-if="values[index] !== undefined && values[index] !== null && values[index] !== ''">
+              <BIconCircleHalf v-if="mapping.trait.mType === 'multi'" />
+              <BIconCircleFill v-else />
+            </template>
+            <BIconCircle v-else />
+            <span class="mx-1">{{ mapping.trait.name }}</span>
+            <b-badge variant="light">{{ getTraitTypeText(mapping.trait) }}</b-badge>
           </span>
         </template>
 
@@ -79,7 +85,7 @@ import VideoModal from '@/components/modals/VideoModal'
 import DataEntryInput from '@/components/DataEntryInput'
 import MultiTraitValueModal from '@/components/modals/MultiTraitValueModal'
 import { mapGetters } from 'vuex'
-import { BIconCameraFill, BIconCircleFill, BIconCircle, BIconMic, BIconInfoCircle, BIconChatRightTextFill, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
+import { BIconCameraFill, BIconCircleFill, BIconCircle, BIconCircleHalf, BIconMic, BIconInfoCircle, BIconChatRightTextFill, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
 
 const emitter = require('tiny-emitter/instance')
 
@@ -94,6 +100,7 @@ export default {
     BIconCaretRightFill,
     BIconChatRightTextFill,
     BIconInfoCircle,
+    BIconCircleHalf,
     BIconCalendar3,
     BIconMic,
     BIconSlashCircle,
@@ -534,15 +541,16 @@ export default {
     },
     verify: function (verifyCallback) {
       this.formState = this.visibleTraitMapping.map((t, i) => {
+        let valid
         if (this.values[i] === '' || this.values[i] === null) {
-          return true
+          valid = true
         } else if (t.trait.restrictions) {
           if (t.trait.type === 'categorical') {
             // Check whether the value is one of the pre-defined categories
             return t.trait.restrictions.categories.indexOf(this.values[i]) !== -1
           } else if (t.trait.type === 'int' || t.trait.type === 'float') {
             // Check whether the value lies between the required min and max
-            let valid = true
+            valid = true
             if (t.trait.restrictions.min !== undefined && t.trait.restrictions.min !== null && t.trait.restrictions.min > this.values[i]) {
               valid = false
             }
@@ -554,7 +562,18 @@ export default {
           }
         }
 
-        return true
+        if (t.trait.type === 'int') {
+          try {
+            const int = Number(this.values[i])
+            if (isNaN(this.values[i]) || isNaN(int) || !Number.isInteger(int)) {
+              valid = false
+            }
+          } catch (err) {
+            valid = false
+          }
+        }
+
+        return valid
       })
 
       // If the form is invalid, return

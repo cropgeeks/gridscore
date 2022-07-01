@@ -286,6 +286,7 @@
   "tooltipShowSharingCode": "QR-Code zum Teilen zeigen",
   "tooltipSettingsGetLocation": "Aktuellen GPS Standort benutzen",
   "tooltipSettingsResetColors": "Farben zurücksetzen",
+  "tooltipSettingsSurveyVarieties": "Sortennamen müssen einzeln pro Textfeldzeile angegeben werden. Zusätzliche Sortennamen können nachträglich hinzugefügt werden.",
   "tooltipSettingsVarieties": "Sortennamen müssen einzeln pro Textfeldzeile angegeben werden. Angefangen mit Feld-Zeile 1 von links nach rechts gefolgt von den verbleibenden Feld-Zeilen.",
   "tooltipSettingsVarietiesGrid": "Sortennamen müssen in einem Gitter angegeben werden, genauso wie im Feld-Plan. Dieses kann von Excel oder Ähnlichem kopiert werden.",
   "tooltipToggleDarkMode": "Dark Mode umschalten",

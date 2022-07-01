@@ -288,6 +288,7 @@
   "tooltipSettings": "Settings",
   "tooltipSettingsGetLocation": "Use current GPS location",
   "tooltipSettingsResetColors": "Reset to default",
+  "tooltipSettingsSurveyVarieties": "Variety names must be provided one per text line. Additional varieties can be added at a later stage.",
   "tooltipSettingsVarieties": "Variety names must be provided one per text line. Starting with field row 1 from left to right and continuing with the remaining field rows.",
   "tooltipSettingsVarietiesGrid": "Variety names must be provided in a grid, same as the field plan. This can be copied from Excel or similar.",
   "tooltipShowSharingCode": "Show QR code for sharing",
