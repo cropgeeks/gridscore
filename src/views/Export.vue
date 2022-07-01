@@ -368,30 +368,25 @@ export default {
     exportToGerminateFormat: function () {
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
       if (storeData) {
-        emitter.emit('set-loading', true)
+        this.synchronizeDataset(this.storeDatasetId)
+          .then(dataset => {
+            emitter.emit('set-loading', true)
+            return this.axios(`config/${dataset.uuid}/export-g8`, null, 'get')
+          })
+          .then(result => {
+            emitter.emit('set-loading', true)
+            if (result && result.data) {
+              this.germinateTemplateFile = `${this.storeServerUrl}config/${this.storeDatasetUuid}/export-g8/${result.data}`
+            } else {
+              this.germinateTemplateFile = null
+            }
 
-        const dataCopy = JSON.parse(JSON.stringify(this.$store.getters.storeDataset))
-
-          this.postConfigForSharing(false, null, dataCopy, storeData, this.storeDatasetUuid, this.storeRows, this.storeCols)
-            .then(result => {
-              if (result && result.data) {
-                this.$store.commit('ON_DATASET_UUID_CHANGED_MUTATION', result.data)
-              }
-            })
-            .then(() => this.axios(`config/${this.storeDatasetUuid}/export-g8`, null, 'get'))
-            .then(result => {
-              if (result && result.data) {
-                this.germinateTemplateFile = `${this.storeServerUrl}config/${this.storeDatasetUuid}/export-g8/${result.data}`
-              } else {
-                this.germinateTemplateFile = null
-              }
-
-              this.plausibleEvent('dataset-export', { format: 'germinate' })
-            })
-            .catch(() => {
-              // TODO
-            })
-            .finally(() => emitter.emit('set-loading', false))
+            this.plausibleEvent('dataset-export', { format: 'germinate' })
+          })
+          .catch(() => {
+            // TODO
+          })
+          .finally(() => emitter.emit('set-loading', false))
       }
     }
   },

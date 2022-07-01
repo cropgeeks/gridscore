@@ -20,17 +20,22 @@
       <h2>{{ $t('pageHomeDatasetsTitle') }} - <small>{{ $t('pageHomeDatasetsSubtitle') }}</small></h2>
       <b-row>
         <b-col cols=12 sm=6 lg=3 v-for="dataset in datasets" :key="`dataset-${dataset.id}`" class="mb-3">
-          <b-card :title="`${dataset.id} - ${dataset.name}`" class="h-100" :border-variant="dataset.id === storeDatasetId ? 'info' : null" :bg-variant="dataset.id === storeDatasetId ? 'light' : null">
+          <b-card class="h-100" no-body :border-variant="dataset.id === storeDatasetId ? 'info' : null" :bg-variant="dataset.id === storeDatasetId ? 'light' : null">
             <a href="#" @click.prevent="synchronizeDataset(dataset.id, true)" v-if="datasetsWithUpdates.includes(dataset.id)">
               <div class="card-corner" v-b-tooltip="$t('tooltipDatasetUpdateAvailable')" />
               <BIconArrowRepeat class="card-corner-icon" />
             </a>
+            <b-card-body class="d-flex flex-column justify-content-between align-items-start">
+              <b-card-title class="dataset-title">{{ `${dataset.id} - ${dataset.name}` }}</b-card-title>
 
-            <b-card-text><BIconLayoutThreeColumns rotate="90" /> {{ $tc('formLabelRowCount', dataset.rows) }}</b-card-text>
-            <b-card-text><BIconLayoutThreeColumns /> {{ $tc('formLabelColCount', dataset.cols) }}</b-card-text>
-            <b-card-text><BIconTags /> {{ $tc('formLabelTraits', dataset.traits.length) }}</b-card-text>
-            <b-card-text><BIconClipboard /> {{ dataset.datasetType === 'SURVEY' ? $t('widgetDatasetCardDatasetTypeSurvey') : $t('widgetDatasetCardDatasetTypeTrial') }}</b-card-text>
-            <b-card-text v-if="dataset.lastUpdatedOn"><BIconCalendarDate /> {{ new Date(dataset.lastUpdatedOn).toLocaleString() }}</b-card-text>
+              <div>
+                <b-card-text><BIconLayoutThreeColumns rotate="90" /> {{ $tc('formLabelRowCount', dataset.rows) }}</b-card-text>
+                <b-card-text><BIconLayoutThreeColumns /> {{ $tc('formLabelColCount', dataset.cols) }}</b-card-text>
+                <b-card-text><BIconTags /> {{ $tc('formLabelTraits', dataset.traits.length) }}</b-card-text>
+                <b-card-text><BIconClipboard /> {{ dataset.datasetType === 'SURVEY' ? $t('widgetDatasetCardDatasetTypeSurvey') : $t('widgetDatasetCardDatasetTypeTrial') }}</b-card-text>
+                <b-card-text v-if="dataset.lastUpdatedOn"><BIconCalendarDate /> {{ new Date(dataset.lastUpdatedOn).toLocaleString() }}</b-card-text>
+              </div>
+            </b-card-body>
 
             <template #footer>
               <div class="d-flex justify-content-between">
@@ -304,5 +309,13 @@ export default {
   right: 7px;
   color: white;
   pointer-events: none;
+}
+.dataset-title {
+  display: -webkit-box;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 </style>
