@@ -126,7 +126,7 @@ export default {
           // Find the minimum in the data
           for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-              const date = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, storeData.get(`${row}-${col}`), false)
+              const date = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, storeData.get(`${row}-${col}`), true)
 
               if (date !== null) {
                 minDateString = date < minDateString ? date : minDateString
@@ -140,6 +140,8 @@ export default {
           const z = []
           const text = []
 
+          let minZ = Number.MAX_SAFE_INTEGER
+          let maxZ = -Number.MAX_SAFE_INTEGER
           for (let row = rows - 1; row >= 0; row--) {
             const rowZ = []
             const textZ = []
@@ -147,13 +149,16 @@ export default {
               const cell = storeData.get(`${row}-${col}`)
               textZ.push(cell.name)
               // Get the cell date
-              const dateString = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, cell, false)
+              const dateString = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, cell, true)
 
               if (dateString) {
                 // If there is one, return the time difference to the minimum date in days
                 const date = Date.parse(dateString)
 
                 rowZ.push((date - minDate) / (1000 * 60 * 60 * 24))
+
+                minZ = Math.min(minZ, rowZ[rowZ.length - 1])
+                maxZ = Math.max(maxZ, rowZ[rowZ.length - 1])
               } else {
                 // Else return NaN
                 rowZ.push(NaN)
@@ -161,6 +166,15 @@ export default {
             }
             z.push(rowZ)
             text.push(textZ)
+          }
+
+          const zero = (0 - minZ) / (maxZ - minZ)
+          let colorscale = [[0, this.storeDarkMode ? '#444444' : '#dddddd'], [1, this.storeTraitColors[this.trait % this.storeTraitColors.length]]]
+
+          if (zero > 0) {
+            const top = this.storeTraitColors[this.trait % this.storeTraitColors.length]
+            const bottom = this.storeTraitColors[(this.trait + 1) % this.storeTraitColors.length]
+            colorscale = [[0, bottom], [zero, this.storeDarkMode ? '#444444' : '#dddddd'], [1, top]]
           }
 
           data = [{
@@ -172,7 +186,7 @@ export default {
             text: text,
             type: 'heatmap',
             hoverongaps: false,
-            colorscale: [[0, this.storeDarkMode ? '#444444' : '#dddddd'], [1, this.storeTraitColors[this.trait % this.storeTraitColors.length]]],
+            colorscale: colorscale,
             colorbar: {
               title: {
                 text: this.$t('plotLegendDaysSinceFirstRecording'),
@@ -190,6 +204,8 @@ export default {
           const z = []
           const text = []
 
+          let minZ = Number.MAX_SAFE_INTEGER
+          let maxZ = -Number.MAX_SAFE_INTEGER
           for (let row = rows - 1; row >= 0; row--) {
             const rowZ = []
             const textZ = []
@@ -214,12 +230,23 @@ export default {
                   // Else just plot the value
                   rowZ.push(value)
                 }
+                minZ = Math.min(minZ, rowZ[rowZ.length - 1])
+                maxZ = Math.max(maxZ, rowZ[rowZ.length - 1])
               } else {
                 rowZ.push(NaN)
               }
             }
             z.push(rowZ)
             text.push(textZ)
+          }
+
+          const zero = (0 - minZ) / (maxZ - minZ)
+          let colorscale = [[0, this.storeDarkMode ? '#444444' : '#dddddd'], [1, this.storeTraitColors[this.trait % this.storeTraitColors.length]]]
+
+          if (zero > 0) {
+            const top = this.storeTraitColors[this.trait % this.storeTraitColors.length]
+            const bottom = this.storeTraitColors[(this.trait + 1) % this.storeTraitColors.length]
+            colorscale = [[0, bottom], [zero, this.storeDarkMode ? '#444444' : '#dddddd'], [1, top]]
           }
 
           data = [{
@@ -231,7 +258,7 @@ export default {
             text: text,
             type: 'heatmap',
             hoverongaps: false,
-            colorscale: [[0, this.storeDarkMode ? '#444444' : '#dddddd'], [1, this.storeTraitColors[this.trait % this.storeTraitColors.length]]],
+            colorscale: colorscale,
             hoverinfo: isCategorical ? 'text' : 'all',
             colorbar: isCategorical
               ? {
