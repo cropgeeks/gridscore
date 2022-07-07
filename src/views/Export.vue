@@ -85,6 +85,19 @@
         </template>
         <p v-html="$t('modalTextExportGerminate')" />
 
+        <p v-if="hasMultiTrait">{{ $t('modalTextExportGerminateMultiSelection') }}</p>
+
+        <b-form @submit.prevent v-if="storeTraits && storeTraits.length > 0">
+          <template v-for="(trait, index) in storeTraits">
+            <b-form-group :label="trait.name" :label-for="`trait-select-${trait.name}`" :key="`trait-select-${trait.name}`" v-if="trait.mType === 'multi'">
+              <b-form-radio-group
+                :id="`trait-select-${trait.name}`"
+                v-model="multiTraitSelection[index]"
+                :options="multiTraitOptions[index]" />
+            </b-form-group>
+          </template>
+        </b-form>
+
         <b-button @click="exportToGerminateFormat">{{ $t('buttonExportGerminateFormat') }}</b-button>
 
         <div v-if="germinateTemplateFile" class="my-3">
@@ -121,7 +134,14 @@ export default {
   data: function () {
     return {
       selectedTrait: null,
-      germinateTemplateFile: null
+      germinateTemplateFile: null,
+      multiTraitOptions: [],
+      multiTraitSelection: []
+    }
+  },
+  watch: {
+    storeTraits: function () {
+      this.updateMultiTraitOptions()
     }
   },
   computed: {
@@ -136,6 +156,13 @@ export default {
       'storeServerUrl',
       'storeTraits'
     ]),
+    hasMultiTrait: function () {
+      if (!this.storeTraits) {
+        return false
+      } else {
+        return this.storeTraits.some(t => t.mType === 'multi')
+      }
+    },
     traitOptions: function () {
       if (this.storeTraits) {
         const result = this.storeTraits.map((t, index) => {
@@ -365,13 +392,22 @@ export default {
   },
   mixins: [api],
   methods: {
+    updateMultiTraitOptions: function () {
+      if (this.storeTraits) {
+        this.multiTraitOptions = this.storeTraits.map(t => t.mType === 'multi' ? this.getMultiTraitMethods(t) : null)
+        this.multiTraitSelection = this.storeTraits.map(t => t.mType === 'multi' ? 'last' : null)
+      } else {
+        this.multiTraitOptions = []
+        this.multiTraitSelection = []
+      }
+    },
     exportToGerminateFormat: function () {
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
       if (storeData) {
         this.synchronizeDataset(this.storeDatasetId)
           .then(dataset => {
             emitter.emit('set-loading', true)
-            return this.axios(`config/${dataset.uuid}/export-g8`, null, 'get')
+            return this.axios(`config/${dataset.uuid}/export-g8`, this.multiTraitSelection, 'post')
           })
           .then(result => {
             emitter.emit('set-loading', true)
@@ -393,6 +429,8 @@ export default {
   mounted: function () {
     if (this.storeDatasetId !== undefined && this.storeDatasetId !== null && (!this.$store.state.dataset.data || this.$store.state.dataset.data.length < 1)) {
       this.$store.dispatch('loadDataset', { datasetId: this.storeDatasetId, redirect: false })
+    } else {
+      this.updateMultiTraitOptions()
     }
   }
 }

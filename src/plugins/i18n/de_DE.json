@@ -215,6 +215,7 @@
   "modalTextExportData": "Die aufgezeichneten Daten sind hier zum Exportieren bereitgestellt. Die Daten wurden in einem Matrixformat formatiert wo die Sortennamen entlang der linken Seite erscheinen und Merkmale als Spalten dargestellt werden. Einige zusätzliche Spalten für Standorte und Kommentare sind ebenfalls vorhanden.",
   "modalTextExportFieldPlan": "Daten können in tabularer Form exportiert werden die das Feldlayout widerspiegelt. Nutze das Dropdown-Menü um entweder die Keimplasma-/Sortennamen zu exportieren oder wähle ein Merkmal um dieses zu exportieren.",
   "modalTextExportGerminate": "Falls die Daten nach Germinate importiert werden sollen kann GridScore sie im <a href='https://github.com/germinateplatform/germinate-data-templates'>Germinate Data Template Format</a> exportieren. Einfach auf den Knopf unten klicken um die Daten zum GridScore Server zur Bearbeitung zu schicken. Wenn der Download abgeschlossen ist, erscheint ein Download-Link zum Herunterladen.",
+  "modalTextExportGerminateMultiSelection": "Bitte eine Zusammenrechnungsmethode für jedes Mehrfach-Merkmal auswählen.",
   "modalTextExportTraits": "Die anfangs definierten Merkmale sind hier zum Exportieren bereitgestellt. Das Exportformat hält sich eng an das von <a href='https://ics.hutton.ac.uk/get-germinate'>Germinate</a> benutzte Format.",
   "modalTextImportOr": "ODER",
   "modalTextExportQR": "Untenstehenden QR Code auf dem empfangenden Gerät scannen. Die Konfiguration wird dort dann verfügbar sein.",

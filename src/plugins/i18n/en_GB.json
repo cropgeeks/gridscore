@@ -218,6 +218,7 @@
   "modalTextExportData": "The recorded data is available for export below. The data has been formatted into a matrix format where variety names appear along the left side and traits are shown as columns. There are some additional columns for geographic locations and comments.",
   "modalTextExportFieldPlan": "Data can be exported in a tabular form that represents the field layout. Use the dropdown box to either select the germplasm/variety names or a trait and export the data using the download option.",
   "modalTextExportGerminate": "If you are using Germinate and want to export your data in the <a href='https://github.com/germinateplatform/germinate-data-templates'>Germinate Data Template Format</a> then GridScore can do all the work for you. Simply click the button below to send your data to the GridScore server for processing. A download link will appear when the data is ready.",
+  "modalTextExportGerminateMultiSelection": "Please pick an aggregation method for each multi-trait.",
   "modalTextExportTraits": "The initially defined traits are available for export below. The export format is closely aligned to the format used by <a href='https://ics.hutton.ac.uk/get-germinate'>Germinate</a>.",
   "modalTextImportOr": "OR",
   "modalTextExportQR": "Scan the QR code below on the receiving device. Your current configuration will then be available there.",
