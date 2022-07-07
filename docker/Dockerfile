@@ -10,7 +10,7 @@ ADD https://api.github.com/repos/cropgeeks/gridscore/git/refs/heads/master versi
 RUN echo "Pulling GitHub branch: $BRANCH"
 RUN apk add --no-cache git && \
     if [ "$BRANCH" = "master" ] ; then git clone -b "main" --single-branch --depth 1 https://github.com/cropgeeks/gridscore-server.git /opt/gridscore-server ; else git clone -b "$BRANCH" --single-branch --depth 1 https://github.com/cropgeeks/gridscore-server.git /opt/gridscore-server ; fi && \
-    if [ "$BRANCH" = "master" ] ; then git clone -b "main" --single-branch --depth 1 https://github.com/cropgeeks/gridscore.git /opt/gridscore-client ; else git clone -b "$BRANCH" --single-branch --depth 1 https://github.com/cropgeeks/gridscore.git /opt/gridscore-client
+    git clone -b "$BRANCH" --single-branch --depth 1 https://github.com/cropgeeks/gridscore.git /opt/gridscore-client
 
 # Build the client code
 WORKDIR /opt/gridscore-client
