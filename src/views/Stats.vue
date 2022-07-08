@@ -5,7 +5,9 @@
 
     <template v-if="storeTraits && storeTraits.length > 0">
       <div v-for="(trait, index) in storeTraits" :key="`trait-stats-${index}`">
-        <h2><span :style="{ color: storeTraitColors[index % storeTraitColors.length] }"><BIconCircleFill /> {{ trait.name }} <b-badge variant="light" class="ml-1">{{ getTraitTypeText(trait) }}</b-badge></span></h2>
+        <h2>
+          <TraitHeading :trait="trait" mode="full" />
+        </h2>
         <b-form-group :label="$t('formLabelMultiTraitVizType')" :label-for="`trait-viz-type-${index}`" v-if="trait.mType === 'multi'">
           <b-form-select :id="`trait-viz-type-${index}`" :options="multiTraitOptions[index]" v-model="selectedMultiTraitMethods[index]" />
         </b-form-group>
@@ -20,9 +22,10 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import { BIconCircleFill, BIconQuestionCircleFill } from 'bootstrap-vue'
+import { BIconQuestionCircleFill } from 'bootstrap-vue'
 
 import HelpModal from '@/components/modals/HelpModal'
+import TraitHeading from '@/components/TraitHeading'
 
 const emitter = require('tiny-emitter/instance')
 const Plotly = require('plotly.js/lib/core')
@@ -35,9 +38,9 @@ Plotly.register([
 
 export default {
   components: {
-    BIconCircleFill,
     BIconQuestionCircleFill,
-    HelpModal
+    HelpModal,
+    TraitHeading
   },
   computed: {
     /** Mapgetters exposing the store configuration */

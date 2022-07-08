@@ -8,15 +8,7 @@
                     :description="formDescriptions ? formDescriptions[index] : null">
         <!-- Show the trait name along with the type and its color as the label -->
         <template v-slot:label>
-          <span :style="{ color: storeTraitColors[mapping.index % storeTraitColors.length] }">
-            <template v-if="values[index] !== undefined && values[index] !== null && values[index] !== ''">
-              <BIconCircleHalf v-if="mapping.trait.mType === 'multi'" />
-              <BIconCircleFill v-else />
-            </template>
-            <BIconCircle v-else />
-            <span class="mx-1">{{ mapping.trait.name }}</span>
-            <b-badge variant="light">{{ getTraitTypeText(mapping.trait) }}</b-badge>
-          </span>
+          <TraitHeading :trait="mapping.trait" :mode="(values[index] !== undefined && values[index] !== null && values[index] !== '') ? 'full' : 'empty'" />
         </template>
 
         <b-input-group>
@@ -84,8 +76,9 @@ import ImageModal from '@/components/modals/ImageModal'
 import VideoModal from '@/components/modals/VideoModal'
 import DataEntryInput from '@/components/DataEntryInput'
 import MultiTraitValueModal from '@/components/modals/MultiTraitValueModal'
+import TraitHeading from '@/components/TraitHeading'
 import { mapGetters } from 'vuex'
-import { BIconCameraFill, BIconCircleFill, BIconCircle, BIconCircleHalf, BIconMic, BIconInfoCircle, BIconChatRightTextFill, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
+import { BIconCameraFill, BIconMic, BIconInfoCircle, BIconChatRightTextFill, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
 
 const emitter = require('tiny-emitter/instance')
 
@@ -94,13 +87,10 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 export default {
   components: {
     BIconCameraFill,
-    BIconCircleFill,
-    BIconCircle,
     BIconCaretLeftFill,
     BIconCaretRightFill,
     BIconChatRightTextFill,
     BIconInfoCircle,
-    BIconCircleHalf,
     BIconCalendar3,
     BIconMic,
     BIconSlashCircle,
@@ -109,7 +99,8 @@ export default {
     ImageModal,
     MultiTraitValueModal,
     VideoModal,
-    Tour
+    Tour,
+    TraitHeading
   },
   props: {
     /** The row of the current data point */

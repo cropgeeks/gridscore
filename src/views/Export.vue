@@ -89,7 +89,18 @@
 
         <b-form @submit.prevent v-if="storeTraits && storeTraits.length > 0">
           <template v-for="(trait, index) in storeTraits">
-            <b-form-group :label="trait.name" :label-for="`trait-select-${trait.name}`" :key="`trait-select-${trait.name}`" v-if="trait.mType === 'multi'">
+            <b-form-group :label="trait.name"
+                          :label-for="`trait-select-${trait.name}`"
+                          :key="`trait-select-${trait.name}`"
+                          :content-cols="12"
+                          :label-cols="12"
+                          :content-cols-lg="10"
+                          :label-cols-lg="2"
+                          class="align-items-center"
+                          v-if="trait.mType === 'multi'">
+              <template #label>
+                <TraitHeading :trait="trait" mode="full" />
+              </template>
               <b-form-radio-group
                 :id="`trait-select-${trait.name}`"
                 v-model="multiTraitSelection[index]"
@@ -115,6 +126,7 @@ import { BIconDownload, BIconArrowLeft, BIconTags, BIconFileEarmarkSpreadsheet, 
 
 import { mapGetters } from 'vuex'
 
+import TraitHeading from '@/components/TraitHeading'
 import HelpModal from '@/components/modals/HelpModal'
 
 import api from '@/mixin/api'
@@ -129,7 +141,8 @@ export default {
     BIconFileEarmarkSpreadsheet,
     BIconQuestionCircleFill,
     BIconGrid3x3,
-    HelpModal
+    HelpModal,
+    TraitHeading
   },
   data: function () {
     return {
@@ -154,7 +167,8 @@ export default {
       'storeDatasetName',
       'storeRows',
       'storeServerUrl',
-      'storeTraits'
+      'storeTraits',
+      'storeTraitColors'
     ]),
     hasMultiTrait: function () {
       if (!this.storeTraits) {
