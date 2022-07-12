@@ -6,9 +6,9 @@
           <b-img fluid src="img/gridscore2.svg" alt="GridScore logo" />
         </b-col>
         <b-col cols=12 md=8 order="2" order-md="1">
-          <h1 class="display-3 text-center text-md-left">{{ $t('appTitle') }}</h1>
+          <h1 class="display-4 text-center text-md-left">{{ $t('appTitle') }}</h1>
           <p class="lead text-center text-md-left">{{ $t('pageHomeWelcome') }}</p>
-          <p class="text-center text-md-left">{{ $t('pageHomeInstructions') }}</p>
+          <p class="text-center text-md-left mb-0">{{ $t('pageHomeInstructions') }}</p>
         </b-col>
       </b-row>
     </div>
@@ -326,7 +326,7 @@ export default {
 
 @media (min-width: 768px) {
   .about-header img {
-    max-height: 200px;
+    max-height: 150px;
   }
 }
 </style>
