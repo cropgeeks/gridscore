@@ -316,7 +316,7 @@ export default {
               }
 
               // Comments
-              result += '\t' + (cell.comment ? cell.comment : '')
+              result += '\t' + (cell.comment ? cell.comment.replace(/\r?\n/, ' ') : '')
             }
           }
         }
@@ -362,7 +362,7 @@ export default {
               }
 
               // Comments
-              result += '\t' + (cell.comment ? cell.comment : '')
+              result += '\t' + (cell.comment ? cell.comment.replace(/\r?\n/, ' ') : '')
             }
           }
         }

@@ -489,11 +489,11 @@ export default {
 
           this.speak(this.visibleTraitMapping[newIndex].trait.name)
         }
-      } else {
-        if (this.isGuidedWalk) {
-          // Automatically call submit
-          this.$emit('submit')
-        }
+      // } else {
+      //   if (this.isGuidedWalk) {
+      //     // Automatically call submit
+      //     this.$emit('submit')
+      //   }
       }
     },
     onValueChanged: function (event, index) {
