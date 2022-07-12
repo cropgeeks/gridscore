@@ -321,6 +321,12 @@ export default {
   overflow: hidden;
 }
 .about-header img {
-  max-height: 200px;
+  max-height: 125px;
+}
+
+@media (min-width: 768px) {
+  .about-header img {
+    max-height: 200px;
+  }
 }
 </style>

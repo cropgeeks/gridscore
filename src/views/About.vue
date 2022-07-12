@@ -143,7 +143,13 @@ export default {
   object-fit: contain;
 }
 .about-header img {
-  max-height: 200px;
+  max-height: 125px;
+}
+
+@media (min-width: 768px) {
+  .about-header img {
+    max-height: 200px;
+  }
 }
 
 .hutton-header.row .col {
