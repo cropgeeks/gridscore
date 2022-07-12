@@ -1,0 +1,93 @@
+<template>
+  <b-modal :title="$t('modalTitleChangelog')"
+           :ok-title="$t('buttonClose')"
+           ok-only
+           no-fade
+           size="lg"
+           ref="changelogModal">
+    <p>{{ $t('modalTextChangelog') }}</p>
+
+    <b-card :title="version.version" v-for="version in changelog" :key="`changelog-${version.version}`">
+      <dl class="row">
+        <template v-for="(item, index) in version.items">
+          <dt :key="`changelog-${version.version}-dt-${index}`" class="col-md-4"><b-badge :variant="badge[item.type].variant">{{ badge[item.type].text }}</b-badge> {{ item.title }}</dt>
+          <dd :key="`changelog-${version.version}-dd-${index}`" class="col-md-8">{{ item.text }}</dd>
+        </template>
+      </dl>
+    </b-card>
+  </b-modal>
+</template>
+
+<script>
+import { mapGetters } from 'vuex'
+
+import deDE from '@/plugins/changelog/de_DE.json'
+import enGB from '@/plugins/changelog/en_GB.json'
+
+const changelogMap = {
+  de_DE: deDE,
+  en_GB: enGB
+}
+
+const semver = require('semver')
+
+export default {
+  props: {
+    prevVersion: {
+      type: String,
+      default: null
+    }
+  },
+  data: function () {
+    return {
+      badge: {
+        new: { variant: 'success', text: 'NEW' },
+        update: { variant: 'info', text: 'UPD' },
+        bugfix: { variant: 'warning', text: 'FIX' }
+      }
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'storeLocale'
+    ]),
+    changelog: function () {
+      if (this.storeLocale in changelogMap) {
+        return changelogMap[this.storeLocale]
+      } else {
+        return enGB
+      }
+    },
+    visibleChangelog: function () {
+      if (!this.prevVersion) {
+        return this.changelog
+      } else {
+        const parsed = semver.valid(this.prevVersion)
+
+        if (parsed) {
+          return this.changelog.filter(c => semver.gt(c.version, this.prevVersion))
+        } else {
+          return this.changelog
+        }
+      }
+    }
+  },
+  methods: {
+    /**
+     * Shows and resets modal dialog
+     */
+    show: function () {
+      this.$refs.changelogModal.show()
+    },
+    /**
+     * Hides the modal dialog
+     */
+    hide: function () {
+      this.$nextTick(() => this.$refs.changelogModal.hide())
+    }
+  }
+}
+</script>
+
+<style scoped>
+</style>

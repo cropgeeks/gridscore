@@ -1,0 +1,37 @@
+[
+  {
+    "version": "1.11.0",
+    "items": [
+      {
+        "type": "new",
+        "title": "Data synchronization",
+        "text": "GridScore is now able to synchronize data collected on different devices for the same trial. Data will be joined by prioritizing data with a newer recording date."
+      },
+      {
+        "type": "new",
+        "title": "Germinate export",
+        "text": "When exporting data containing multi-traits to Germinate Data Templates, an aggregation method has to be chosen per trait."
+      },
+      {
+        "type": "new",
+        "title": "Surveys",
+        "text": "GridScore now supports another type of dataset, namely Surveys. These are designed to support free data collection which is not physically located in a grid-like fashion."
+      },
+      {
+        "type": "new",
+        "title": "Dataset comments",
+        "text": "It's now possible to add general comments to the whole trial. Use the wee comment icon next to the trial name on the data screen."
+      },
+      {
+        "type": "update",
+        "title": "Data circles",
+        "text": "Trait data circles for multi-traits now show a half-filled circle when the trait has been scored at least once."
+      },
+      {
+        "type": "bugfix",
+        "title": "Speech synthesis",
+        "text": "Fixed a bug with the speech synthesis which would sometimes cause text to be skipped."
+      }
+    ]
+  }
+]

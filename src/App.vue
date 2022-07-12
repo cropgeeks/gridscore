@@ -81,6 +81,8 @@
         <p class="text-muted mt-3" v-if="$t('modalTextLoading')">{{ $t('modalTextLoading') }}</p>
       </div>
     </b-modal>
+
+    <ChangelogModal :prevVersion="changelogVersionNumber" ref="changelogModal" />
   </div>
 </template>
 
@@ -89,6 +91,7 @@ import Vue from 'vue'
 import { VuePlausible } from 'vue-plausible'
 import { mapGetters } from 'vuex'
 import Tour from '@/components/Tour'
+import ChangelogModal from '@/components/modals/ChangelogModal'
 import { loadLanguageAsync } from '@/plugins/i18n'
 import { BIconMap, BIconUiChecksGrid, BIconGraphUp, BIconMoon, BIconSun, BIconDice3, BIconBarChartSteps, BIconGearFill, BIconCalendarDate, BIconGridFill, BIconTrash, BIconInfoCircle, BIconFlag, BIconPlus } from 'bootstrap-vue'
 import idb from '@/plugins/idb'
@@ -115,6 +118,7 @@ export default {
     BIconPlus,
     BIconMoon,
     BIconSun,
+    ChangelogModal,
     Tour
   },
   data: function () {
@@ -192,7 +196,8 @@ export default {
       datasets: [],
       sidebarShown: false,
       sidebarCaller: null,
-      darkMode: false
+      darkMode: false,
+      changelogVersionNumber: null
     }
   },
   watch: {
@@ -211,7 +216,8 @@ export default {
       'storeLocale',
       'storeUniqueClientId',
       'storeRunCount',
-      'storePlausible'
+      'storePlausible',
+      'storeChangelogVersionNumber'
     ])
   },
   mixins: [api],
@@ -495,6 +501,12 @@ export default {
         })
     } else {
       this.enablePlausible()
+    }
+
+    this.changelogVersionNumber = this.storeChangelogVersionNumber
+    if (this.storeChangelogVersionNumber !== this.gridScoreVersion) {
+      this.$refs.changelogModal.show()
+      this.$store.dispatch('setChangelogVersionNumber', this.gridScoreVersion)
     }
   },
   destroyed: function () {

@@ -30,6 +30,8 @@ You can copy/paste this data straight from the text boxes into other tools like 
 
 [Germinate](https://ics.hutton.ac.uk/get-germinate) is a well-known plant genetic resources database which stores various types of data including phenotypic data. Germinate also has a well-defined set of [data templates](https://github.com/germinateplatform/germinate-data-templates) which are used to import data into Germinate. GridScore can export your data straight into the phenotypic data template of Germinate so you don't have to reformat your data manually.
 
-To do so, select the Germinate tab on the export page and then press the `Export to Germinate format` button to start the export process. This may take a few seconds depending on the size of your trial and your internet connection.
+To do so, select the Germinate tab on the export page. If you have multi-traits in your trial, you will have to choose how to aggregate them as Germinate only allows a single value per plot. For numeric traits, you can choose to use the last value, the average or the sum, while for text, date or categorical traits you only have the option to use the last value.
+
+To start the export process, press the `Export to Germinate format` button. This may take a few seconds depending on the size of your trial and your internet connection.
 
 Once exported, your data will be downloaded as a Germinate template Excel file.

@@ -92,7 +92,7 @@
     <!-- Modal for trait import via BrAPI -->
     <BrapiTraitImportModal ref="brapiTraitImportModal" @traits-selected="loadBrapiTraits" />
 
-    <HelpModal url="https://cropgeeks.github.io/gridscore/trial-setup.html" ref="helpModal" />
+    <HelpModal url="https://cropgeeks.github.io/gridscore/survey-setup.html" ref="helpModal" />
   </b-container>
 </template>
 

@@ -1,0 +1,37 @@
+[
+  {
+    "version": "1.11.0",
+    "items": [
+      {
+        "type": "new",
+        "title": "Daten Synchronisierung",
+        "text": "GridScore kann jetzt Daten von verschiedenen Geräten im gleichen Versuch synchronisieren. Daten werden priorisiert nach dem neuesten Änderungsdatum."
+      },
+      {
+        "type": "new",
+        "title": "Germinate-Export",
+        "text": "Beim Exportieren von Daten in Germinate Datenvorlagen die Mehrfachmerkmale enthalten muss eine Aggregierungsmethode pro Merkmal gewählt werden."
+      },
+      {
+        "type": "new",
+        "title": "Studien",
+        "text": "GridScore unterstützt jetzt einen weiteren Typen an Datensatz: Studien. Diese sind für die freie Sammlung von Daten geeignet die sich nicht an eine Rasteranordnung halten."
+      },
+      {
+        "type": "new",
+        "title": "Datensatzkommentare",
+        "text": "Es ist jetzt möglich allgemeine Kommentare zum gesamten Versuch hinzuzufügen. Dazu wird das kleine Kommentar-Symbol neben dem Versuchsnamen auf dem Datenbildschirm genutzt."
+      },
+      {
+        "type": "update",
+        "title": "Datenkreise",
+        "text": "Die Merkmalskreise für Mehrfachmerkmale zeigen nun einen half-gefüllten Kreis wenn ein Mehrfachmerkmal mindestens einmal bewertet wurde."
+      },
+      {
+        "type": "bugfix",
+        "title": "Sprachsynthese",
+        "text": "Behebt einen Fehler bei der Sprachsynthese wo in bestimmten Fällen Text verloren geht."
+      }
+    ]
+  }
+]

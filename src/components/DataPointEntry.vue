@@ -436,7 +436,6 @@ export default {
         this.values = this.visibleTraitMapping.map(t => t.trait.mType === 'multi' ? null : dp.values[t.index])
         this.dates = this.visibleTraitMapping.map(t => t.trait.mType === 'multi' ? null : dp.dates[t.index])
         this.name = dp.name
-        // this.isMarked = dp.isMarked || false
         this.comment = dp.comment
 
         this.updateFormDescriptions()

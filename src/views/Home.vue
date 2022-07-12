@@ -1,11 +1,17 @@
 <template>
   <b-container class="py-3">
-    <div class="text-center">
-      <img src="img/gridscore2.svg" fluid  class="about-header-logo" alt="GridScore logo">
-      <h1 class="py-3">{{ $t('appTitle') }}</h1>
+    <div class="about-header bg-light p-5 mb-4 border rounded-lg">
+      <b-row>
+        <b-col cols=12 md=4 class="text-center text-md-right" order="1" order-md="2">
+          <b-img fluid src="img/gridscore2.svg" alt="GridScore logo" />
+        </b-col>
+        <b-col cols=12 md=8 order="2" order-md="1">
+          <h1 class="display-3 text-center text-md-left">{{ $t('appTitle') }}</h1>
+          <p class="lead text-center text-md-left">{{ $t('pageHomeWelcome') }}</p>
+          <p class="text-center text-md-left">{{ $t('pageHomeInstructions') }}</p>
+        </b-col>
+      </b-row>
     </div>
-    <h2>{{ $t('pageHomeWelcome') }}</h2>
-    <p v-html="$t('pageHomeInstructions')" />
 
     <div class="text-center">
       <b-button class="mx-2 mb-3" :to="{ name: 'setup' }"><BIconJournalPlus /> {{ $t('buttonSetupTrial') }}</b-button>
@@ -289,10 +295,6 @@ export default {
 </script>
 
 <style scoped>
-.about-header-logo {
-  max-height: 200px;
-}
-
 .card-corner {
   position: absolute;
   top: 0;
@@ -317,5 +319,8 @@ export default {
   line-clamp: 2;
   -webkit-line-clamp: 2;
   overflow: hidden;
+}
+.about-header img {
+  max-height: 200px;
 }
 </style>

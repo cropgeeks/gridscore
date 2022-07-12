@@ -425,6 +425,10 @@ export default {
           e.preventDefault()
           e.stopPropagation()
         }
+        // Prevent scrolling the table if the page hasn't scrolled to the bottom yet
+        if (e.deltaY > 0 && (window.innerHeight + window.scrollY) < document.body.offsetHeight) {
+          return
+        }
       }
 
       const cvdx = this.origin.x - newX

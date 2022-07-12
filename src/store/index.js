@@ -83,7 +83,8 @@ const storeState = {
       plausibleHashMode: true,
       plausibleApiHost: null
     },
-    hideCitationMessage: false
+    hideCitationMessage: false,
+    changelogVersionNumber: null
   },
   getters: {
     storeDarkMode: (state) => state.darkMode,
@@ -121,7 +122,8 @@ const storeState = {
     storeVisibleTraits: (state) => state.visibleTraits,
     storePlausible: (state) => state.plausible,
     storeNavigationMode: (state) => state.navigationMode,
-    storeHideCitationMessage: (state) => state.hideCitationMessage
+    storeHideCitationMessage: (state) => state.hideCitationMessage,
+    storeChangelogVersionNumber: (state) => state.changelogVersionNumber
   },
   mutations: {
     ON_RUN_COUNT_CHANGED_MUTATION: function (state, newRunCount) {
@@ -429,6 +431,13 @@ const storeState = {
       } else {
         state.hideCitationMessage = newHideCitationMessage
       }
+    },
+    ON_CHANGELOG_VERSION_NUMBER_CHANGED_MUTATION: function (state, newChangelogVersionNumber) {
+      if (state.changelogVersionNumber === undefined) {
+        Vue.set(state, 'changelogVersionNumber', newChangelogVersionNumber)
+      } else {
+        state.changelogVersionNumber = newChangelogVersionNumber
+      }
     }
   },
   actions: {
@@ -576,6 +585,9 @@ const storeState = {
     },
     setHideCitationMessage: function ({ commit }, showCitationMessage) {
       commit('ON_HIDE_CITATION_MESSAGE_CHANGED', showCitationMessage)
+    },
+    setChangelogVersionNumber: function ({ commit }, changelogVersionNumber) {
+      commit('ON_CHANGELOG_VERSION_NUMBER_CHANGED_MUTATION', changelogVersionNumber)
     }
   },
   plugins: [createPersistedState({

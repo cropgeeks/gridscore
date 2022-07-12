@@ -25,28 +25,43 @@
       </b-row>
     </b-container>
     <b-container class="py-5">
-      <div class="text-center">
-        <img src="img/gridscore2.svg" fluid  class="about-header-logo" alt="GridScore logo">
-        <h1 class="py-3">{{ $t('appTitle') }} <small>v{{ gridScoreVersion }}</small></h1>
+      <div class="about-header bg-light p-5 mb-4 border rounded-lg">
+        <b-row>
+          <b-col cols=12 md=4 class="text-center text-md-right" order="1" order-md="2">
+            <b-img fluid src="img/gridscore2.svg" alt="GridScore logo" />
+          </b-col>
+          <b-col cols=12 md=8 order="2" order-md="1">
+            <h1 class="display-3 text-center text-md-left">{{ $t('appTitle') }}</h1>
+            <p class="lead text-center text-md-left"><BIconTag /> {{ $t('pageAboutVersion', { version: gridScoreVersion }) }}</p>
+            <p class="text-center text-md-left"><a href="#" class="text-secondary" @click="$refs.changelogModal.show()"><BIconInfoCircle /> {{ $t('pageAboutChangelog') }}</a></p>
+          </b-col>
+        </b-row>
       </div>
+
       <p>{{ $t('pageAboutParagraphOne') }}</p>
       <p v-html="$t('pageAboutParagraphTwo')" />
       <p class="d-flex"><BIconInfoCircleFill class="mt-1" /> <span class="ml-3" v-html="$t('pageAboutDocumentationLink')" /></p>
       <p class="d-flex"><BIconGithub class="mt-1" /> <span class="ml-3" v-html="$t('pageAboutGitHubLink')" /></p>
       <p class="d-flex"><BIconNewspaper class="mt-1" /> <span class="ml-3" v-html="$t('modalTextCitation')" /></p>
     </b-container>
+
+    <ChangelogModal ref="changelogModal" />
   </div>
 </template>
 
 <script>
-import { BIconGithub, BIconInfoCircleFill, BIconNewspaper } from 'bootstrap-vue'
+import ChangelogModal from '@/components/modals/ChangelogModal'
+import { BIconGithub, BIconInfoCircleFill, BIconInfoCircle, BIconNewspaper, BIconTag } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 
 export default {
   components: {
     BIconGithub,
     BIconInfoCircleFill,
-    BIconNewspaper
+    BIconInfoCircle,
+    BIconNewspaper,
+    BIconTag,
+    ChangelogModal
   },
   computed: {
     /** Mapgetters exposing the store configuration */
@@ -126,6 +141,9 @@ export default {
   height: 150px;
   width: auto;
   object-fit: contain;
+}
+.about-header img {
+  max-height: 200px;
 }
 
 .hutton-header.row .col {
