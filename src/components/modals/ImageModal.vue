@@ -9,7 +9,7 @@
     <!-- Preview the image -->
     <b-img fluid rounded :src="imageData" class="image" v-if="imageData" />
     <!-- Input for selecting (or taking) the image -->
-    <b-form-file v-model="imageFile" accept="image/*" capture class="file-selector" />
+    <b-form-file v-model="imageFile" accept="image/*" capture class="file-selector" ref="imageInput" />
 
     <b-form-group class="mt-2" label-for="trait-selector" :label="$t('formLabelImageTagTraitSelector')">
       <b-form-select :options="traitOptions" multiple v-model="traitIds" id="trait-selector" />
@@ -188,7 +188,15 @@ export default {
         this.traitIds = []
       }
 
-      this.$nextTick(() => this.$refs.imageModal.show())
+      this.$nextTick(() => {
+        this.$refs.imageModal.show()
+
+        this.$nextTick(() => {
+          // Open up the capture/file selector initially
+          this.$refs.imageInput.$el.childNodes[0].focus()
+          this.$refs.imageInput.$el.childNodes[0].click()
+        })
+      })
     },
     /**
      * Hides the modal dialog

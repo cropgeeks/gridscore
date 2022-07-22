@@ -23,14 +23,14 @@
               </svg>
             </b-button>
           </b-input-group-prepend>
-          <b-form-input id="germplasm-name" v-model="germplasm" required :state="state.germplasm" ref="germplasmName" />
+          <b-form-textarea id="germplasm-name" v-model="germplasm" required :state="state.germplasm" ref="germplasmName" />
           <b-form-invalid-feedback :state="state.varieties">
             {{ $t('formFeedbackSetupSurveyAddVariety') }}
           </b-form-invalid-feedback>
         </b-input-group>
       </b-form-group>
     </b-form>
-    <BarcodeScannerModal ref="barcodeScannerModal" @code-scanned="code => { germplasm = code }" />
+    <BarcodeScannerModal ref="barcodeScannerModal" @code-scanned="addCode" />
   </b-modal>
 </template>
 
@@ -79,14 +79,28 @@ export default {
     hide: function () {
       this.$nextTick(() => this.$refs.addGermplasmModal.hide())
     },
+    addCode: function (code) {
+      if (!this.germplasm || this.germplasm === '') {
+        this.germplasm = code
+      } else {
+        this.germplasm += `\n${code}`
+      }
+    },
     onSubmit: function () {
-      this.state.germplasm = (this.germplasm !== null) && !this.uniqueGermplasmNames.has(this.germplasm)
+      if (!this.germplasm) {
+        this.state.germplasm = false
+        return
+      }
+
+      const individualGermplasm = this.germplasm.split('\n').map(g => g.trim()).filter(g => g !== '')
+
+      this.state.germplasm = !individualGermplasm.some(g => this.uniqueGermplasmNames.has(g))
 
       if (this.state.germplasm === false) {
         return
       }
 
-      this.$store.dispatch('addGermplasmToSurveyDataset', { datasetId: this.storeDatasetId, germplasm: this.germplasm })
+      this.$store.dispatch('addGermplasmToSurveyDataset', { datasetId: this.storeDatasetId, germplasm: individualGermplasm })
 
       this.hide()
     }

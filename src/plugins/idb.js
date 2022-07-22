@@ -122,18 +122,23 @@ export default {
     const dataset = await this.getDataset(datasetId)
     const data = await this.getDatasetData(datasetId)
 
-    data.push({
-      dsId: datasetId,
-      row: dataset.rows,
-      col: 0,
-      name: germplasm,
-      dates: new Array(dataset.traits.length).fill(null),
-      values: new Array(dataset.traits.length).fill(null),
-      geolocation: null,
-      comment: null
+    let counter = dataset.rows
+    germplasm.forEach(g => {
+      data.push({
+        dsId: datasetId,
+        row: counter,
+        col: 0,
+        name: g,
+        dates: new Array(dataset.traits.length).fill(null),
+        values: new Array(dataset.traits.length).fill(null),
+        geolocation: null,
+        comment: null
+      })
+
+      counter++
     })
 
-    dataset.rows++
+    dataset.rows = counter
 
     return new Promise(resolve => {
       const tx = db.transaction('data', 'readwrite')
