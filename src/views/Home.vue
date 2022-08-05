@@ -319,6 +319,7 @@ export default {
   line-clamp: 2;
   -webkit-line-clamp: 2;
   overflow: hidden;
+  max-width: 100%;
 }
 .about-header img {
   max-height: 125px;

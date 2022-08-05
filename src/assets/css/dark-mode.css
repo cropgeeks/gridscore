@@ -36,16 +36,16 @@
 }
 
 .dark-mode .btn-secondary:not(:disabled):not(.disabled):active,
-.btn-secondary:not(:disabled):not(.disabled).active,
-.show>.btn-secondary.dropdown-toggle {
+.dark-mode .btn-secondary:not(:disabled):not(.disabled).active,
+.dark-mode .show>.btn-secondary.dropdown-toggle {
   color: rgb(232, 230, 227);
   background-color: rgb(82, 89, 92);
   border-color: rgb(106, 99, 87);
 }
 
 .dark-mode .btn-secondary:not(:disabled):not(.disabled):active:focus,
-.btn-secondary:not(:disabled):not(.disabled).active:focus,
-.show>.btn-secondary.dropdown-toggle:focus {
+.dark-mode .btn-secondary:not(:disabled):not(.disabled).active:focus,
+.dark-mode .show>.btn-secondary.dropdown-toggle:focus {
   box-shadow: rgb(82 89 92 / 50%) 0px 0px 0px 0.2rem;
 }
 
@@ -62,13 +62,13 @@
 }
 
 .dark-mode .btn-primary:not(:disabled):not(.disabled):active:focus,
-.btn-primary:not(:disabled):not(.disabled).active:focus,
-.show>.btn-primary.dropdown-toggle:focus {
+.dark-mode .btn-primary:not(:disabled):not(.disabled).active:focus,
+.dark-mode .show>.btn-primary.dropdown-toggle:focus {
   box-shadow: rgb(10 122 179 / 50%) 0px 0px 0px 0.2rem;
 }
 
 .dark-mode .btn-primary:focus,
-.btn-primary.focus {
+.dark-mode .btn-primary.focus {
   color: rgb(232, 230, 227);
   background-color: rgb(0, 108, 162);
   border-color: rgb(0, 131, 198);
@@ -87,16 +87,16 @@
 }
 
 .dark-mode .btn-outline-secondary:not(:disabled):not(.disabled):active,
-.btn-outline-secondary:not(:disabled):not(.disabled).active,
-.show>.btn-outline-secondary.dropdown-toggle {
+.dark-mode .btn-outline-secondary:not(:disabled):not(.disabled).active,
+.dark-mode .show>.btn-outline-secondary.dropdown-toggle {
   color: rgb(232, 230, 227);
   background-color: rgb(92, 100, 104);
   border-color: rgb(82, 89, 92);
 }
 
 .dark-mode .btn-outline-secondary:not(:disabled):not(.disabled):active:focus,
-.btn-outline-secondary:not(:disabled):not(.disabled).active:focus,
-.show>.btn-outline-secondary.dropdown-toggle:focus {
+.dark-mode .btn-outline-secondary:not(:disabled):not(.disabled).active:focus,
+.dark-mode .show>.btn-outline-secondary.dropdown-toggle:focus {
   box-shadow: rgb(92 100 104 / 50%) 0px 0px 0px 0.2rem;
 }
 
@@ -113,16 +113,16 @@
 }
 
 .dark-mode .btn-danger:not(:disabled):not(.disabled):active,
-.btn-danger:not(:disabled):not(.disabled).active,
-.show>.btn-danger.dropdown-toggle {
+.dark-mode .btn-danger:not(:disabled):not(.disabled).active,
+.dark-mode .show>.btn-danger.dropdown-toggle {
   color: rgb(232, 230, 227);
   background-color: rgb(150, 31, 22);
   border-color: rgb(168, 35, 26);
 }
 
 .dark-mode .btn-danger:not(:disabled):not(.disabled):active:focus,
-.btn-danger:not(:disabled):not(.disabled).active:focus,
-.show>.btn-danger.dropdown-toggle:focus {
+.dark-mode .btn-danger:not(:disabled):not(.disabled).active:focus,
+.dark-mode .show>.btn-danger.dropdown-toggle:focus {
   box-shadow: rgb(152 31 23 / 50%) 0px 0px 0px 0.2rem;
 }
 
@@ -138,16 +138,16 @@
 }
 
 .dark-mode .btn-outline-danger:not(:disabled):not(.disabled):active,
-.btn-outline-danger:not(:disabled):not(.disabled).active,
-.show>.btn-outline-danger.dropdown-toggle {
+.dark-mode .btn-outline-danger:not(:disabled):not(.disabled).active,
+.dark-mode .show>.btn-outline-danger.dropdown-toggle {
   color: rgb(232, 230, 227);
   background-color: rgb(171, 36, 26);
   border-color: rgb(152, 32, 23);
 }
 
 .dark-mode .btn-outline-danger:not(:disabled):not(.disabled):active:focus,
-.btn-outline-danger:not(:disabled):not(.disabled).active:focus,
-.show>.btn-outline-danger.dropdown-toggle:focus {
+.dark-mode .btn-outline-danger:not(:disabled):not(.disabled).active:focus,
+.dark-mode .show>.btn-outline-danger.dropdown-toggle:focus {
   box-shadow: rgb(171 36 26 / 50%) 0px 0px 0px 0.2rem;
 }
 
@@ -164,16 +164,16 @@
 }
 
 .dark-mode .btn-success:not(:disabled):not(.disabled):active,
-.btn-success:not(:disabled):not(.disabled).active,
-.show>.btn-success.dropdown-toggle {
+.dark-mode .btn-success:not(:disabled):not(.disabled).active,
+.dark-mode .show>.btn-success.dropdown-toggle {
   color: rgb(232, 230, 227);
   background-color: rgb(35, 113, 46);
   border-color: rgb(48, 155, 64);
 }
 
 .dark-mode .btn-success:not(:disabled):not(.disabled):active:focus,
-.btn-success:not(:disabled):not(.disabled).active:focus,
-.show>.btn-success.dropdown-toggle:focus {
+.dark-mode .btn-success:not(:disabled):not(.disabled).active:focus,
+.dark-mode .show>.btn-success.dropdown-toggle:focus {
   box-shadow: rgb(52 138 83 / 50%) 0px 0px 0px 0.2rem;
 }
 
@@ -190,16 +190,16 @@
 }
 
 .dark-mode .btn-light:not(:disabled):not(.disabled):active,
-.btn-light:not(:disabled):not(.disabled).active,
-.show>.btn-light.dropdown-toggle {
+.dark-mode .btn-light:not(:disabled):not(.disabled).active,
+.dark-mode .show>.btn-light.dropdown-toggle {
   color: rgb(209, 205, 199);
   background-color: rgb(49, 53, 55);
   border-color: rgb(62, 68, 70);
 }
 
 .dark-mode .btn-light:not(:disabled):not(.disabled):active:focus,
-.btn-light:not(:disabled):not(.disabled).active:focus,
-.show>.btn-light.dropdown-toggle:focus {
+.dark-mode .btn-light:not(:disabled):not(.disabled).active:focus,
+.dark-mode .show>.btn-light.dropdown-toggle:focus {
   box-shadow: rgb(52 56 58 / 50%) 0px 0px 0px 0.2rem;
 }
 
@@ -286,14 +286,14 @@
 }
 
 .dark-mode .dropdown-item:hover,
-.dropdown-item:focus {
+.dark-mode .dropdown-item:focus {
   color: rgb(217, 213, 208);
   text-decoration-color: initial;
   background-color: rgb(35, 38, 39);
 }
 
 .dark-mode .dropdown-item.active,
-.dropdown-item:active {
+.dark-mode .dropdown-item:active {
   color: rgb(232, 230, 227);
   text-decoration-color: initial;
   background-color: rgb(40, 74, 109);
@@ -416,13 +416,13 @@
 }
 
 .dark-mode .list-group-item-primary.list-group-item-action:hover,
-.list-group-item-primary.list-group-item-action:focus {
+.dark-mode .list-group-item-primary.list-group-item-action:focus {
   color: rgb(117, 208, 255);
   background-color: rgb(52, 57, 59);
 }
 
 .dark-mode .list-group-item-primary.list-group-item-action:hover,
-.list-group-item-primary.list-group-item-action:focus {
+.dark-mode .list-group-item-primary.list-group-item-action:focus {
   color: rgb(117, 208, 255);
   background-color: rgb(52, 57, 59);
 }
