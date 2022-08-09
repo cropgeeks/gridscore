@@ -531,7 +531,7 @@ export default {
     },
     verify: function (verifyCallback) {
       this.formState = this.visibleTraitMapping.map((t, i) => {
-        let valid
+        let valid = true
         if (this.values[i] === '' || this.values[i] === null) {
           valid = true
         } else if (t.trait.restrictions) {
@@ -616,6 +616,14 @@ export default {
       const finalValues = JSON.parse(JSON.stringify(dp.values))
       const finalDates = JSON.parse(JSON.stringify(dp.dates))
 
+      // Set all multi traits to null initially
+      this.storeTraits.forEach((t, i) => {
+        if (t.mType === 'multi') {
+          finalValues[i] = null
+          finalDates[i] = null
+        }
+      })
+      // Then set the values for all visible traits
       this.visibleTraitMapping.forEach((t, index) => {
         finalValues[t.index] = this.values[index]
         finalDates[t.index] = this.dates[index]
