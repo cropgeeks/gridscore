@@ -4,6 +4,7 @@
            :cancel-title="$t('buttonCancel')"
            size="md"
            no-fade
+           scrollable
            @ok.prevent="onSubmit"
            ref="multiTraitValueModal">
     <p>{{ $t('modalTextMultiTraitValues') }}</p>

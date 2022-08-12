@@ -725,19 +725,23 @@ export default {
       this.uctx.drawImage(this.userPositionImg, -8, -8)
       this.uctx.restore()
     },
-    fittingString: function (str, maxWidth) {
+    fittingString: function (str, maxWidth, fromStart = true) {
       let width = this.ctx.measureText(str).width
       const ellipsis = '…'
       const ellipsisWidth = this.ctx.measureText(ellipsis).width
       if (width <= maxWidth || width <= ellipsisWidth) {
           return str
       } else {
-          let len = str.length
-          while (width >= maxWidth - ellipsisWidth && len-- > 0) {
-              str = str.substring(0, len)
-              width = this.ctx.measureText(str).width
+          while (width >= maxWidth - ellipsisWidth && str.length > 0) {
+            if (fromStart) {
+              str = str.substring(0, str.length - 1)
+            } else {
+              str = str.substring(1, str.length)
+            }
+            width = this.ctx.measureText(str).width
           }
-          return str + ellipsis
+
+          return fromStart ? (str + ellipsis) : (ellipsis + str)
       }
     },
     drawComment: function (x, y) {
@@ -843,7 +847,8 @@ export default {
       if (this.showValues && this.storeVisibleTraits && this.storeVisibleTraits.filter(t => t).length === 1) {
         this.storeVisibleTraits.forEach((visible, i) => {
           if (visible) {
-            const traitValue = this.fittingString(cell.values[i] || '', this.coreWidth)
+            const str = cell.values[i] === null ? '' : (this.storeTraits[i].mType === 'multi' ? cell.values[i].join(', ') : cell.values[i])
+            const traitValue = this.fittingString(str || '', this.coreWidth, false)
             this.ctx.fillStyle = this.fillStyleText
             this.ctx.fillText(traitValue, x + this.cellWidth / 2, maxY + this.textPartHeight - this.padding + this.fontSize / 2)
           }

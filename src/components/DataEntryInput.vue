@@ -19,7 +19,7 @@
                 @keyup.enter="$emit('enter')"
                 :value="values[index]"
                 @change="(event) => $emit('onValueChanged', +event)"
-                @wheel.prevent
+                @wheel="$event.target.blur()"
                 type="number"
                 :min="(trait.restrictions && trait.restrictions.min !== null && trait.restrictions.min !== undefined) ? trait.restrictions.min : null"
                 :max="(trait.restrictions && trait.restrictions.max !== null && trait.restrictions.max !== undefined) ? trait.restrictions.max : null" />
@@ -33,7 +33,7 @@
                 :value="values[index]"
                 @change="(event) => $emit('onValueChanged', +event)"
                 type="number"
-                @wheel.prevent
+                @wheel="$event.target.blur()"
                 :min="(trait.restrictions && trait.restrictions.min !== null && trait.restrictions.min !== undefined) ? trait.restrictions.min : null"
                 :max="(trait.restrictions && trait.restrictions.max !== null && trait.restrictions.max !== undefined) ? trait.restrictions.max : null"
                 :step="0.02" />

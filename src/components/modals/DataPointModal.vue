@@ -10,7 +10,7 @@
            id="data-entry-modal"
            ref="dataPointModal">
     <template v-slot:modal-header="{ close }">
-      <h5 class="modal-title">{{ name }}</h5>
+      <h5 class="modal-title text-truncate">{{ name }}</h5>
 
       <b-button-group id="data-entry-header">
         <b-button @click="startTour()"><BIconQuestionCircle /></b-button>

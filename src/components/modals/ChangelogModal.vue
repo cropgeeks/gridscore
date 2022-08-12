@@ -8,7 +8,10 @@
     <p>{{ $t('modalTextChangelog') }}</p>
 
     <b-card :title="version.version" v-for="version in visibleChangelog" :key="`changelog-${version.version}`" class="mb-3">
-      <dl class="row">
+      <b-card-sub-title v-if="version.date" class="mb-3">
+        <BIconCalendarDate /> {{ new Date(version.date).toLocaleDateString() }}
+      </b-card-sub-title>
+      <dl class="row mb-0">
         <template v-for="(item, index) in version.items">
           <dt :key="`changelog-${version.version}-dt-${index}`" class="col-md-4"><b-badge :variant="badge[item.type].variant">{{ badge[item.type].text }}</b-badge> {{ item.title }}</dt>
           <dd :key="`changelog-${version.version}-dd-${index}`" class="col-md-8">{{ item.text }}</dd>
@@ -20,6 +23,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { BIconCalendarDate } from 'bootstrap-vue'
 
 import deDE from '@/plugins/changelog/de_DE.json'
 import enGB from '@/plugins/changelog/en_GB.json'
@@ -32,6 +36,9 @@ const changelogMap = {
 const semver = require('semver')
 
 export default {
+  components: {
+    BIconCalendarDate
+  },
   props: {
     prevVersion: {
       type: String,
