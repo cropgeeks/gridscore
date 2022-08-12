@@ -64,6 +64,11 @@ export default {
     highlightPosition: {
       type: Object,
       default: () => null
+    },
+    /** Determines whether the trait value of a single trait is shown or not */
+    showValues: {
+      type: Boolean,
+      default: false
     }
   },
   data: function () {
@@ -281,7 +286,13 @@ export default {
       return Math.ceil(this.visibleTraitCount / this.circlesPerRow)
     },
     cellHeight: function () {
-      return Math.max(this.textPartHeight + this.circleRows * (this.circleWidth + this.padding), this.canvasHeight / this.storeRows)
+      let height = Math.max(this.textPartHeight + this.circleRows * (this.circleWidth + this.padding), this.canvasHeight / this.storeRows)
+
+      if (this.showValues) {
+        height += this.textPartHeight - this.padding
+      }
+
+      return height
     },
     cellWidth: function () {
       const minReq = Math.max(this.storeColumnWidth, 120)
@@ -794,6 +805,7 @@ export default {
       this.ctx.fillText(text, x + this.cellWidth / 2, y + this.padding + this.fontSize / 2)
 
       // How many circle rows do we need?
+      let maxY = y + this.padding + this.fontSize / 2
       let traitCounter = 0
       for (let r = 0; r < this.circleRows; r++) {
         // How many circles are in this row?
@@ -822,8 +834,20 @@ export default {
           const targetY = Math.round(y + this.textPartHeight + r * (this.circleRadius * 2 + this.padding))
           this.$refs.offscreenCanvas.copyToCanvas(realIndex, fillType, count, this.ctx, targetX, targetY)
 
+          maxY = targetY
+
           traitCounter++
         }
+      }
+
+      if (this.showValues && this.storeVisibleTraits && this.storeVisibleTraits.filter(t => t).length === 1) {
+        this.storeVisibleTraits.forEach((visible, i) => {
+          if (visible) {
+            const traitValue = this.fittingString(cell.values[i] || '', this.coreWidth)
+            this.ctx.fillStyle = this.fillStyleText
+            this.ctx.fillText(traitValue, x + this.cellWidth / 2, maxY + this.textPartHeight - this.padding + this.fontSize / 2)
+          }
+        })
       }
 
       // Add a bookmark symbol if required

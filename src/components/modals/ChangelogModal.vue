@@ -7,7 +7,7 @@
            ref="changelogModal">
     <p>{{ $t('modalTextChangelog') }}</p>
 
-    <b-card :title="version.version" v-for="version in changelog" :key="`changelog-${version.version}`">
+    <b-card :title="version.version" v-for="version in visibleChangelog" :key="`changelog-${version.version}`" class="mb-3">
       <dl class="row">
         <template v-for="(item, index) in version.items">
           <dt :key="`changelog-${version.version}-dt-${index}`" class="col-md-4"><b-badge :variant="badge[item.type].variant">{{ badge[item.type].text }}</b-badge> {{ item.title }}</dt>
@@ -60,14 +60,30 @@ export default {
     },
     visibleChangelog: function () {
       if (!this.prevVersion) {
-        return this.changelog
+        return this.changelog.concat().sort((a, b) => {
+          if (semver.eq(a.version, b.version)) {
+            return 0
+          } else if (semver.gt(a.version, b.version)) {
+            return -1
+          } else {
+            return 1
+          }
+        })
       } else {
         const parsed = semver.valid(this.prevVersion)
 
         if (parsed) {
           return this.changelog.filter(c => semver.gt(c.version, this.prevVersion))
         } else {
-          return this.changelog
+          return this.changelog.concat().sort((a, b) => {
+            if (semver.eq(a.version, b.version)) {
+              return 0
+            } else if (semver.gt(a.version, b.version)) {
+              return -1
+            } else {
+              return 1
+            }
+          })
         }
       }
     }

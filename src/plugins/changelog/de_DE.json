@@ -33,5 +33,29 @@
         "text": "Behebt einen Fehler bei der Sprachsynthese wo in bestimmten Fällen Text verloren geht."
       }
     ]
+  }, {
+    "version": "1.12.0",
+    "items": [
+      {
+        "type": "new",
+        "title": "Einzel-Merkmal Wertedarstellung",
+        "text": "GridScore kann jetzt die Werte für ein einzelnes Merkmal für alle Pflanzen/Beete direkt in der Datenansicht anzeigen. Um dies zu nutzen, klicke auf 'Merkmalssichtbarkeit' und dann auf 'Einzelner Wert'. Jetzt kann zwischen einzelnen Merkmalen gewechselt werden um deren Werte direkt im Feldplan anzuzeigen."
+      },
+      {
+        "type": "update",
+        "title": "Besseres Scannen von QR-Codes/Barcodes",
+        "text": "Wir haben Programmbibliotheken für das Scannen von QR-Codes/Barcodes gewechselt. Die neue Bibliothek unterstützt mehrere Typen an Codes und sollte auch schneller beim Scannen sein als die alte Bibliothek."
+      },
+      {
+        "type": "new",
+        "title": "Mehrere Einträge zu einer Studie hinzufügen",
+        "text": "Es ist jetzt möglich mehrere Einträge auf einmal zu einer Studie hinzuzufügen statt dies einzeln zu tun."
+      },
+      {
+        "type": "bugfix",
+        "title": "Fehlerbehebung beim Sammeln von Mehrfachmarkmalsdaten",
+        "text": "In vorherigen Versionen war ein Fehler enthalten der auftrat wenn ein Mehrfachmerkmal bewertet wurde während gleichzeitig andere Merkmale ausgeblendet waren. Dies resultierte in korrupten Daten, wurde aber hiermit behoben."
+      }
+    ]
   }
 ]

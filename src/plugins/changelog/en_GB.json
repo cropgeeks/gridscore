@@ -33,5 +33,29 @@
         "text": "Fixed a bug with the speech synthesis which would sometimes cause text to be skipped."
       }
     ]
+  }, {
+    "version": "1.12.0",
+    "items": [
+      {
+        "type": "new",
+        "title": "Single trait value display",
+        "text": "GridScore can now show you the value of a single trait for all plants/plots right in the data view. To try this out, select the 'Trait visibility' dropdown menu and then select 'Single value'. You are then able to switch between individual traits to see their values right in the field plan."
+      },
+      {
+        "type": "update",
+        "title": "Better QR-code/barcode scanning",
+        "text": "We switched to a new library for QR-code/barcode scanning. This new library has better support for a variety of barcodes and should also scan codes quicker than the old library."
+      },
+      {
+        "type": "new",
+        "title": "Adding multiple entries to a survey",
+        "text": "You'll now be able to add multiple entries to a survey at the same time rather than adding them individually."
+      },
+      {
+        "type": "bugfix",
+        "title": "Bug fix for multi-trait scoring",
+        "text": "In previous versions there was a bug that happened when scoring multi-traits while also having some traits toggled. This would result in corrupted data and has now been corrected."
+      }
+    ]
   }
 ]

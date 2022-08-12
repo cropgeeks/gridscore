@@ -77,6 +77,7 @@
           <b-button-group>
             <b-button @click="toggleVisibilityAll(true)"><BIconCircleFill /> {{ $t('buttonSelectAll') }}</b-button>
             <b-button @click="toggleVisibilityAll(false)"><BIconCircle /> {{ $t('buttonDeselectAll') }}</b-button>
+            <b-button :pressed="traitVisibilityValue" @click="toggleVisibilityValue"><BIconFilterCircleFill /> {{ $t('buttonTraitVisibilityValue') }}</b-button>
           </b-button-group>
         </b-dropdown-form>
         <b-dropdown-item v-for="(trait, index) in storeTraits" :key="`trait-${index}`" @click.native.capture.stop="toggleVisibility(index)">
@@ -94,7 +95,7 @@
       </b-button>
     </div>
 
-    <GridTableCanvas @cell-clicked="onCellClicked" :traitStats="storeShowStatsInTable ? traitStats : null" v-if="storeTraits && storeTraits.length > 0" :highlightPosition="userPosition" ref="canvas" />
+    <GridTableCanvas @cell-clicked="onCellClicked" :showValues="traitVisibilityValue" :traitStats="storeShowStatsInTable ? traitStats : null" v-if="storeTraits && storeTraits.length > 0" :highlightPosition="userPosition" ref="canvas" />
     <DataPointModal ref="dataPointModal" :row="cell.row" :col="cell.col" />
     <BarcodeScannerModal ref="barcodeScannerModal" @code-scanned="searchByBarcode" />
     <BarcodeViewerModal ref="barcodeViewModal" :text="storeDatasetUuid" :title="storeDatasetName" v-if="storeDatasetUuid" />
@@ -134,7 +135,7 @@ import CommentModal from '@/components/modals/CommentModal'
 import BarcodeScannerModal from '@/components/modals/BarcodeScannerModal'
 import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
 import HelpModal from '@/components/modals/HelpModal'
-import { BIconCircleFill, BIconGearFill, BIconSearch, BIconChatLeftText, BIconArrowsMove, BIconQuestionCircleFill, BIconPlus, BIconSlashCircle, BIconCloudCheck, BIconCircleHalf, BIconCircle, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
+import { BIconCircleFill, BIconFilterCircleFill, BIconGearFill, BIconSearch, BIconChatLeftText, BIconArrowsMove, BIconQuestionCircleFill, BIconPlus, BIconSlashCircle, BIconCloudCheck, BIconCircleHalf, BIconCircle, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap'
 
@@ -153,7 +154,8 @@ export default {
         row: null,
         col: null
       },
-      traitStats: null
+      traitStats: null,
+      traitVisibilityValue: false
     }
   },
   watch: {
@@ -183,6 +185,7 @@ export default {
     BIconChatLeftText,
     BIconCircleFill,
     BIconSlashCircle,
+    BIconFilterCircleFill,
     BIconGearFill,
     BIconCircleHalf,
     BIconCircle,
@@ -302,12 +305,29 @@ export default {
         }
       })
     },
+    toggleVisibilityValue: function () {
+      this.traitVisibilityValue = !this.traitVisibilityValue
+
+      if (this.traitVisibilityValue) {
+        const temp = this.storeVisibleTraits.concat().map(_ => false)
+        temp[0] = true
+        this.$store.dispatch('setVisibleTraits', temp)
+      } else {
+        this.toggleVisibilityAll(true)
+      }
+    },
     toggleVisibilityAll: function (select) {
-      this.$store.dispatch('setVisibleTraits', this.storeTraits.map(i => select))
+      this.traitVisibilityValue = false
+      this.$store.dispatch('setVisibleTraits', this.storeTraits.map(_ => select))
     },
     toggleVisibility: function (index) {
-      const temp = this.storeVisibleTraits.concat()
-      temp[index] = !temp[index]
+      let temp = this.storeVisibleTraits.concat()
+      if (this.traitVisibilityValue) {
+        temp = temp.map(_ => false)
+        temp[index] = true
+      } else {
+        temp[index] = !temp[index]
+      }
       this.$store.dispatch('setVisibleTraits', temp)
     },
     onCellClicked: function (cell) {

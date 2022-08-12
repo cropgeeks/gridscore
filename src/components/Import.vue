@@ -6,7 +6,9 @@
       <b-button @click="onImportClicked">{{ $t('formLabelImportDataServerUuid') }}</b-button>
       <template v-if="showCamera">
         <p class="text-muted mt-3">{{ $t('formDescriptionImportDataServerUuid') }}</p>
-        <QrcodeStream @decode="onDecode" @init="scrollToCamera" ref="cameraInput" />
+        <div class="camera-wrapper d-flex justify-content-center">
+          <BarcodeScanner @code-scanned="onDecode" ref="scanner" />
+        </div>
       </template>
       <p class="text-danger mt-3" v-if="serverError">{{ serverError }}</p>
     </b-form>
@@ -16,7 +18,7 @@
 
 <script>
 import YesNoCancelModal from '@/components/modals/YesNoCancelModal'
-import { QrcodeStream } from 'vue-qrcode-reader'
+import BarcodeScanner from '@/components/BarcodeScanner'
 import idb from '@/plugins/idb'
 
 import api from '@/mixin/api'
@@ -24,6 +26,10 @@ import api from '@/mixin/api'
 import { mapGetters } from 'vuex'
 
 export default {
+  components: {
+    BarcodeScanner,
+    YesNoCancelModal
+  },
   props: {
     useDatasetUuid: {
       type: Boolean,
@@ -48,10 +54,6 @@ export default {
     storeDatasetUuid: function () {
       this.reset()
     }
-  },
-  components: {
-    QrcodeStream,
-    YesNoCancelModal
   },
   mixins: [api],
   methods: {
@@ -132,11 +134,19 @@ export default {
       this.$store.dispatch('addDataset', this.config)
     }
   },
+  beforeDestroy: function () {
+    if (this.$refs.scanner) {
+      this.$refs.scanner.close()
+    }
+  },
   mounted: function () {
     this.reset()
   }
 }
 </script>
 
-<style>
+<style scoped>
+.camera-wrapper > div {
+  max-width: 500px;
+}
 </style>
