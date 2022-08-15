@@ -187,6 +187,8 @@
   "modalTextConfigDecisionRequired": "Teile deiner Daten weisen inkompatible Unterschiede zu den Daten auf dem Server auf. Es muss entschieden werden welche Daten behalten werden. GridScore wird die Daten wie sonst vereinen außer die Kollisions-Fälle wo die Daten basierend auf deiner Entscheidung übernommen werden.",
   "modalTitleConfigDecisionRequired": "Entscheidung erforderlich",
   "modalTitleDatasetComment": "Versuchs-/Studienkommentar",
+  "modalTitleDeleteMultiTraitValue": "Wert löschen",
+  "modalTextDeleteMultiTraitValue": "Sicher, dass diese Mehrfachmessung gelöscht werden soll?",
   "modalTitleHideCitation": "Veröffentlichungsinformationen ausblenden",
   "modalTextHideCitation": "Sicher, dass diese Information ausgeblendet werden soll? Sie kann weiterhin auf der 'Über' Seite gefunden werden.",
   "modalTitleCitation": "GridScore Veröffentlichung",

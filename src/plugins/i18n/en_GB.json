@@ -190,6 +190,8 @@
   "modalTextConfigDecisionRequired": "Some parts of your data and the remote data have incompatible differences. You'll have to decide which version to keep. GridScore will join the data as usual except for those collisions where it will prefer the version based on your decision.",
   "modalTitleConfigDecisionRequired": "Decision required",
   "modalTitleDatasetComment": "Trial/survey comment",
+  "modalTitleDeleteMultiTraitValue": "Delete value",
+  "modalTextDeleteMultiTraitValue": "Are you sure you want to delete this multi-trait value?",
   "modalTitleHideCitation": "Hide citation information",
   "modalTextHideCitation": "Are you sure you want to hide this information? You can still find the reference on the 'About' page.",
   "modalTitleCitation": "GridScore Publication",

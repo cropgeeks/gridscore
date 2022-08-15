@@ -4,7 +4,6 @@
            :cancel-title="$t('buttonCancel')"
            size="md"
            no-fade
-           scrollable
            @ok.prevent="onSubmit"
            ref="multiTraitValueModal">
     <p>{{ $t('modalTextMultiTraitValues') }}</p>
@@ -18,7 +17,14 @@
         <b-badge v-if="trait.restrictions.max">&le; {{ trait.restrictions.max }}</b-badge>
         <b-badge v-if="trait.restrictions.categories">in {{ trait.restrictions.categories.join(', ') }}</b-badge>
       </div>
-      <b-form-group :label="dates[index]" v-for="(datum, index) in values" :key="`datum-${index}`" :label-for="`input-${index}`">
+      <b-form-group v-for="(datum, index) in values" :key="`datum-${index}`" :label-for="`input-${index}`">
+        <template #label>
+          <div class="d-flex align-items-center">
+            <b-badge>{{ dates[index] }}</b-badge>
+            <b-form-datepicker size="sm" class="ml-auto mr-1" button-only v-model="dates[index]" />
+            <b-button size="sm" variant="danger" @click="deleteValue(index)" v-b-tooltip="$t('buttonDelete')"><BIconTrash /></b-button>
+          </div>
+        </template>
         <DataEntryInput :values="values" :index="index" :trait="trait" :formState="formState" class="d-block" :id="`input-${index}`"
                         @handleDateInput="handleDateInput(index)"
                         @handleDateInputChar="event => handleDateInputChar(index, event)"
@@ -33,9 +39,11 @@
 import Vue from 'vue'
 import DataEntryInput from '@/components/DataEntryInput'
 import { mapGetters } from 'vuex'
+import { BIconTrash } from 'bootstrap-vue'
 
 export default {
   components: {
+    BIconTrash,
     DataEntryInput
   },
   computed: {
@@ -77,6 +85,20 @@ export default {
     }
   },
   methods: {
+    deleteValue: function (index) {
+      this.$bvModal.msgBoxConfirm(this.$t('modalTextGuidedWalkExit'), {
+          title: this.$t('modalTitleGuidedWalkExit'),
+          okVariant: 'danger',
+          okTitle: this.$t('buttonYes'),
+          cancelTitle: this.$t('buttonNo')
+        })
+          .then(value => {
+            if (value) {
+              this.values.splice(index, 1)
+              this.dates.splice(index, 1)
+            }
+          })
+    },
     onSubmit: function () {
       this.formState = this.values.map((v, i) => {
         if (v === '' || v === null) {
