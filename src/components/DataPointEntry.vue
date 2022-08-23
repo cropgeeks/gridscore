@@ -609,7 +609,7 @@ export default {
       })
 
       // Only store the comment if it's not empty
-      const comment = (this.comment !== undefined && this.comment !== null && this.comment.length > 0) ? this.comment : null
+      const comment = (this.comment !== undefined && this.comment !== null && this.comment.trim().length > 0) ? this.comment.trim() : null
 
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
       const dp = storeData.get(`${this.row}-${this.col}`)
