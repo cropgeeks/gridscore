@@ -7,6 +7,7 @@
 
     <div v-if="multiTraits && multiTraits.length > 0" class="mt-3">
       <h1>{{ $t('pageTimelineMultiTitle') }}</h1>
+      <p>{{ $t('pageTimelineMultipleText') }}</p>
       <MultiTraitTimeline :trait="mt" v-for="mt in multiTraits" :key="`mt-${mt.name}`" />
     </div>
     <HelpModal url="https://cropgeeks.github.io/gridscore/visualizing-data.html#timeline" ref="helpModal" />

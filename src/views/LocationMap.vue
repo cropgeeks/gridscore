@@ -168,7 +168,7 @@ export default {
   },
   methods: {
     log: function (event) {
-      console.log(event.latlng)
+      console.log(event.latlng, `"geolocation":{"lat":${event.latlng.lat},"lng":${event.latlng.lng},"elv":${Math.random() * 10 + 200}}`)
     },
     updateBounds: function () {
       const b = L.latLngBounds()

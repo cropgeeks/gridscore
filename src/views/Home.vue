@@ -17,7 +17,12 @@
       <b-button class="mx-2 mb-3" :to="{ name: 'setup' }"><BIconJournalPlus /> {{ $t('buttonSetupTrial') }}</b-button>
       <b-button class="mx-2 mb-3" :to="{ name: 'setup-survey' }"><BIconJournalAlbum /> {{ $t('buttonSetupSurvey') }}</b-button>
       <b-button class="mx-2 mb-3" :to="{ name: 'import' }"><BIconCloudDownloadFill /> {{ $t('buttonImportTrial') }}</b-button>
-      <b-button class="mx-2 mb-3" @click="loadExampleData"><BIconFileSpreadsheet /> {{ $t('buttonLoadExampleData') }}</b-button>
+      <b-dropdown class="mx-2 mb-3">
+        <template #button-content>
+          <BIconFileSpreadsheet /> {{ $t('buttonLoadExampleData') }}
+        </template>
+        <b-dropdown-item v-for="example in exampleTrials" :key="`example-${example.id}`" @click="loadExampleData(example)">{{ example.name }}</b-dropdown-item>
+      </b-dropdown>
       <b-button class="mx-2 mb-3" @click="startTour"><BIconPlayFill /> {{ $t('buttonStartIntroductionTour') }}</b-button>
       <b-button class="mx-2 mb-3" @click="$refs.helpModal.show()"><BIconQuestionCircleFill /> {{ $t('buttonHelp') }}</b-button>
     </div>
@@ -140,7 +145,18 @@ export default {
     ...mapGetters([
       'storeDatasetId',
       'storeHideCitationMessage'
-    ])
+    ]),
+    exampleTrials: function () {
+      return [{
+        id: 'barley-2020',
+        name: this.$t('exampleTrialsBarley2020'),
+        file: 'barley-trial'
+      }, {
+        id: 'multi-trait',
+        name: this.$t('exampleTrialsMultiTrial'),
+        file: 'multi-trait'
+      }]
+    }
   },
   mixins: [api],
   methods: {
@@ -162,8 +178,8 @@ export default {
     startTour: function () {
       emitter.emit('show-introduction-tour')
     },
-    loadExampleData: function () {
-      this.$store.dispatch('addDataset', require('@/example-data.json'))
+    loadExampleData: function (example) {
+      this.$store.dispatch('addDataset', require(`@/assets/data/${example.file}.json`))
 
       this.plausibleEvent('example-load')
     },

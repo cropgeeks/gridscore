@@ -10,7 +10,7 @@
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav>
+        <b-navbar-nav v-if="storeDatasetId !== undefined && storeDatasetId !== null">
           <b-nav-item active-class="active" :to="{ name: 'data' }" v-if="storeDatasetId"><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
           <b-nav-item active-class="active" :to="{ name: 'home' }" v-else><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
           <b-nav-item active-class="active" :to="{ name: 'timeline' }"><BIconGraphUp /> {{ $t('menuTimeSeries') }}</b-nav-item>

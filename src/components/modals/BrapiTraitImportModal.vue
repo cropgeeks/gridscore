@@ -157,26 +157,16 @@ export default {
     getTraits: function () {
       this.loading = true
       this.brapiGetVariables()
-        .all(variables => {
+        .then(variables => {
           this.traits = variables
           this.loading = false
           this.errorMessage = null
         })
-      // this.brapiGetVariables()
-      //   .then(response => {
-      //     if (response && response.data && response.data.result && response.data.result.data) {
-      //       this.traits = response.data.result.data
-      //     } else {
-      //       this.traits = []
-      //     }
-      //     this.loading = false
-      //     this.errorMessage = null
-      //   })
-      //   .catch(error => {
-      //     this.errorMessage = error
-      //     this.traits = []
-      //     this.loading = false
-      //   })
+        .catch(error => {
+          this.errorMessage = error
+          this.traits = []
+          this.loading = false
+        })
     }
   }
 }

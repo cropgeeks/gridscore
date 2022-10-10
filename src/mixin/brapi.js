@@ -1,13 +1,9 @@
 import { mapGetters } from 'vuex'
-import BrAPI from '@solgenomics/brapijs'
 const axios = require('axios').default
 
 export default {
   data: function () {
-    const brapiClient = BrAPI(this.storeBrapiConfig ? this.storeBrapiConfig.url : null, 'v2.0', null)
-
     return {
-      brapiClient: brapiClient,
       /** Store the `serverinfo` result for each BrAPI URL to know which calls are available */
       serverInfos: {
       }
@@ -18,11 +14,6 @@ export default {
     ...mapGetters([
       'storeBrapiConfig'
     ])
-  },
-  watch: {
-    storeBrapiConfig: function (newValue) {
-      this.brapiClient = BrAPI(newValue ? newValue.url : null, 'v2.0', null)
-    }
   },
   methods: {
     /**
@@ -65,7 +56,14 @@ export default {
      * @returns Promise
      */
     brapiGetVariables: function () {
-      return this.brapiClient.variables()
+      return this.get('variables', 'variables', null, 'get', false)
+        .then(result => {
+          if (result && result.data && result.data.result && result.data.result.data) {
+            return result.data.result.data
+          } else {
+            return []
+          }
+        })
     },
     /**
      * Retrieves the `serverinfo` from the BrAPI server to check availability of certain endpoints. Sets the field `serverInfo` for this BrAPI server

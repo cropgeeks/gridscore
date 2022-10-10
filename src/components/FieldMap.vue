@@ -24,7 +24,7 @@
       </b-col>
     </b-row>
     <!-- Map showing the corner points and user position -->
-    <Map :locations="locations" :rows="rows" :cols="cols" @set-corner="updateLocationLatLng" ref="map" />
+    <MapComponent :locations="locations" :rows="rows" :cols="cols" @set-corner="updateLocationLatLng" ref="map" />
   </div>
 </template>
 
@@ -33,7 +33,7 @@ import { mapGetters } from 'vuex'
 import Vue from 'vue'
 
 import GpsInput from '@/components/GpsInput'
-import Map from '@/components/Map'
+import MapComponent from '@/components/MapComponent'
 
 /**
  * Shows the field layout corner points selection components as well as the map
@@ -74,7 +74,7 @@ export default {
   },
   components: {
     GpsInput,
-    Map
+    MapComponent
   },
   methods: {
     /**
