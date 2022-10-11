@@ -140,9 +140,9 @@ export default {
           // Update statistics
           mins.forEach((m, i) => {
             if (values[i] !== undefined && values[i] !== null) {
-              mins[i] = Math.min(mins[i], values[i])
-              maxs[i] = Math.max(maxs[i], values[i])
-              totals[i] += values[i]
+              mins[i] = Math.min(mins[i], +values[i])
+              maxs[i] = Math.max(maxs[i], +values[i])
+              totals[i] += +values[i]
               counts[i]++
             }
           })

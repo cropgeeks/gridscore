@@ -67,7 +67,7 @@ export default {
       }
     },
     multiTraits: function () {
-      return this.storeTraits.filter(t => t.mType === 'multi')
+      return this.storeTraits.filter(t => t.mType === 'multi' && (t.type === 'int' || t.type === 'float'))
     }
   },
   methods: {
