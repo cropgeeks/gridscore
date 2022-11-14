@@ -8,9 +8,10 @@ export default {
       if (db) {
         return resolve(db)
       } else {
-        openDB('gridscore-' + window.location.pathname, 6, {
+        openDB('gridscore-' + window.location.pathname, 7, {
           upgrade: function (db, oldVersion, newVersion, transaction) {
             let datasets
+            let data
             if (oldVersion < 1) {
               datasets = db.createObjectStore('datasets', { keyPath: 'id', autoIncrement: true })
               datasets.createIndex('name', 'name', { unique: false })
@@ -20,7 +21,7 @@ export default {
               datasets.createIndex('cornerPoints', 'cornerPoints', { unique: false })
               datasets.createIndex('brapiConfig', 'brapiConfig', { unique: false })
 
-              const data = db.createObjectStore('data', { keyPath: ['dsId', 'row', 'col'] })
+              data = db.createObjectStore('data', { keyPath: ['dsId', 'row', 'col'] })
               data.createIndex('dsId', 'dsId', { unique: false })
               data.createIndex('row', 'row', { unique: false })
               data.createIndex('col', 'col', { unique: false })
@@ -55,6 +56,10 @@ export default {
               datasets = transaction.objectStore('datasets')
               datasets.createIndex('comment', 'comment', { unique: false })
             }
+            if (oldVersion < 7) {
+              data = transaction.objectStore('data')
+              data.createIndex('rep', 'rep', { unique: false })
+            }
           }
         }).then(db => resolve(db))
       }
@@ -86,6 +91,21 @@ export default {
     if (dataset) {
       const range = IDBKeyRange.bound([datasetId, 0, 0], [datasetId, dataset.rows, dataset.cols])
       return db.getAll('data', range)
+        .then(dp => {
+          if (dp) {
+            dp.forEach(c => {
+              let displayName = c.name
+
+              if (c.rep) {
+                displayName += '-' + c.rep
+              }
+
+              c.displayName = displayName
+            })
+          }
+
+          return dp
+        })
     } else {
       return new Promise(resolve => resolve([]))
     }
@@ -279,6 +299,7 @@ export default {
             row: y,
             col: x,
             name: d.name,
+            rep: d.rep,
             dates: d.dates,
             values: d.values,
             geolocation: d.geolocation,

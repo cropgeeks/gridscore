@@ -10,14 +10,14 @@
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav v-if="storeDatasetId !== undefined && storeDatasetId !== null">
-          <b-nav-item active-class="active" :to="{ name: 'data' }" v-if="storeDatasetId"><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
-          <b-nav-item active-class="active" :to="{ name: 'home' }" v-else><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
-          <b-nav-item active-class="active" :to="{ name: 'timeline' }"><BIconGraphUp /> {{ $t('menuTimeSeries') }}</b-nav-item>
-          <b-nav-item active-class="active" :to="{ name: 'heatmap' }"><BIconGridFill /> {{ $t('menuHeatmap') }}</b-nav-item>
-          <b-nav-item active-class="active" :to="{ name: 'scatter' }"><BIconDice3 flip-h /> {{ $t('menuScatter') }}</b-nav-item>
-          <b-nav-item active-class="active" :to="{ name: 'stats' }"><BIconBarChartSteps /> {{ $t('menuStats') }}</b-nav-item>
-          <b-nav-item active-class="active" :to="{ name: 'location-map' }"><BIconMap /> {{ $t('menuLocationMap') }}</b-nav-item>
+        <b-navbar-nav>
+          <b-nav-item :disabled="menuItemDisabled" active-class="active" :to="{ name: 'data' }" v-if="storeDatasetId"><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
+          <b-nav-item :disabled="menuItemDisabled" active-class="active" :to="{ name: 'home' }" v-else><BIconUiChecksGrid /> {{ $t('menuHome') }}</b-nav-item>
+          <b-nav-item :disabled="menuItemDisabled" active-class="active" :to="{ name: 'timeline' }"><BIconGraphUp /> {{ $t('menuTimeSeries') }}</b-nav-item>
+          <b-nav-item :disabled="menuItemDisabled" active-class="active" :to="{ name: 'heatmap' }"><BIconGridFill /> {{ $t('menuHeatmap') }}</b-nav-item>
+          <b-nav-item :disabled="menuItemDisabled" active-class="active" :to="{ name: 'scatter' }"><BIconDice3 flip-h /> {{ $t('menuScatter') }}</b-nav-item>
+          <b-nav-item :disabled="menuItemDisabled" active-class="active" :to="{ name: 'stats' }"><BIconBarChartSteps /> {{ $t('menuStats') }}</b-nav-item>
+          <b-nav-item :disabled="menuItemDisabled" active-class="active" :to="{ name: 'location-map' }"><BIconMap /> {{ $t('menuLocationMap') }}</b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
@@ -218,7 +218,10 @@ export default {
       'storeRunCount',
       'storePlausible',
       'storeChangelogVersionNumber'
-    ])
+    ]),
+    menuItemDisabled: function () {
+      return this.storeDatasetId === undefined || this.storeDatasetId === null
+    }
   },
   mixins: [api],
   methods: {

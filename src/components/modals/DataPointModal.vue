@@ -10,7 +10,7 @@
            id="data-entry-modal"
            ref="dataPointModal">
     <template v-slot:modal-header="{ close }">
-      <h5 class="modal-title text-truncate">{{ name }}</h5>
+      <h5 class="modal-title text-truncate">{{ displayName }}</h5>
 
       <b-button-group id="data-entry-header">
         <b-button @click="startTour()"><BIconQuestionCircle /></b-button>
@@ -77,9 +77,9 @@ export default {
   },
   data: function () {
     return {
+      displayName: null,
       guidedWalkVisible: false,
       isMarked: false,
-      name: null,
       isGuidedWalk: true,
       walkingOrder: null,
       walkingOrderIndex: 0,
@@ -138,7 +138,7 @@ export default {
           } else {
             const cell = this.$store.getters.storeData.get(`${current.y}-${current.x}`)
 
-            if (cell.name) {
+            if (cell.displayName) {
               this.localCol = current.x
               this.localRow = current.y
               this.update()
@@ -172,7 +172,7 @@ export default {
       } else {
         const cell = this.$store.getters.storeData.get(`${current.y}-${current.x}`)
 
-        if (cell.name) {
+        if (cell.displayName) {
           this.localCol = current.x
           this.localRow = current.y
           this.update()
@@ -192,10 +192,10 @@ export default {
       if (this.localRow !== null && this.localCol !== null) {
         const cell = this.$store.getters.storeData.get(`${this.localRow}-${this.localCol}`)
         this.isMarked = cell.isMarked || false
-        this.name = cell.name
+        this.displayName = cell.displayName
       } else {
         this.isMarked = false
-        this.name = null
+        this.displayName = null
       }
     },
     /**

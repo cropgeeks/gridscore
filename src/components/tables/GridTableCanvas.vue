@@ -483,7 +483,7 @@ export default {
 
         const cell = this.$store.getters.storeData.get(`${row}-${col}`)
 
-        if (this.storeIgnoreEmptyCells === true && !cell.name) {
+        if (this.storeIgnoreEmptyCells === true && !cell.displayName) {
           return
         }
 
@@ -799,12 +799,12 @@ export default {
       // Fill the background
       this.ctx.fillRect(x, y, this.cellWidth, this.cellHeight)
 
-      if (this.storeIgnoreEmptyCells === true && !cell.name) {
+      if (this.storeIgnoreEmptyCells === true && !cell.displayName) {
         return
       }
 
       // Add the name text
-      const text = this.fittingString(cell.name || 'N/A', this.coreWidth)
+      const text = this.fittingString(cell.displayName || 'N/A', this.coreWidth)
       this.ctx.fillStyle = this.fillStyleText
       this.ctx.fillText(text, x + this.cellWidth / 2, y + this.padding + this.fontSize / 2)
 

@@ -68,7 +68,7 @@ export default {
 
       this.uniqueGermplasmNames = new Set()
       this.$store.getters.storeData.forEach(cell => {
-        this.uniqueGermplasmNames.add(cell.name)
+        this.uniqueGermplasmNames.add(cell.displayName)
       })
 
       this.$refs.addGermplasmModal.show()

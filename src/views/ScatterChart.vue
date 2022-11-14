@@ -121,7 +121,7 @@ export default {
           if (one !== undefined && one !== null && two !== undefined && two !== null) {
             data[0].x.push(one)
             data[0].y.push(two)
-            data[0].text.push(c.name)
+            data[0].text.push(c.displayName)
           }
         }
       })

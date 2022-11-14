@@ -59,5 +59,31 @@
         "text": "In vorherigen Versionen war ein Fehler enthalten der auftrat wenn ein Mehrfachmerkmal bewertet wurde während gleichzeitig andere Merkmale ausgeblendet waren. Dies resultierte in korrupten Daten, wurde aber hiermit behoben."
       }
     ]
+  },
+  {
+    "version": "1.13.0",
+    "date": "2022-11-14",
+    "items": [
+      {
+        "type": "new",
+        "title": "Rep-Unterstützung",
+        "text": "GridScore unterstützt jetzt Rep-Nummern. Dafür wurde eine neue Schaltfläche zum Setup hinzugefügt in dem die Keimplasmaidentifikatoren und Rep-Nummern definiert werden. Reps sind optional außer wenn sie nötig sind um zwischen Beeten mit gleichem Keimplasmaidentifikator zu unterscheiden."
+      },
+      {
+        "type": "new",
+        "title": "Shapefile-Export",
+        "text": "Falls die Versuchseckpunkte definiert sind kann GridScore jetzt ein Germinate-kompatibles Shapefile generieren. Dieses kann dann direkt zu Germinate hochgeladen werden um die einzelnen Beetformen zu definieren."
+      },
+      {
+        "type": "new",
+        "title": "Visualisierung von numerischen Mehrfach-Merkmalen",
+        "text": "Eine neue Visualisierung für numerische Mehrfach-Merkmale wurde hinzugefügt um die Entwicklung der Merkmalswerte über die Zeit darzustellen. Dies ist besonders nützlich um den Einfluss der Zeitkomponente auf die Werte von Merkmalen wie Krankheitsresistenz, Pflanzengröße und Ertrag zu erkennen."
+      },
+      {
+        "type": "bugfix",
+        "title": "Entfernen von numerischen Merkmalswerten",
+        "text": "Es war zuvor nicht möglich den Wert eines numerischen Merkmals komplett zu entfernen. Dies wurde in dieser Version behoben."
+      }
+    ]
   }
 ]

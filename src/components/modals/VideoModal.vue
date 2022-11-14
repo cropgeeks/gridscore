@@ -1,5 +1,5 @@
 <template>
-  <b-modal :title="name"
+  <b-modal :title="displayName"
            :ok-title="$t('buttonSave')"
            :cancel-title="$t('buttonCancel')"
            @ok.prevent="downloadVideo"
@@ -43,7 +43,7 @@ export default {
   },
   props: {
     /** The variety name to use as the title */
-    name: {
+    displayName: {
       type: String,
       default: null
     }
@@ -84,10 +84,11 @@ export default {
      */
     downloadVideo: async function () {
       if (this.videoFile) {
+        const filename = `${this.getDateTime(this.videoDate)}_${this.displayName}.${this.videoFile.name.split('.').pop()}`
         if (this.supportsSaving) {
           // create a new handle
           const newHandle = await window.showSaveFilePicker({
-            suggestedName: `${this.getDateTime(this.videoDate)}_${this.name}.${this.videoFile.name.split('.').pop()}`,
+            suggestedName: filename,
             excludeAcceptAllOption: true,
             types: [{
               description: 'Video file',
@@ -105,7 +106,7 @@ export default {
         } else {
           const dl = document.createElement('a')
           dl.setAttribute('href', this.videoData)
-          dl.setAttribute('download', `${this.getDateTime(this.videoDate)}_${this.name}.${this.videoFile.name.split('.').pop()}`)
+          dl.setAttribute('download', filename)
           dl.click()
         }
       }

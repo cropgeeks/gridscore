@@ -97,7 +97,7 @@ export default {
             case 'date': {
               chartType = 'box'
               const datapoints = []
-              storeData.forEach((c, k) => datapoints.push({ value: this.extractMultiTraitDatum(index, trait.mType, this.selectedMultiTraitMethods[index], c, true), name: c.name }))
+              storeData.forEach((c, k) => datapoints.push({ value: this.extractMultiTraitDatum(index, trait.mType, this.selectedMultiTraitMethods[index], c, true), name: c.displayName }))
               data.push({
                 x: datapoints.map(d => d.value),
                 text: datapoints.map(d => d.name),

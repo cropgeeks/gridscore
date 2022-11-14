@@ -3,12 +3,9 @@
     <h2>{{ storeDatasetName }} <small><b-button v-b-tooltip="$t('formPlaceholderDatasetComment')" variant="link" class="text-muted" size="sm" @click="$refs.commentModal.show()"><BIconChatLeftText /></b-button></small></h2>
     <div class="d-flex justify-content-between mb-3" v-if="storeTraits && storeTraits.length > 0">
       <p>{{ $t('pageHomeText') }}</p>
-      <b-form inline @submit.prevent.stop>
-        <VueTypeaheadBootstrap id="typeahead" v-model="searchTerm" @hit="openDataInput" :data="germplasmNames">
-          <template slot="append">
-            <b-button @click="openDataInput"><BIconSearch /></b-button>
-          </template>
-          <template slot="prepend">
+      <b-form inline @submit.prevent.stop="openDataInput">
+        <b-input-group>
+          <b-input-group-prepend>
             <b-button @click="$refs.barcodeScannerModal.show()" v-b-tooltip="$t('tooltipScanQRCodeFindPlot')">
               <!-- TODO: Replace with bootstrap-vue icon once new version is released -->
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-qr-code-scan" viewBox="0 0 16 16">
@@ -19,8 +16,12 @@
                 <path d="M12 9h2V8h-2v1Z"/>
               </svg>
             </b-button>
-          </template>
-        </VueTypeaheadBootstrap>
+          </b-input-group-prepend>
+          <b-form-input v-model="searchTerm" />
+          <b-input-group-append>
+            <b-button @click="openDataInput"><BIconSearch /></b-button>
+          </b-input-group-append>
+        </b-input-group>
       </b-form>
     </div>
     <div class="d-flex flex-row align-items-end top-banner">
@@ -124,6 +125,8 @@
         </div>
       </b-popover>
     </template>
+
+    <SearchMatchModal :searchMatches="searchMatches" ref="searchMatchModal" @item-selected="openDataInputCell" />
   </div>
 </template>
 
@@ -134,10 +137,10 @@ import DataPointModal from '@/components/modals/DataPointModal'
 import CommentModal from '@/components/modals/CommentModal'
 import BarcodeScannerModal from '@/components/modals/BarcodeScannerModal'
 import BarcodeViewerModal from '@/components/modals/BarcodeViewerModal'
+import SearchMatchModal from '@/components/modals/SearchMatchModal'
 import HelpModal from '@/components/modals/HelpModal'
 import { BIconCircleFill, BIconFilterCircleFill, BIconGearFill, BIconSearch, BIconChatLeftText, BIconArrowsMove, BIconQuestionCircleFill, BIconPlus, BIconSlashCircle, BIconCloudCheck, BIconCircleHalf, BIconCircle, BIconDownload, BIconShareFill, BIconArrowsFullscreen, BIconGeoAltFill, BIconArrowUpLeft, BIconArrowUp, BIconArrowUpRight, BIconArrowLeft, BIconArrowRight, BIconArrowDownLeft, BIconArrowDown, BIconArrowDownRight } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
-import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap'
 
 import api from '@/mixin/api'
 
@@ -148,6 +151,7 @@ export default {
   data: function () {
     return {
       searchTerm: null,
+      searchMatches: null,
       focusInterval: null,
       germplasmNames: [],
       cell: {
@@ -209,10 +213,10 @@ export default {
     BarcodeViewerModal,
     GridTableCanvas,
     DataPointModal,
-    VueTypeaheadBootstrap,
     HelpModal,
     AddGermplasmModal,
-    CommentModal
+    CommentModal,
+    SearchMatchModal
   },
   computed: {
     /** Mapgetters exposing the store configuration */
@@ -277,32 +281,57 @@ export default {
     moveCanvas: function (direction) {
       this.$refs.canvas.moveInDirection(direction)
     },
-    openDataInput: function (isBarcode) {
+    openDataInputCell: function (match) {
+      this.$nextTick(() => {
+        this.onCellClicked({
+          row: match.row,
+          col: match.col
+        })
+        this.plausibleEvent('data-search', { type: 'input', successful: true })
+      })
+      this.searchMatches = null
+    },
+    openDataInput: function () {
       this.$nextTick(() => {
         if (this.searchTermLowerCase === null) {
           return
         }
 
+        this.searchMatches = null
+        const matches = []
+
         this.$store.state.dataset.data.forEach((c, k) => {
-          if (c.name !== undefined && c.name !== null && c.name.toLowerCase() === this.searchTermLowerCase) {
-            this.$nextTick(() => {
-              const [rowIndex, columnIndex] = k.split('-').map(i => +i)
+          const name = (c.name || '').toLowerCase()
+          const displayName = (c.displayName || '').toLowerCase()
+          if (name === this.searchTermLowerCase || displayName === this.searchTermLowerCase) {
+            const [rowIndex, columnIndex] = k.split('-').map(i => +i)
 
-              this.onCellClicked({
-                row: rowIndex,
-                col: columnIndex
-              })
-
-              this.plausibleEvent('data-search', { type: isBarcode ? 'barcode' : 'input', successful: true })
+            matches.push({
+              row: rowIndex,
+              col: columnIndex,
+              cell: c
             })
-
-            this.searchTerm = ''
           }
         })
 
-        if (this.searchTerm !== '') {
-          this.plausibleEvent('data-search', { type: isBarcode ? 'barcode' : 'input', successful: false })
+        if (matches.length > 1) {
+          // Show selection dialog
+          this.searchMatches = matches
+
+          this.$nextTick(() => this.$refs.searchMatchModal.show())
+        } else if (matches.length !== 0) {
+          this.$nextTick(() => {
+            this.onCellClicked({
+              row: matches[0].row,
+              col: matches[0].col
+            })
+            this.plausibleEvent('data-search', { type: 'input', successful: true })
+          })
+        } else {
+          this.plausibleEvent('data-search', { type: 'input', successful: false })
         }
+
+        this.searchTerm = ''
       })
     },
     toggleVisibilityValue: function () {
@@ -365,11 +394,17 @@ export default {
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
       if (storeData) {
         storeData.forEach((value, key) => {
-          if (value.name && value.name.length > 0) {
-            germplasmArray.push(value.name)
+          if (value.displayName && value.displayName.length > 0) {
+            germplasmArray.push({
+              name: value.name,
+              rep: value.rep,
+              displayName: value.displayName,
+              col: value.col,
+              row: value.row
+            })
           }
         })
-        germplasmArray.sort()
+        germplasmArray.sort((a, b) => a.displayName.localeCompare(b.displayName))
         Object.freeze(germplasmArray)
       }
       this.germplasmNames = germplasmArray

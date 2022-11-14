@@ -84,35 +84,42 @@
           </svg> Germinate
         </template>
         <p v-html="$t('modalTextExportGerminate')" />
+        <div>
+          <p v-if="hasMultiTrait">{{ $t('modalTextExportGerminateMultiSelection') }}</p>
 
-        <p v-if="hasMultiTrait">{{ $t('modalTextExportGerminateMultiSelection') }}</p>
+          <b-form @submit.prevent v-if="storeTraits && storeTraits.length > 0">
+            <template v-for="(trait, index) in storeTraits">
+              <b-form-group :label="trait.name"
+                            :label-for="`trait-select-${trait.name}`"
+                            :key="`trait-select-${trait.name}`"
+                            :content-cols="12"
+                            :label-cols="12"
+                            :content-cols-lg="10"
+                            :label-cols-lg="2"
+                            class="align-items-center"
+                            v-if="trait.mType === 'multi'">
+                <template #label>
+                  <TraitHeading :trait="trait" mode="full" />
+                </template>
+                <b-form-radio-group
+                  :id="`trait-select-${trait.name}`"
+                  v-model="multiTraitSelection[index]"
+                  :options="multiTraitOptions[index]" />
+              </b-form-group>
+            </template>
+          </b-form>
 
-        <b-form @submit.prevent v-if="storeTraits && storeTraits.length > 0">
-          <template v-for="(trait, index) in storeTraits">
-            <b-form-group :label="trait.name"
-                          :label-for="`trait-select-${trait.name}`"
-                          :key="`trait-select-${trait.name}`"
-                          :content-cols="12"
-                          :label-cols="12"
-                          :content-cols-lg="10"
-                          :label-cols-lg="2"
-                          class="align-items-center"
-                          v-if="trait.mType === 'multi'">
-              <template #label>
-                <TraitHeading :trait="trait" mode="full" />
-              </template>
-              <b-form-radio-group
-                :id="`trait-select-${trait.name}`"
-                v-model="multiTraitSelection[index]"
-                :options="multiTraitOptions[index]" />
-            </b-form-group>
-          </template>
-        </b-form>
+          <b-button @click="exportToGerminateFormat"><BIconFileEarmarkSpreadsheet /> {{ $t('buttonExportGerminateFormat') }}</b-button>
 
-        <b-button @click="exportToGerminateFormat">{{ $t('buttonExportGerminateFormat') }}</b-button>
-
-        <div v-if="germinateTemplateFile" class="my-3">
-          <BIconDownload /> <a :href="germinateTemplateFile" @click="() => { germinateTemplateFile = null }"> {{ $t('linkExport') }}</a>
+          <div v-if="germinateTemplateFile" class="my-3">
+            <BIconDownload /> <a :href="germinateTemplateFile" @click="() => { germinateTemplateFile = null }"> {{ $t('linkExport') }}</a>
+          </div>
+        </div>
+        <div class="mt-3" v-if="canExportShapefile">
+          <b-button @click="exportShapefile"><BIconGrid3x2Gap /> {{ $t('buttonExportGerminateShapefile') }}</b-button>
+          <div v-if="shapeFile" class="my-3">
+            <BIconDownload /> <a :href="shapeFile" @click="() => { shapeFile = null }"> {{ $t('linkExport') }}</a>
+          </div>
         </div>
       </b-tab>
     </b-tabs>
@@ -122,7 +129,7 @@
 </template>
 
 <script>
-import { BIconDownload, BIconArrowLeft, BIconTags, BIconFileEarmarkSpreadsheet, BIconQuestionCircleFill, BIconGrid3x3 } from 'bootstrap-vue'
+import { BIconDownload, BIconArrowLeft, BIconTags, BIconFileEarmarkSpreadsheet, BIconQuestionCircleFill, BIconGrid3x3, BIconGrid3x2Gap } from 'bootstrap-vue'
 
 import { mapGetters } from 'vuex'
 
@@ -131,6 +138,7 @@ import HelpModal from '@/components/modals/HelpModal'
 
 import api from '@/mixin/api'
 
+const fixPer = require('fix-perspective')
 const emitter = require('tiny-emitter/instance')
 
 export default {
@@ -141,6 +149,7 @@ export default {
     BIconFileEarmarkSpreadsheet,
     BIconQuestionCircleFill,
     BIconGrid3x3,
+    BIconGrid3x2Gap,
     HelpModal,
     TraitHeading
   },
@@ -148,6 +157,7 @@ export default {
     return {
       selectedTrait: null,
       germinateTemplateFile: null,
+      shapeFile: null,
       multiTraitOptions: [],
       multiTraitSelection: []
     }
@@ -165,11 +175,15 @@ export default {
       'storeDatasetId',
       'storeDatasetUuid',
       'storeDatasetName',
+      'storeCornerPoints',
       'storeRows',
       'storeServerUrl',
       'storeTraits',
       'storeTraitColors'
     ]),
+    canExportShapefile: function () {
+      return this.storeCornerPoints && this.storeCornerPoints.length === 4
+    },
     hasMultiTrait: function () {
       if (!this.storeTraits) {
         return false
@@ -184,6 +198,10 @@ export default {
             value: index,
             text: t.name
           }
+        })
+        result.unshift({
+          value: 'rep',
+          text: this.$t('formLabelSettingsReps')
         })
         result.unshift({
           value: 'name',
@@ -209,6 +227,8 @@ export default {
       if (this.selectedTrait !== null) {
         if (this.selectedTrait === 'name') {
           return 'name'
+        } else if (this.selectedTrait === 'rep') {
+          return 'rep'
         } else {
           return this.storeTraits[this.selectedTrait].name.replace(/[^a-z0-9]/gi, '-').toLowerCase()
         }
@@ -285,7 +305,7 @@ export default {
       }
 
       // Header row
-      let result = `Line/Trait\t${this.storeTraits.map(t => t.name).join('\t')}\tLat\tLng\tElv\tComment`
+      let result = `Line/Trait\tRep\t${this.storeTraits.map(t => t.name).join('\t')}\tLat\tLng\tElv\tComment`
 
       // For each field row
       for (let y = 0; y < this.storeRows; y++) {
@@ -302,6 +322,8 @@ export default {
               result += '\n'
               // Variety name
               result += cell.name
+              // Rep
+              result += '\t' + (cell.rep || '')
 
               // Values joined
               result += '\t' + data.join('\t')
@@ -331,7 +353,7 @@ export default {
       }
 
       // Header row
-      let result = `Line/Trait\t${this.storeTraits.map(t => t.name).join('\t')}\tLat\tLng\tElv\tComment`
+      let result = `Line/Trait\tRep\t${this.storeTraits.map(t => t.name).join('\t')}\tLat\tLng\tElv\tComment`
 
       // For each field row
       for (let y = 0; y < this.storeRows; y++) {
@@ -348,6 +370,8 @@ export default {
               result += '\n'
               // Variety name
               result += cell.name
+              // Rep
+              result += '\t' + (cell.rep || '')
 
               // Values joined
               result += '\t' + data.join('\t')
@@ -393,6 +417,8 @@ export default {
           if (cell) {
             if (this.selectedTrait === 'name') {
               result += cell.name || ''
+            } else if (this.selectedTrait === 'rep') {
+              result += cell.rep || ''
             } else {
               result += cell.values[this.selectedTrait] || ''
             }
@@ -413,6 +439,46 @@ export default {
       } else {
         this.multiTraitOptions = []
         this.multiTraitSelection = []
+      }
+    },
+    exportShapefile: function () {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (storeData) {
+        this.synchronizeDataset(this.storeDatasetId)
+          .then(dataset => {
+            emitter.emit('set-loading', true)
+
+            const to = this.storeCornerPoints.filter(l => l !== null).map(l => { return { x: l[0], y: l[1] } })
+            const from = [
+              { x: 0, y: 0 },
+              { x: 100, y: 0 },
+              { x: 100, y: 100 },
+              { x: 0, y: 100 }
+            ]
+            const transform = fixPer(from, to)
+
+            const result = {}
+            for (let x = 0; x <= this.storeCols; x++) {
+              for (let y = 0; y <= this.storeRows; y++) {
+                const p = transform((100.0 / this.storeCols) * x, (100.0 / this.storeRows) * y)
+
+                result[`${x}-${this.storeRows - y}`] = [p.x, p.y]
+              }
+            }
+
+            return this.axios(`config/${dataset.uuid}/export-shapefile`, result, 'post')
+          })
+          .then(result => {
+            emitter.emit('set-loading', true)
+
+            this.shapeFile = `${this.storeServerUrl}config/${this.storeDatasetUuid}/export-shapefile/${result.data}`
+
+            this.plausibleEvent('dataset-export', { format: 'shapefile' })
+          })
+          .catch(() => {
+            // TODO
+          })
+          .finally(() => emitter.emit('set-loading', false))
       }
     },
     exportToGerminateFormat: function () {

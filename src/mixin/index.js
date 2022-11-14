@@ -3,7 +3,7 @@ import { mapGetters } from 'vuex'
 export default {
   data: function () {
     return {
-      gridScoreVersion: '1.12.0',
+      gridScoreVersion: '1.13.0',
       multiTraitMethods: {
         // TODO: Handle dates!
         last: {
@@ -14,12 +14,12 @@ export default {
         avg: {
           text: this.$t('formSelectMultiTraitVizTypeAvg'),
           value: 'avg',
-          call: (values) => (values && values.length > 0) ? (values.reduce((a, b) => a + b) / values.length) : null
+          call: (values) => (values && values.length > 0) ? (values.reduce((a, b) => a + (+b), 0) / values.length) : null
         },
         sum: {
           text: this.$t('formSelectMultiTraitVizTypeSum'),
           value: 'sum',
-          call: (values) => (values && values.length > 0) ? values.reduce((a, b) => a + b) : null
+          call: (values) => (values && values.length > 0) ? values.reduce((a, b) => a + (+b), 0) : null
         }
       }
     }

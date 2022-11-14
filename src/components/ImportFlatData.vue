@@ -26,7 +26,7 @@ import idb from '@/plugins/idb'
 export default {
   data: function () {
     return {
-      flatData: null,
+      flatData: '',
       parsedData: null,
       dataFile: null,
       datasets: [],
@@ -63,13 +63,16 @@ export default {
   methods: {
     tabber: function (event) {
       const text = this.flatData
-      const originalSelectionStart = event.target.selectionStart
-      const textStart = text.slice(0, originalSelectionStart)
-      const textEnd = text.slice(originalSelectionStart)
+      console.log('text: \'' + text + '\'')
+      if (text !== null) {
+        const originalSelectionStart = event.target.selectionStart
+        const textStart = text.slice(0, originalSelectionStart)
+        const textEnd = text.slice(originalSelectionStart)
 
-      this.flatData = `${textStart}\t${textEnd}`
-      event.target.value = this.flatData // required to make the cursor stay in place.
-      event.target.selectionEnd = event.target.selectionStart = originalSelectionStart + 1
+        this.flatData = `${textStart}\t${textEnd}`
+        event.target.value = this.flatData // required to make the cursor stay in place.
+        event.target.selectionEnd = event.target.selectionStart = originalSelectionStart + 1
+      }
     },
     parseData: function () {
       const data = {
@@ -145,7 +148,7 @@ export default {
       const datasetData = await idb.getDatasetData(this.selectedDataset.id)
 
       const varieties = new Set()
-      datasetData.forEach(d => varieties.add(d.name))
+      datasetData.forEach(d => varieties.add(d.displayName))
 
       const missingVarieties = Object.keys(this.parsedData.varietyData).filter(v => !varieties.has(v))
       if (missingVarieties.length > 0) {
@@ -199,7 +202,7 @@ export default {
       // Iterate through the database data
       datasetData.forEach(d => {
         // Get the new data for this variety name
-        const newData = this.parsedData.varietyData[d.name]
+        const newData = this.parsedData.varietyData[d.displayName]
 
         if (newData) {
           for (let t = 0; t < this.selectedDataset.traits.length; t++) {

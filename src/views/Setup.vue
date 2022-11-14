@@ -28,34 +28,19 @@
             <b-form-input id="cols" :state="state.cols" number type="number" :min="1" required v-model.number="cols" />
           </b-form-group>
           <!-- Field layout varieties -->
-          <b-form-group label-for="varieties">
-            <!-- Variety label -->
-            <template v-slot:label>
-              <div><BIconTextLeft /><span> {{ $t('formLabelSettingsVarieties') }} </span><span id="variety-label"> <BIconInfoCircle /></span></div>
-              <template v-if="varietyFormat === 'row'">
-                <!-- Tooltip for the variety label info icon -->
-                <b-tooltip target="variety-label">
-                  <div>{{ $t('tooltipSettingsVarieties') }}</div>
-                  <div><b-img fluid src="img/variety-order.svg" width=75 height=75 /></div>
-                </b-tooltip>
-              </template>
-              <template v-else>
-                <!-- Tooltip for the variety label info icon -->
-                <b-tooltip target="variety-label">
-                  <div>{{ $t('tooltipSettingsVarietiesGrid') }}</div>
-                  <div><b-img fluid src="img/variety-order-grid.svg" width=75 height=75 /></div>
-                </b-tooltip>
-              </template>
-              <b-form-radio-group buttons v-model="varietyFormat">
-                <b-form-radio value="tab"><BIconGrid3x3 /> {{ $t('formLabelSettingsTabMode') }}</b-form-radio>
-                <b-form-radio value="row"><BIconLayoutThreeColumns rotate="90" /> {{ $t('formLabelSettingsRowMode') }}</b-form-radio>
-              </b-form-radio-group>
-            </template>
-            <!-- Variety names input -->
-            <b-form-textarea id="varieties" @keydown.tab.prevent="tabber($event)" :state="state.varieties" rows=6 wrap="off" required :placeholder="(varietyFormat === 'row') ? $t('formPlaceholderVarieties') : $t('formPlaceholderVarietiesGrid')" v-model="varieties" />
-            <!-- Variety names file loading -->
-            <b-form-file type="file" :placeholder="$t('buttonOpenFile')" accept="text/plain" v-model="varietiesFile" />
+
+          <b-form-group label-for="germplasm"
+                        :label="$t('formLabelGermplasm')"
+                        :state="state.germplasm"
+                        :description="$t('formDescriptionGermplasm')"
+                        :invalid-feedback="$t('formFeedbackGermplasmMissing')">
+            <b-button :variant="state.germplasm === false ? 'danger' : (germplasmDataValid ? 'success' : 'primary')" id="germplasm" @click="germplasmGridVisible = true">
+              <BIconCheck v-if="germplasmDataValid" />
+              <BIconPencilSquare v-else />
+              {{ germplasmDataValid ? $t('buttonChange') : $t('buttonDefine') }}
+            </b-button>
           </b-form-group>
+          <hr />
         </b-col>
         <b-col cols=12 lg=6>
           <!-- Trait definitions -->
@@ -131,6 +116,33 @@
     <BrapiTraitImportModal ref="brapiTraitImportModal" @traits-selected="loadBrapiTraits" />
 
     <HelpModal url="https://cropgeeks.github.io/gridscore/trial-setup.html" ref="helpModal" />
+
+    <b-sidebar
+      id="germplasm-grid-sidebar"
+      backdrop
+      shadow
+      no-close-on-esc
+      width="100%"
+      @shown="() => $refs.spreadsheetModal.show()"
+      @hidden="() => $refs.spreadsheetModal.hide()"
+      bg-variant="white"
+      v-model="germplasmGridVisible">
+      <template #header="{ hide }">
+        <div class="d-flex flex-wrap align-items-start">
+          <strong>{{ $t('pageSetupGermplasmGridSidebarTitle') }}</strong>
+          <b-button class="ml-auto mr-2" @click="hide">
+            <BIconX /> {{ $t('buttonCancel') }}
+          </b-button>
+          <b-button :variant="germplasmGridFeedback ? 'danger' : 'primary'" class="mx-2" @click="$refs.spreadsheetModal.emitResult()">
+            <BIconSave /> {{ $t('buttonSave') }}
+          </b-button>
+        </div>
+        <small v-if="germplasmGridFeedback" class="text-danger text-center">{{ germplasmGridFeedback }}</small>
+      </template>
+      <div class="px-3 py-2">
+        <TrialSetupSpreadsheet :rows="rows" :cols="cols" :prevGermplasm="germplasmGrid" ref="spreadsheetModal" @grid-updated="germplasmUpdated" @grid-error="setGermplasmGridError" />
+      </div>
+    </b-sidebar>
   </b-container>
 </template>
 
@@ -141,9 +153,10 @@ import TraitConfigurationModal from '@/components/modals/TraitConfigurationModal
 import HelpModal from '@/components/modals/HelpModal'
 import IconBrapi from '@/components/IconBrapi'
 import MarkerSetup from '@/components/MarkerSetup'
+import TrialSetupSpreadsheet from '@/components/TrialSetupSpreadsheet'
 
 import { mapGetters } from 'vuex'
-import { BIconGear, BIconArrowLeft, BIconPlus, BIconSignpost2, BIconX, BIconLayoutThreeColumns, BIconQuestionCircleFill, BIconTextLeft, BIconGrid3x3, BIconJournalPlus, BIconTags, BIconBoundingBox, BIconInfoCircle, BIconTextareaT } from 'bootstrap-vue'
+import { BIconGear, BIconArrowLeft, BIconCheck, BIconPencilSquare, BIconPlus, BIconSignpost2, BIconSave, BIconX, BIconLayoutThreeColumns, BIconQuestionCircleFill, BIconJournalPlus, BIconTags, BIconBoundingBox, BIconTextareaT } from 'bootstrap-vue'
 
 /**
  * Settings modal used to set up trials. Define varieties, traits, field corner points, etc.
@@ -158,7 +171,6 @@ export default {
       newTraits: null,
       trait: null,
       traitToConfigure: null,
-      varieties: null,
       formValidated: false,
       mapVisible: false,
       varietyFormat: 'tab',
@@ -190,9 +202,11 @@ export default {
         rows: null,
         cols: null,
         traits: null,
-        varieties: null
+        germplasm: null
       },
-      varietiesFile: null
+      germplasmGrid: [[]],
+      germplasmGridVisible: false,
+      germplasmGridFeedback: null
     }
   },
   computed: {
@@ -200,14 +214,12 @@ export default {
     ...mapGetters([
       'storeDatasetId',
       'storeDatasetName'
-    ])
+    ]),
+    germplasmDataValid: function () {
+      return this.germplasmGrid && this.germplasmGrid.length === this.rows && this.germplasmGrid.reduce((a, b) => a && (b.length === this.cols), true)
+    }
   },
   watch: {
-    varietiesFile: function (newValue) {
-      if (newValue) {
-        this.loadVarietiesFile()
-      }
-    },
     storeDatasetId: function () {
       this.reset()
     },
@@ -218,35 +230,37 @@ export default {
   components: {
     BIconGear,
     BIconPlus,
+    BIconSave,
     BIconArrowLeft,
     BIconX,
     BIconLayoutThreeColumns,
     BIconSignpost2,
     BIconQuestionCircleFill,
-    BIconTextLeft,
-    BIconGrid3x3,
     BIconBoundingBox,
     BIconTags,
-    BIconInfoCircle,
     BIconJournalPlus,
     BIconTextareaT,
+    BIconCheck,
+    BIconPencilSquare,
     IconBrapi,
     FieldMap,
     BrapiTraitImportModal,
     TraitConfigurationModal,
     MarkerSetup,
-    HelpModal
+    HelpModal,
+    TrialSetupSpreadsheet
   },
   methods: {
-    tabber: function (event) {
-      const text = this.varieties
-      const originalSelectionStart = event.target.selectionStart
-      const textStart = text.slice(0, originalSelectionStart)
-      const textEnd = text.slice(originalSelectionStart)
+    setGermplasmGridError: function (feedback) {
+      this.germplasmGridFeedback = feedback
+    },
+    germplasmUpdated: function (newData) {
+      this.rows = newData.rows
+      this.cols = newData.cols
+      this.germplasmGrid = newData.data
 
-      this.varieties = `${textStart}\t${textEnd}`
-      event.target.value = this.varieties // required to make the cursor stay in place.
-      event.target.selectionEnd = event.target.selectionStart = originalSelectionStart + 1
+      this.germplasmGridVisible = false
+      this.germplasmGridFeedback = null
     },
     /**
      * Loads the given selected BrAPI traits into the list of new traits for this dataset
@@ -375,17 +389,6 @@ export default {
       }
     },
     /**
-     * Loads the variety list from the file selected by the file input.
-     */
-    loadVarietiesFile: function () {
-      const reader = new FileReader()
-      reader.onload = event => {
-        this.varieties = event.target.result.replace(/\r/g, '')
-        this.varietiesFile = null
-      }
-      reader.readAsText(this.varietiesFile)
-    },
-    /**
      * Resets the modal state based on the current configuration of the dataset
      */
     reset: function () {
@@ -394,17 +397,16 @@ export default {
       this.cols = 1
       this.markers = null
       this.newTraits = []
-      this.varieties = null
+      this.germplasmGrid = null
       this.formValidated = false
       this.state = {
         datasetName: null,
         rows: null,
         cols: null,
         traits: null,
-        varieties: null
+        germplasm: null
       }
       this.trait = null
-      this.varietiesFile = null
       this.mapVisible = false
     },
     /**
@@ -418,7 +420,7 @@ export default {
         rows: this.rows > 0,
         cols: this.cols > 0,
         traits: (this.newTraits !== null) && (this.newTraits.length > 0),
-        varieties: (this.varieties !== null) && (this.varieties.length > 0)
+        germplasm: this.germplasmGrid !== null && this.germplasmGrid.length === this.rows && this.germplasmGrid.reduce((a, b) => a && (b.length === this.cols), true)
       }
 
       // If a trait is missing it's configuration, return
@@ -427,7 +429,7 @@ export default {
       }
 
       // If everything is set, continue
-      if (this.state.rows && this.state.cols && this.state.traits && this.state.varieties) {
+      if (this.state.rows && this.state.cols && this.state.traits && this.state.germplasm) {
         // Ask for confirmation
         this.$bvModal.msgBoxConfirm(this.$t('modalTextSetupWarning'), {
           title: this.$t('modalTitleSetupWarning'),
@@ -440,7 +442,7 @@ export default {
               rows: parseInt(this.rows),
               cols: parseInt(this.cols),
               traits: this.newTraits,
-              varieties: this.varietyFormat === 'row' ? this.varieties.split('\n').map(v => v.trim()) : this.varieties.split('\n').map(r => r.split('\t').map(v => v.trim())).reduce((a, b) => a.concat(b), []),
+              varieties: null, // TODO: User germplasmGrid to set this here
               cornerPoints: this.$refs.map.getCornerPoints(),
               markers: this.$refs.markerSetup ? this.$refs.markerSetup.getMarkerConfig() : null,
               datasetType: 'TRIAL',
@@ -448,12 +450,14 @@ export default {
             }
 
             const data = []
-            let counter = 0
             for (let y = 0; y < dataset.rows; y++) {
               const rowData = []
               for (let x = 0; x < dataset.cols; x++) {
+                const rep = (this.germplasmGrid[y][x].rep !== null && this.germplasmGrid[y][x].rep.length > 0) ? this.germplasmGrid[y][x].rep : null
+
                 rowData.push({
-                  name: dataset.varieties.length > counter ? dataset.varieties[counter++] : null,
+                  name: this.germplasmGrid[y][x].name,
+                  rep: rep,
                   dates: new Array(dataset.traits.length).fill(null),
                   values: new Array(dataset.traits.length).fill(null),
                   geolocation: null,
@@ -499,5 +503,9 @@ export default {
 .trait-list {
   max-height: 50vh;
   overflow-y: auto;
+}
+#germplasm-grid-sidebar .b-sidebar-header {
+  flex-direction: column;
+  align-items: stretch;
 }
 </style>

@@ -147,7 +147,8 @@ export default {
             const textZ = []
             for (let col = 0; col < cols; col++) {
               const cell = storeData.get(`${row}-${col}`)
-              textZ.push(cell.name)
+
+              textZ.push(cell.displayName)
               // Get the cell date
               const dateString = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, cell, true)
 
@@ -217,9 +218,9 @@ export default {
 
               if (isCategorical) {
                 // Plot the actual category rather than just its index
-                textZ.push(`x: ${col}<br>y: ${row}<br>z: ${value}<br>${cell.name}`)
+                textZ.push(`x: ${col}<br>y: ${row}<br>z: ${value}<br>${cell.displayName}`)
               } else {
-                textZ.push(cell.name)
+                textZ.push(cell.displayName)
               }
 
               if (value !== undefined && value !== null) {

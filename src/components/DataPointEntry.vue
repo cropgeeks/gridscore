@@ -59,9 +59,9 @@
       <b-button @click="$refs.videoModal.show()"><BIconCameraVideoFill/> {{ $t('buttonTakeVideo') }}</b-button>
     </b-button-group>
     <!-- Image tagging modal -->
-    <ImageModal :row="row" :col="col" :preferredTrait="preferredTrait" :name="name" ref="imageModal" />
+    <ImageModal :row="row" :col="col" :preferredTrait="preferredTrait" :displayName="displayName" ref="imageModal" />
     <!-- Video tagging modal -->
-    <VideoModal :name="name" ref="videoModal" />
+    <VideoModal :displayName="displayName" ref="videoModal" />
     <!-- Modal showing all previously recorded values of a multi trait -->
     <MultiTraitValueModal :traitIndex="multiTraitIndex" :row="row" :col="col" ref="multiTraitValueModal" v-if="multiTraitIndex !== null" @data-changed="multiTraitDataChanged" />
 
@@ -127,6 +127,8 @@ export default {
       values: [],
       dates: [],
       name: null,
+      rep: null,
+      displayName: null,
       comment: null,
       imageFile: null,
       imageData: null,
@@ -436,10 +438,12 @@ export default {
         this.values = this.visibleTraitMapping.map(t => t.trait.mType === 'multi' ? null : dp.values[t.index])
         this.dates = this.visibleTraitMapping.map(t => t.trait.mType === 'multi' ? null : dp.dates[t.index])
         this.name = dp.name
+        this.rep = dp.rep
+        this.displayName = dp.displayName
         this.comment = dp.comment
 
         this.updateFormDescriptions()
-        this.speak(this.name, false)
+        this.speak(dp.displayName, false)
         this.speak(this.visibleTraitMapping[0].trait.name, false)
         this.setFocus()
       }
@@ -634,6 +638,7 @@ export default {
         row: this.row,
         col: this.col,
         name: this.name,
+        rep: this.rep,
         isMarked: this.isMarked,
         values: finalValues,
         dates: finalDates,

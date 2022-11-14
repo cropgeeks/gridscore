@@ -1,5 +1,5 @@
 <template>
-  <b-modal :title="name"
+  <b-modal :title="displayName"
            :ok-title="$t('buttonSave')"
            :cancel-title="$t('buttonCancel')"
            @ok.prevent="downloadImage"
@@ -61,7 +61,7 @@ export default {
   },
   props: {
     /** The variety name to use as the title */
-    name: {
+    displayName: {
       type: String,
       default: null
     },
@@ -144,10 +144,11 @@ export default {
      */
     downloadImage: async function () {
       if (this.imageFile) {
+        const filename = `${this.getDateTime(this.imageDate)}_${this.displayName}_${this.row + 1}_${this.col + 1}_${this.traitIds !== null ? this.traitIds.map(t => this.storeTraits[t].name).join('-') : ''}.${this.imageFile.name.split('.').pop()}`
         if (this.supportsSaving) {
           // create a new handle
           const newHandle = await window.showSaveFilePicker({
-            suggestedName: `${this.getDateTime(this.imageDate)}_${this.name}_${this.row + 1}_${this.col + 1}_${this.traitIds !== null ? this.traitIds.map(t => this.storeTraits[t].name).join('-') : ''}.${this.imageFile.name.split('.').pop()}`,
+            suggestedName: filename,
             excludeAcceptAllOption: true,
             types: [{
               description: 'Image file',
@@ -165,7 +166,7 @@ export default {
         } else {
           const dl = document.createElement('a')
           dl.setAttribute('href', this.imageData)
-          dl.setAttribute('download', `${this.getDateTime(this.imageDate)}_${this.name}_${this.row + 1}_${this.col + 1}_${this.traitIds !== null ? this.traitIds.map(t => this.storeTraits[t].name).join('-') : ''}.${this.imageFile.name.split('.').pop()}`)
+          dl.setAttribute('download', filename)
           dl.click()
         }
       }

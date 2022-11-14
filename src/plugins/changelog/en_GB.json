@@ -59,5 +59,31 @@
         "text": "In previous versions there was a bug that happened when scoring multi-traits while also having some traits toggled. This would result in corrupted data and has now been corrected."
       }
     ]
+  },
+  {
+    "version": "1.13.0",
+    "date": "2022-11-14",
+    "items": [
+      {
+        "type": "new",
+        "title": "Rep support",
+        "text": "GridScore now supports rep numbers in the trial setup. For this purpose, a new germplasm identifier and rep screen has been added. Reps are completely optional unless the same germplasm identifier has been used multiple times, in which case the rep needs to be used to differentiate between them."
+      },
+      {
+        "type": "new",
+        "title": "Shapefile export",
+        "text": "If the corner points of a trial have been defined, GridScore can generate a Germinate-compatible Shapefile which can then be directly uploaded to Germinate to define the individual plot shapes."
+      },
+      {
+        "type": "new",
+        "title": "Numeric multi-trait visualization",
+        "text": "A new visualization for numeric multi-traits has been added that shows the value development over time. This is particularly useful to see if there are any temporal effects on trait values like disease resistance, plant height or yield."
+      },
+      {
+        "type": "bugfix",
+        "title": "Numeric data point removal",
+        "text": "It was previously impossible to remove the value of a numeric trait. This has been fixed in this release."
+      }
+    ]
   }
 ]

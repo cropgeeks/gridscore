@@ -122,6 +122,9 @@ export default {
       }
       this.redrawRunning = true
 
+      const dx = Math.max(1, this.markersEveryCol)
+      const dy = Math.max(1, this.markersEveryRow)
+
       this.ctx.clearRect(0, 0, this.width, this.height)
       this.ctx.lineWidth = 1
       this.ctx.strokeStyle = this.storeDarkMode ? 'white' : 'black'
@@ -189,10 +192,10 @@ export default {
           this.ctx.fill()
 
           // Increase y
-          y += h * this.markersEveryRow
+          y += h * dy
         }
         // Increase x
-        x += w * this.markersEveryCol
+        x += w * dx
         // Reset y
         y = py
       }

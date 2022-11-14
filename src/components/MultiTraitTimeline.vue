@@ -64,9 +64,16 @@ export default {
       'storeTraits',
       'storeTraitColors'
     ]),
+    searchTermLowerCase: function () {
+      if (this.searchTerm) {
+        return this.searchTerm.toLowerCase()
+      } else {
+        return null
+      }
+    },
     filteredGermplasm: function () {
       if (this.searchTerm) {
-        return this.allGermplasm.filter(g => g.includes(this.searchTerm))
+        return this.allGermplasm.filter(g => g.toLowerCase().includes(this.searchTermLowerCase))
       } else {
         return this.allGermplasm
       }
@@ -78,9 +85,7 @@ export default {
       } else {
         const result = []
 
-        storeData.forEach(c => {
-          result.push(c.name)
-        })
+        storeData.forEach(c => result.push(c.displayName))
 
         return result.sort()
       }
@@ -147,11 +152,11 @@ export default {
             }
           })
 
-          if (this.plotMode === 'all' || (this.plotMode === 'selection' && this.selectedGermplasm.indexOf(c.name) !== -1)) {
+          if (this.plotMode === 'all' || (this.plotMode === 'selection' && this.selectedGermplasm.indexOf(c.displayName) !== -1)) {
             traces.push({
               type: 'scatter',
               mode: 'lines+markers',
-              name: c.name,
+              name: c.displayName,
               x: c.dates[traitIndex],
               y: values
             })
