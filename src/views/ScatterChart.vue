@@ -170,8 +170,9 @@ export default {
           text: t.name
         }
       })
+      // Select the first two traits (if available) initially
       this.traitOne = this.traits.length > 0 ? 0 : null
-      this.traitTwo = this.traitOne
+      this.traitTwo = this.traits.length > 1 ? 1 : this.traitOne
 
       this.multiTraitOptionsOne = this.getMultiTraitMethods(this.storeTraits[this.traitOne])
       this.multiTraitOptionsTwo = this.getMultiTraitMethods(this.storeTraits[this.traitTwo])
