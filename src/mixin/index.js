@@ -9,17 +9,35 @@ export default {
         last: {
           text: this.$t('formSelectMultiTraitVizTypeLast'),
           value: 'last',
-          call: (values) => (values && values.length > 0) ? values[values.length - 1] : null
+          call: (values, dates, timepoint) => (values && values.length > 0) ? values[values.length - 1] : null
         },
         avg: {
           text: this.$t('formSelectMultiTraitVizTypeAvg'),
           value: 'avg',
-          call: (values) => (values && values.length > 0) ? (values.reduce((a, b) => a + (+b), 0) / values.length) : null
+          call: (values, dates, timepoint) => (values && values.length > 0) ? (values.reduce((a, b) => a + (+b), 0) / values.length) : null
         },
         sum: {
           text: this.$t('formSelectMultiTraitVizTypeSum'),
           value: 'sum',
-          call: (values) => (values && values.length > 0) ? values.reduce((a, b) => a + (+b), 0) : null
+          call: (values, dates, timepoint) => (values && values.length > 0) ? values.reduce((a, b) => a + (+b), 0) : null
+        },
+        timeline: {
+          text: this.$t('formSelectMultiTraitVizTypeTimeline'),
+          value: 'timeline',
+          call: (values, dates, timepoint) => {
+            if (values && values.length > 0) {
+              let result = null
+              for (let i = 0; i < dates.length; i++) {
+                if (dates[i] <= timepoint) {
+                  result = values[i]
+                }
+              }
+
+              return result
+            } else {
+              return null
+            }
+          }
         }
       }
     }
@@ -56,11 +74,11 @@ export default {
         return this.$t('axiosErrorNoInternet')
       }
     },
-    getMultiTraitMethods: function (trait) {
+    getMultiTraitMethods: function (trait, includeTimeline = false) {
       if (trait.type === 'int' || trait.type === 'float') {
-        return Object.keys(this.multiTraitMethods).map(k => this.multiTraitMethods[k])
+        return Object.keys(this.multiTraitMethods).filter(m => m !== 'timeline' || includeTimeline).map(k => this.multiTraitMethods[k])
       } else {
-        return [this.multiTraitMethods.last]
+        return [this.multiTraitMethods.last, this.multiTraitMethods.timeline]
       }
     },
     getTouchPosition: function (e) {
@@ -101,7 +119,7 @@ export default {
           return null
       }
     },
-    extractMultiTraitDatum: function (traitIndex, traitMType, multiTraitMethod, cell, isValue) {
+    extractMultiTraitDatum: function (traitIndex, traitMType, timepoint, multiTraitMethod, cell, isValue) {
       if (!cell) {
         return null
       }
@@ -110,8 +128,8 @@ export default {
       let date
 
       if (traitMType === 'multi') {
-        value = this.multiTraitMethods[multiTraitMethod].call(cell.values[traitIndex])
-        date = this.multiTraitMethods[multiTraitMethod].call(cell.dates[traitIndex])
+        value = this.multiTraitMethods[multiTraitMethod].call(cell.values[traitIndex], cell.dates[traitIndex], timepoint)
+        date = this.multiTraitMethods[multiTraitMethod].call(cell.dates[traitIndex], cell.dates[traitIndex], timepoint)
       } else {
         value = cell.values[traitIndex] || null
         date = cell.dates[traitIndex] || null

@@ -95,8 +95,8 @@ export default {
           let value = c.values[i]
           let date = d
           if (this.storeTraits[i].mType === 'multi') {
-            value = this.extractMultiTraitDatum(i, this.storeTraits[i].mType, 'last', c, true)
-            date = this.extractMultiTraitDatum(i, this.storeTraits[i].mType, 'last', c, false)
+            value = this.extractMultiTraitDatum(i, this.storeTraits[i].mType, null, 'last', c, true)
+            date = this.extractMultiTraitDatum(i, this.storeTraits[i].mType, null, 'last', c, false)
           }
           // If it exists
           if (value !== undefined && value !== null && date) {

@@ -97,7 +97,7 @@ export default {
             case 'date': {
               chartType = 'box'
               const datapoints = []
-              storeData.forEach((c, k) => datapoints.push({ value: this.extractMultiTraitDatum(index, trait.mType, this.selectedMultiTraitMethods[index], c, true), name: c.displayName }))
+              storeData.forEach((c, k) => datapoints.push({ value: this.extractMultiTraitDatum(index, trait.mType, null, this.selectedMultiTraitMethods[index], c, true), name: c.displayName }))
               data.push({
                 x: datapoints.map(d => d.value),
                 text: datapoints.map(d => d.name),
@@ -117,7 +117,7 @@ export default {
               chartType = 'bar'
               const map = {}
               const datapoints = []
-              storeData.forEach((c, k) => datapoints.push(this.extractMultiTraitDatum(index, trait.mType, this.selectedMultiTraitMethods[index], c, true)))
+              storeData.forEach((c, k) => datapoints.push(this.extractMultiTraitDatum(index, trait.mType, null, this.selectedMultiTraitMethods[index], c, true)))
               datapoints.forEach(c => {
                 if (map[c]) {
                   map[c] += 1

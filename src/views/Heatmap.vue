@@ -3,13 +3,24 @@
     <h1>{{ $t('pageHeatmapTitle') }} <small><a href="#" class="text-secondary" @click="$refs.helpModal.show()"><BIconQuestionCircleFill /></a></small></h1>
     <p>{{ $t('pageHeatmapText') }}</p>
     <div v-if="storeDatasetId && storeTraits && storeTraits.length > 0">
-      <!-- Trait selection box -->
-      <b-form-group :label="$t('formLabelTrait')" label-for="trait">
-        <b-form-select id="trait" :options="traits" v-model="trait" />
-      </b-form-group>
-      <b-form-group :label="$t('formLabelMultiTraitVizType')" label-for="trait-viz-type" v-if="trait !== null && storeTraits[trait].mType === 'multi'">
-        <b-form-select id="trait-viz-type" :options="multiTraitOptions" v-model="selectedMultiTraitMethod" />
-      </b-form-group>
+      <b-row>
+        <b-col cols=12 md=6 lg=4>
+          <!-- Trait selection box -->
+          <b-form-group :label="$t('formLabelTrait')" label-for="trait">
+            <b-form-select id="trait" :options="traits" v-model="trait" />
+          </b-form-group>
+        </b-col>
+        <b-col cols=12 md=6 lg=4>
+          <b-form-group :label="$t('formLabelMultiTraitVizType')" label-for="trait-viz-type" v-if="trait !== null && storeTraits[trait].mType === 'multi'">
+            <b-form-select id="trait-viz-type" :options="multiTraitOptions" v-model="selectedMultiTraitMethod" />
+          </b-form-group>
+        </b-col>
+        <b-col cols=12 md=6 lg=4>
+          <b-form-group :label="$t('formLabelMultiTraitVizTimeline')" label-for="timepoint" v-if="trait !== null && storeTraits[trait].mType === 'multi' && selectedMultiTraitMethod === 'timeline'" :description="$t('formDescriptionCurrentTimepoint', { date: timepoints[currentTimepoint] })">
+            <b-form-input type="range" v-model.number="currentTimepoint" :min="0" :max="timepoints.length - 1" />
+          </b-form-group>
+        </b-col>
+      </b-row>
       <!-- Heatmap element -->
       <div id="heatmap-chart"/>
     </div>
@@ -47,7 +58,8 @@ export default {
       traits: [],
       trait: null,
       selectedMultiTraitMethod: 'last',
-      multiTraitOptions: []
+      multiTraitOptions: [],
+      currentTimepoint: 0
     }
   },
   computed: {
@@ -70,12 +82,32 @@ export default {
       } else {
         return ''
       }
+    },
+    timepoints: function () {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+
+      const set = new Set()
+      storeData.forEach(c => {
+        const t = this.storeTraits[this.trait]
+
+        if (t.mType === 'multi' && c.dates[this.trait]) {
+          c.dates[this.trait].forEach(date => set.add(date))
+        }
+      })
+
+      set.delete(null)
+
+      const sorted = [...set]
+      sorted.sort()
+      return sorted
     }
   },
   watch: {
     trait: function (newValue) {
       this.selectedMultiTraitMethod = 'last'
-      this.multiTraitOptions = this.getMultiTraitMethods(this.storeTraits[newValue])
+      this.currentTimepoint = 0
+      this.multiTraitOptions = this.getMultiTraitMethods(this.storeTraits[newValue], true)
+
       this.update()
     },
     storeLocale: function () {
@@ -85,6 +117,9 @@ export default {
       this.update()
     },
     selectedMultiTraitMethod: function () {
+      this.update()
+    },
+    currentTimepoint: function () {
       this.update()
     }
   },
@@ -118,15 +153,30 @@ export default {
       }
 
       if (hasData === true) {
+        let minScale = null
+        let maxScale = null
+
         // If there is data, plot the data differently for dates and text
         if (actualTrait.type === 'date' || actualTrait.type === 'text') {
           // Assume a maximum date
           let minDateString = '9999-12-31'
+          let minDateMultiString = '9999-12-31'
 
           // Find the minimum in the data
           for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-              const date = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, storeData.get(`${row}-${col}`), true)
+              if (actualTrait.mType === 'multi' && this.timepoints) {
+                // Get the min and max across all timepoints for the scale
+                this.timepoints.forEach(tp => {
+                  const d = this.extractMultiTraitDatum(this.trait, actualTrait.mType, tp, this.selectedMultiTraitMethod, storeData.get(`${row}-${col}`), true)
+
+                  if (d !== null) {
+                    minDateMultiString = d < minDateMultiString ? d : minDateMultiString
+                  }
+                })
+              }
+
+              const date = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.timepoints[this.currentTimepoint], this.selectedMultiTraitMethod, storeData.get(`${row}-${col}`), true)
 
               if (date !== null) {
                 minDateString = date < minDateString ? date : minDateString
@@ -136,6 +186,7 @@ export default {
 
           // Parse it
           const minDate = Date.parse(minDateString)
+          const minDateMulti = Date.parse(minDateMultiString)
 
           const z = []
           const text = []
@@ -150,19 +201,49 @@ export default {
 
               textZ.push(cell.displayName)
               // Get the cell date
-              const dateString = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, cell, true)
+              const dateString = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.timepoints[this.currentTimepoint], this.selectedMultiTraitMethod, cell, true)
 
               if (dateString) {
                 // If there is one, return the time difference to the minimum date in days
                 const date = Date.parse(dateString)
 
-                rowZ.push((date - minDate) / (1000 * 60 * 60 * 24))
+                // If it's a multi-trait, take the difference to the minimum across timepoints (so it matches the global scale)
+                if (actualTrait.mType === 'multi') {
+                  rowZ.push((date - minDateMulti) / (1000 * 60 * 60 * 24))
+                } else {
+                  rowZ.push((date - minDate) / (1000 * 60 * 60 * 24))
+                }
 
                 minZ = Math.min(minZ, rowZ[rowZ.length - 1])
                 maxZ = Math.max(maxZ, rowZ[rowZ.length - 1])
               } else {
                 // Else return NaN
                 rowZ.push(NaN)
+              }
+
+              if (actualTrait.mType === 'multi' && this.timepoints) {
+                // Get the min and max across all timepoints for the scale
+                if (cell.values && cell.values[this.trait]) {
+                  cell.values[this.trait].forEach(d => {
+                    if (d) {
+                      // If there is one, return the time difference to the minimum date in days
+                      const date = Date.parse(d)
+
+                      const diff = (date - minDateMulti) / (1000 * 60 * 60 * 24)
+
+                      if (minScale === null) {
+                        minScale = diff
+                      } else {
+                        minScale = Math.min(diff, minScale)
+                      }
+                      if (maxScale === null) {
+                        maxScale = diff
+                      } else {
+                        maxScale = Math.max(diff, maxScale)
+                      }
+                    }
+                  })
+                }
               }
             }
             z.push(rowZ)
@@ -213,8 +294,25 @@ export default {
             for (let col = 0; col < cols; col++) {
               const cell = storeData.get(`${row}-${col}`)
 
+              if (actualTrait.mType === 'multi' && !isCategorical && this.timepoints) {
+                if (cell.values && cell.values[this.trait]) {
+                  cell.values[this.trait].forEach(d => {
+                    if (minScale === null) {
+                      minScale = d
+                    } else {
+                      minScale = Math.min(minScale, d)
+                    }
+                    if (maxScale === null) {
+                      maxScale = d
+                    } else {
+                      maxScale = Math.max(maxScale, d)
+                    }
+                  })
+                }
+              }
+
               // Get the cell date
-              const value = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.selectedMultiTraitMethod, cell, true)
+              const value = this.extractMultiTraitDatum(this.trait, actualTrait.mType, this.timepoints[this.currentTimepoint], this.selectedMultiTraitMethod, cell, true)
 
               if (isCategorical) {
                 // Plot the actual category rather than just its index
@@ -280,6 +378,14 @@ export default {
                 tickfont: { color: this.storeDarkMode ? 'white' : 'black' }
               }
           }]
+        }
+
+        // If minScale and maxScale are set (means we have a multi-trait with timepoints), then adjust the z-scale to show the overall min
+        // and max instead of just the min and max for the current timepoint
+        if (minScale !== null && maxScale !== null) {
+          data[0].zauto = false
+          data[0].zmin = minScale
+          data[0].zmax = maxScale
         }
 
         // Get the axis ticks based on inversion state

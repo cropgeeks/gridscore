@@ -115,8 +115,8 @@ export default {
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
       storeData.forEach((c, k) => {
         if (c.values) {
-          const one = this.extractMultiTraitDatum(this.traitOne, this.storeTraits[this.traitOne].mType, this.selectedMultiTraitMethodOne, c, true)
-          const two = this.extractMultiTraitDatum(this.traitTwo, this.storeTraits[this.traitTwo].mType, this.selectedMultiTraitMethodTwo, c, true)
+          const one = this.extractMultiTraitDatum(this.traitOne, this.storeTraits[this.traitOne].mType, null, this.selectedMultiTraitMethodOne, c, true)
+          const two = this.extractMultiTraitDatum(this.traitTwo, this.storeTraits[this.traitTwo].mType, null, this.selectedMultiTraitMethodTwo, c, true)
 
           if (one !== undefined && one !== null && two !== undefined && two !== null) {
             data[0].x.push(one)
