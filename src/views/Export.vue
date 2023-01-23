@@ -85,29 +85,38 @@
         </template>
         <p v-html="$t('modalTextExportGerminate')" />
         <div>
-          <p v-if="hasMultiTrait">{{ $t('modalTextExportGerminateMultiSelection') }}</p>
+          <div v-if="hasMultiTrait && storeTraits && storeTraits.length > 0">
+            <b-form @submit.prevent>
 
-          <b-form @submit.prevent v-if="storeTraits && storeTraits.length > 0">
-            <template v-for="(trait, index) in storeTraits">
-              <b-form-group :label="trait.name"
-                            :label-for="`trait-select-${trait.name}`"
-                            :key="`trait-select-${trait.name}`"
-                            :content-cols="12"
-                            :label-cols="12"
-                            :content-cols-lg="10"
-                            :label-cols-lg="2"
-                            class="align-items-center"
-                            v-if="trait.mType === 'multi'">
-                <template #label>
-                  <TraitHeading :trait="trait" mode="full" />
-                </template>
-                <b-form-radio-group
-                  :id="`trait-select-${trait.name}`"
-                  v-model="multiTraitSelection[index]"
-                  :options="multiTraitOptions[index]" />
+              <b-form-group :label="$t('formLabelExportGerminateAggregation')" label-for="aggregation" :description="$t('formDescriptionExportGerminateAggregation')">
+                <b-form-checkbox id="aggregation" switch v-model="multiTraitAggregation">{{ $t(multiTraitAggregation ? 'buttonYes' : 'buttonNo') }}</b-form-checkbox>
               </b-form-group>
-            </template>
-          </b-form>
+
+              <div v-if="multiTraitAggregation">
+                <p>{{ $t('modalTextExportGerminateMultiSelection') }}</p>
+
+                <template v-for="(trait, index) in storeTraits">
+                  <b-form-group :label="trait.name"
+                                :label-for="`trait-select-${trait.name}`"
+                                :key="`trait-select-${trait.name}`"
+                                :content-cols="12"
+                                :label-cols="12"
+                                :content-cols-lg="10"
+                                :label-cols-lg="2"
+                                class="align-items-center"
+                                v-if="trait.mType === 'multi'">
+                    <template #label>
+                      <TraitHeading :trait="trait" mode="full" />
+                    </template>
+                    <b-form-radio-group
+                      :id="`trait-select-${trait.name}`"
+                      v-model="multiTraitSelection[index]"
+                      :options="multiTraitOptions[index]" />
+                  </b-form-group>
+                </template>
+              </div>
+            </b-form>
+          </div>
 
           <b-button @click="exportToGerminateFormat"><BIconFileEarmarkSpreadsheet /> {{ $t('buttonExportGerminateFormat') }}</b-button>
 
@@ -157,6 +166,7 @@ export default {
     return {
       selectedTrait: null,
       germinateTemplateFile: null,
+      multiTraitAggregation: false,
       shapeFile: null,
       multiTraitOptions: [],
       multiTraitSelection: []
@@ -487,7 +497,7 @@ export default {
         this.synchronizeDataset(this.storeDatasetId)
           .then(dataset => {
             emitter.emit('set-loading', true)
-            return this.axios(`config/${dataset.uuid}/export-g8`, this.multiTraitSelection, 'post')
+            return this.axios(`config/${dataset.uuid}/export-g8`, this.multiTraitAggregation ? this.multiTraitSelection : [], 'post')
           })
           .then(result => {
             emitter.emit('set-loading', true)

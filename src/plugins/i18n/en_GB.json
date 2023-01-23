@@ -99,6 +99,8 @@
   "formLabelExportFieldPlanTrait": "Trait",
   "formLabelExportFieldPlan": "Field plan",
   "formLabelExportTraits": "Trait overview",
+  "formLabelExportGerminateAggregation": "Aggregate multi-traits?",
+  "formDescriptionExportGerminateAggregation": "If selected, multi-traits will be aggregated to generate a single value per trait for each plot.",
   "formLabelFieldLayoutRowCol": "Row {row}, Column {col}",
   "formLabelGermplasm": "Germplasm/varieties",
   "formLabelMarkersUse": "Show markers on field plan",
