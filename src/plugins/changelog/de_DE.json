@@ -85,5 +85,21 @@
         "text": "Es war zuvor nicht möglich den Wert eines numerischen Merkmals komplett zu entfernen. Dies wurde in dieser Version behoben."
       }
     ]
+  },
+  {
+    "version": "1.14.0",
+    "date": "2023-01-24",
+    "items": [
+      {
+        "type": "new",
+        "title": "Nicht zusammengerechnete Mehrfachmessungen für Export zu Germinate",
+        "text": "Bisher musst beim Exportieren von Mehrfachmessungen in die Germinate Datenvorlagen immer eine Zusammenrechnungsmethode gewählt werden. Dies musste eine dieser Optionen sein: Durchschnitt, Summe oder zuletzt gemessener Wert. Jetzt können alle aufgezeichneten Werte individuell exportiert werden durch das Abwählen einer Zusammenrechnungsmethode. Dies resultiert in einer Datei die alle einzelnen Messungen enthält."
+      },
+      {
+        "type": "new",
+        "title": "Heatmap-Zeitreihen-Diagramm",
+        "text": "Für Mehrfachmessungen ist es jetzt möglich sich alle aufgezeichneten Werte über die Zeit in Form einer Heatmap anzeigen zu lassen. Um dies zu erreichen haben wir eine neue Darstellungsoption hinzugefügt die 'Zeitreihe' heißt. Diese aktiviert einen Zeit-Schieberegler um den dargestellten Zeitpunkt zu ändern und zu sehen wie die Mehrfachmessungen sich über die Zeit verhalten."
+      }
+    ]
   }
 ]

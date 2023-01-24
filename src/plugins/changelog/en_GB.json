@@ -85,5 +85,21 @@
         "text": "It was previously impossible to remove the value of a numeric trait. This has been fixed in this release."
       }
     ]
+  },
+  {
+    "version": "1.14.0",
+    "date": "2023-01-24",
+    "items": [
+      {
+        "type": "new",
+        "title": "Non-aggregated multi-trait export to Germinate",
+        "text": "Until now whenever exporting multi-trait data into the Germinate data templates, an aggregation method per multi-trait had to be selected. This was one of these options: average, sum or last recorded value. You can now export all individual data points for a multi-trait by de-selecting the aggregation during export. This will result in a file containing all individual measurements."
+      },
+      {
+        "type": "new",
+        "title": "Heatmap timeline chart",
+        "text": "For multi-traits it's now possible to to look at all recorded values over time in the form of a heatmap. For this purpose, we added a new visualization option called 'Show timeline' which will activate a time slider to move through time and see how the multi-trait changed over time."
+      }
+    ]
   }
 ]

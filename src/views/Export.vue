@@ -192,7 +192,7 @@ export default {
       'storeTraitColors'
     ]),
     canExportShapefile: function () {
-      return this.storeCornerPoints && this.storeCornerPoints.length === 4
+      return this.storeCornerPoints && this.storeCornerPoints.length === 4 && this.storeCornerPoints.every(cp => cp !== null)
     },
     hasMultiTrait: function () {
       if (!this.storeTraits) {

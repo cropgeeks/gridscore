@@ -3,7 +3,7 @@ import { mapGetters } from 'vuex'
 export default {
   data: function () {
     return {
-      gridScoreVersion: '1.13.0',
+      gridScoreVersion: '1.14.0',
       multiTraitMethods: {
         // TODO: Handle dates!
         last: {
