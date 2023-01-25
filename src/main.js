@@ -31,7 +31,8 @@ import {
   JumbotronPlugin,
   SidebarPlugin,
   EmbedPlugin,
-  ToastPlugin
+  ToastPlugin,
+  PaginationPlugin
 } from 'bootstrap-vue'
 
 import router from '@/router'
@@ -69,6 +70,7 @@ Vue.use(ButtonGroupPlugin)
 Vue.use(FormPlugin)
 Vue.use(FormInputPlugin)
 Vue.use(FormCheckboxPlugin)
+Vue.use(PaginationPlugin)
 Vue.use(FormRadioPlugin)
 Vue.use(FormDatepickerPlugin)
 Vue.use(FormGroupPlugin)
