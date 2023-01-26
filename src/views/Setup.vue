@@ -169,6 +169,7 @@ export default {
       cols: 1,
       markers: null,
       newTraits: null,
+      brapiConfig: null,
       trait: null,
       traitToConfigure: null,
       formValidated: false,
@@ -267,8 +268,9 @@ export default {
      * @param brapiTraits The traits selected in the BrAPI modal dialog
      */
     loadBrapiTraits: function (brapiTraits) {
-      if (brapiTraits && brapiTraits.length > 0) {
-        brapiTraits.forEach(t => {
+      if (brapiTraits && brapiTraits.traits && brapiTraits.traits.length > 0) {
+        this.brapiConfig = brapiTraits.brapiConfig
+        brapiTraits.traits.forEach(t => {
           let type = 'text'
           const restrictions = {}
 
@@ -398,6 +400,7 @@ export default {
       this.markers = null
       this.newTraits = []
       this.germplasmGrid = null
+      this.brapiConfig = null
       this.formValidated = false
       this.state = {
         datasetName: null,
@@ -442,6 +445,7 @@ export default {
               rows: parseInt(this.rows),
               cols: parseInt(this.cols),
               traits: this.newTraits,
+              brapiConfig: this.brapiConfig,
               varieties: null, // TODO: User germplasmGrid to set this here
               cornerPoints: this.$refs.map.getCornerPoints(),
               markers: this.$refs.markerSetup ? this.$refs.markerSetup.getMarkerConfig() : null,

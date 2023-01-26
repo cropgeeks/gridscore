@@ -39,6 +39,7 @@
   "buttonSave": "Save",
   "buttonSelect": "Select",
   "buttonSelectAll": "All",
+  "buttonSelectNone": "None",
   "buttonWarningResetApp": "Reset GridScore",
   "buttonSetupTrial": "Set up a trial",
   "buttonSetupSurvey": "Set up a survey",

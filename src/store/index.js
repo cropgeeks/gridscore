@@ -60,6 +60,7 @@ const storeState = {
       data: [],
       brapiConfig: null
     },
+    brapiConfig: null,
     darkMode: false,
     columnWidth: 120,
     serverUrl: null,
@@ -90,7 +91,7 @@ const storeState = {
     storeDarkMode: (state) => state.darkMode,
     storeRunCount: (state) => state.runCount,
     storeUniqueClientId: (state) => state.uniqueClientId,
-    storeBrapiConfig: (state) => state.dataset ? state.dataset.brapiConfig : null,
+    storeBrapiConfig: (state) => state.dataset ? state.dataset.brapiConfig : state.brapiConfig,
     storeColumnWidth: (state) => state.columnWidth,
     storeData: (state) => state.dataset ? state.dataset.data : null,
     storeDataset: (state) => state.dataset ? state.dataset : null,
@@ -243,7 +244,11 @@ const storeState = {
         newBrapiConfig.url = newBrapiConfig.url.replace(/\/+$/, '')
       }
 
-      state.dataset.brapiConfig = newBrapiConfig
+      if (state.dataset) {
+        state.dataset.brapiConfig = newBrapiConfig
+      } else {
+        state.brapiConfig = newBrapiConfig
+      }
     },
     ON_SERVER_URL_CHANGED: function (state, newServerUrl) {
       state.serverUrl = newServerUrl

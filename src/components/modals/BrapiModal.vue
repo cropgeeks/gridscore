@@ -99,7 +99,7 @@ export default {
         url: this.brapiUrl
       })
 
-      this.$nextTick(() => this.$emit('brapi-url-changed', this.brapiUrl))
+      this.$nextTick(() => this.$emit('brapi-url-changed', { url: this.brapiUrl }))
     }
   }
 }

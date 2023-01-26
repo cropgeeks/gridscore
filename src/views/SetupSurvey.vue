@@ -113,6 +113,7 @@ export default {
     return {
       datasetName: null,
       newTraits: null,
+      brapiConfig: null,
       trait: null,
       traitToConfigure: null,
       varieties: null,
@@ -192,8 +193,9 @@ export default {
      * @param brapiTraits The traits selected in the BrAPI modal dialog
      */
     loadBrapiTraits: function (brapiTraits) {
-      if (brapiTraits && brapiTraits.length > 0) {
-        brapiTraits.forEach(t => {
+      if (brapiTraits && brapiTraits.traits && brapiTraits.traits.length > 0) {
+        this.brapiConfig = brapiTraits.brapiConfig
+        brapiTraits.traits.forEach(t => {
           let type = 'text'
           const restrictions = {}
 
@@ -325,6 +327,7 @@ export default {
       this.datasetName = null
       this.cols = 1
       this.newTraits = []
+      this.brapiConfig = null
       this.varieties = null
       this.formValidated = false
       this.state = {
@@ -373,6 +376,7 @@ export default {
               rows: this.varieties.split('\n').map(v => v.trim()).length,
               cols: 1,
               traits: this.newTraits,
+              brapiConfig: this.brapiConfig,
               varieties: this.varieties.split('\n').map(v => v.trim()),
               cornerPoints: null,
               markers: null,

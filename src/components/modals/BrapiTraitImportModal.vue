@@ -17,6 +17,10 @@
       <!-- Else, show the selection -->
       <b-form @submit.prevent="onSubmit" v-else>
         <p v-if="formState === false" class="text-danger">{{ $t('modalTextWarningBrapiTraitImport') }}</p>
+        <b-button-group>
+          <b-button @click="onSelectTraits(true)"><BIconListCheck /> {{ $t('buttonSelectAll') }}</b-button>
+          <b-button @click="onSelectTraits(false)"><BIconListUl /> {{ $t('buttonSelectNone') }}</b-button>
+        </b-button-group>
         <!-- Checkbox group representing the list of traits -->
         <b-form-checkbox-group v-model="selectedTraits"
                               :options="traitOptions"
@@ -33,18 +37,26 @@ import BrapiModal from '@/components/modals/BrapiModal'
 
 import brapi from '@/mixin/brapi'
 
+import { BIconListCheck, BIconListUl } from 'bootstrap-vue'
+
 /**
  * Modal used to import trait information from a BrAPI source.
  * @emits `traits-selected` List of traits to add
  */
 export default {
+  components: {
+    BIconListCheck,
+    BIconListUl,
+    BrapiModal
+  },
   data: function () {
     return {
       traits: null,
       selectedTraits: [],
       errorMessage: null,
       formState: true,
-      loading: null
+      loading: null,
+      brapiConfig: null
     }
   },
   computed: {
@@ -115,9 +127,6 @@ export default {
       }
     }
   },
-  components: {
-    BrapiModal
-  },
   mixins: [brapi],
   methods: {
     /**
@@ -147,15 +156,19 @@ export default {
         return
       }
 
-      this.$emit('traits-selected', this.selectedTraits)
+      this.$emit('traits-selected', {
+        brapiConfig: this.brapiConfig,
+        traits: this.selectedTraits
+      })
 
       this.hide()
     },
     /**
      * Gets the traits from the BrAPI URL provided by the wrapped component
      */
-    getTraits: function () {
+    getTraits: function (config) {
       this.loading = true
+      this.brapiConfig = config
       this.brapiGetVariables()
         .then(variables => {
           this.traits = variables
@@ -167,6 +180,13 @@ export default {
           this.traits = []
           this.loading = false
         })
+    },
+    onSelectTraits: function (selectAll) {
+      if (selectAll) {
+        this.selectedTraits = this.traits.concat()
+      } else {
+        this.selectedTraits = []
+      }
     }
   }
 }

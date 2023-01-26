@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { mapGetters } from 'vuex'
 const axios = require('axios').default
 
@@ -33,7 +34,7 @@ export default {
       }
 
       if (infoCheck) {
-        if (!this.serverInfos[baseUrl] || !this.serverInfos[baseUrl].some(c => c.service === callName && c.versions.indexOf('2.0') !== -1)) {
+        if (!this.serverInfos[baseUrl] || !this.serverInfos[baseUrl].some(c => c.service === callName && c.versions.indexOf('2.1') !== -1)) {
           return Promise.reject(new Error(`BrAPI call not available for the given URL: ${callName}`))
         }
       }
@@ -51,12 +52,55 @@ export default {
     },
     /**
      * Retrieves the observation variables on the BrAPI server
-     * @param {Number} page (Optional) Page number (default: `0`)
-     * @param {Number} pageSize (Optional) Page size (default: `2147483647`)
      * @returns Promise
      */
     brapiGetVariables: function () {
-      return this.get('variables', 'variables', null, 'get', false)
+      return this.get('variables', 'variables', null, 'get', true)
+        .then(result => {
+          if (result && result.data && result.data.result && result.data.result.data) {
+            return result.data.result.data
+          } else {
+            return []
+          }
+        })
+    },
+    /**
+     * Retrieves the programs on the BrAPI server
+     * @param {*} params The query parameters
+     * @returns Promise
+     */
+    brapiGetPrograms: function (params) {
+      return this.get('programs', 'programs', params, 'get', true)
+        .then(result => {
+          if (result && result.data && result.data.result && result.data.result.data) {
+            return result.data.result.data
+          } else {
+            return []
+          }
+        })
+    },
+    /**
+     * Retrieves the trials on the BrAPI server
+     * @param {*} params The query parameters
+     * @returns Promise
+     */
+    brapiGetTrials: function (params) {
+      return this.get('trials', 'trials', params, 'get', true)
+        .then(result => {
+          if (result && result.data && result.data.result && result.data.result.data) {
+            return result.data.result.data
+          } else {
+            return []
+          }
+        })
+    },
+    /**
+     * Retrieves the studies on the BrAPI server
+     * @param {*} params The query parameters
+     * @returns Promise
+     */
+    brapiGetStudies: function (params) {
+      return this.get('studies', 'studies', params, 'get', true)
         .then(result => {
           if (result && result.data && result.data.result && result.data.result.data) {
             return result.data.result.data
@@ -73,9 +117,9 @@ export default {
       await this.get('serverinfo', 'serverinfo', null, 'get', false)
         .then(result => {
           if (result && result.data && result.data.result) {
-            this.serverInfos[url] = result.data.result.calls
+            Vue.set(this.serverInfos, url, result.data.result.calls)
           } else {
-            this.serverInfos[url] = null
+            Vue.set(this.serverInfos, url, null)
           }
         })
     }
