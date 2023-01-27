@@ -20,7 +20,7 @@
       </b-form-group>
 
       <!-- Button to update the BrAPI URL in the store -->
-      <b-button @click="updateBrapiUrl"><BIconArrowClockwise /> {{ $t('buttonLoad') }}</b-button>
+      <b-button @click="updateBrapiUrl"><BIconArrowClockwise /> {{ $t('buttonUpdate') }}</b-button>
     </b-form>
 
     <!-- Slot that wrapping components can use to fill in their content -->
