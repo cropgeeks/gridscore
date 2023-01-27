@@ -83,10 +83,19 @@
     </b-modal>
 
     <ChangelogModal :prevVersion="changelogVersionNumber" ref="changelogModal" />
+
+    <BrapiModal ref="brapiSettingsModal"
+                :title="'modalTitleBrapiSettings'"
+                :okTitle="'buttonOk'"
+                :cancelTitle="'buttonCancel'"
+                :okDisabled="true"
+                no-fade
+                @brapi-settings-changed="onBrapiSettingsChanged" />
   </div>
 </template>
 
 <script>
+import BrapiModal from '@/components/modals/BrapiModal'
 import Vue from 'vue'
 import { VuePlausible } from 'vue-plausible'
 import { mapGetters } from 'vuex'
@@ -118,6 +127,7 @@ export default {
     BIconPlus,
     BIconMoon,
     BIconSun,
+    BrapiModal,
     ChangelogModal,
     Tour
   },
@@ -225,6 +235,13 @@ export default {
   },
   mixins: [api],
   methods: {
+    onBrapiSettingsChanged: function (config) {
+      this.$store.commit('ON_BRAPI_CONFIG_CHANGED', config)
+
+      emitter.emit('brapi-settings-changed', config)
+
+      this.$refs.brapiSettingsModal.hide()
+    },
     isLocalhost: function () {
       return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === ''
     },
@@ -440,6 +457,17 @@ export default {
           this.$plausible.enableAutoPageviews()
         })
       }
+    },
+    showBrapiSettings: function () {
+      this.$refs.brapiSettingsModal.show()
+    },
+    toast: function (config) {
+      this.$bvToast.toast(config.message, {
+        title: config.title,
+        autoHideDelay: 5000,
+        appendToast: true,
+        variant: config.variant || 'info'
+      })
     }
   },
   mounted: function () {
@@ -455,7 +483,9 @@ export default {
     emitter.on('dataset-changed', this.navigateToDataset)
     emitter.on('dataset-deleted', this.navigateHome)
     emitter.on('set-loading', this.setLoading)
+    emitter.on('toast', this.toast)
     emitter.on('show-introduction-tour', this.showIntroductionTour)
+    emitter.on('show-brapi-settings', this.showBrapiSettings)
     this.updateDatasets()
 
     if ('wakeLock' in navigator) {
@@ -521,7 +551,9 @@ export default {
     emitter.off('dataset-changed', this.navigateToDataset)
     emitter.off('dataset-deleted', this.navigateHome)
     emitter.off('set-loading', this.setLoading)
+    emitter.off('toast', this.toast)
     emitter.off('show-introduction-tour', this.showIntroductionTour)
+    emitter.off('show-brapi-settings', this.showBrapiSettings)
 
     if ('wakeLock' in navigator) {
       this.toggleWakeLock(false)

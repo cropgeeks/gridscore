@@ -6,7 +6,7 @@
               :okDisabled="!selectedTraits || selectedTraits.length < 1"
               @submit="onSubmit"
               no-fade
-              @brapi-url-changed="getTraits">
+              @brapi-settings-changed="getTraits">
     <!-- Fill the slot with the content, assuming the loading state is set -->
     <template v-slot:content v-if="loading !== null">
       <p class="text-danger" v-if="errorMessage">{{ errorMessage }}</p>
@@ -17,16 +17,18 @@
       <!-- Else, show the selection -->
       <b-form @submit.prevent="onSubmit" v-else>
         <p v-if="formState === false" class="text-danger">{{ $t('modalTextWarningBrapiTraitImport') }}</p>
-        <b-button-group>
-          <b-button @click="onSelectTraits(true)"><BIconListCheck /> {{ $t('buttonSelectAll') }}</b-button>
-          <b-button @click="onSelectTraits(false)"><BIconListUl /> {{ $t('buttonSelectNone') }}</b-button>
-        </b-button-group>
-        <!-- Checkbox group representing the list of traits -->
-        <b-form-checkbox-group v-model="selectedTraits"
-                              :options="traitOptions"
-                              required
-                              stacked>
-        </b-form-checkbox-group>
+        <template v-if="traits">
+          <b-button-group>
+            <b-button @click="onSelectTraits(true)"><BIconListCheck /> {{ $t('buttonSelectAll') }}</b-button>
+            <b-button @click="onSelectTraits(false)"><BIconListUl /> {{ $t('buttonSelectNone') }}</b-button>
+          </b-button-group>
+          <!-- Checkbox group representing the list of traits -->
+          <b-form-checkbox-group v-model="selectedTraits"
+                                :options="traitOptions"
+                                required
+                                stacked>
+          </b-form-checkbox-group>
+        </template>
       </b-form>
     </template>
   </BrapiModal>
@@ -35,9 +37,9 @@
 <script>
 import BrapiModal from '@/components/modals/BrapiModal'
 
-import brapi from '@/mixin/brapi'
-
 import { BIconListCheck, BIconListUl } from 'bootstrap-vue'
+
+import { brapiGetVariables, brapiDefaultCatchHandler } from '@/mixin/brapi'
 
 /**
  * Modal used to import trait information from a BrAPI source.
@@ -127,7 +129,6 @@ export default {
       }
     }
   },
-  mixins: [brapi],
   methods: {
     /**
      * Shows the modal and resets it to its default values
@@ -169,12 +170,13 @@ export default {
     getTraits: function (config) {
       this.loading = true
       this.brapiConfig = config
-      this.brapiGetVariables()
+      brapiGetVariables()
         .then(variables => {
           this.traits = variables
           this.loading = false
           this.errorMessage = null
         })
+        .catch(brapiDefaultCatchHandler)
         .catch(error => {
           this.errorMessage = error
           this.traits = []

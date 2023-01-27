@@ -12,19 +12,21 @@
         <template v-slot:label>
           <span v-html="$t('formLabelBrapiUrl')" />
         </template>
-        <b-input-group>
-          <!-- BrAPI URL input field -->
-          <b-form-input v-model="brapiUrl" id="brapiUrl" />
-          <b-input-group-append>
-            <!-- Button to update the BrAPI URL in the store -->
-            <b-button @click="updateBrapiUrl"><BIconArrowClockwise /></b-button>
-          </b-input-group-append>
-        </b-input-group>
+        <!-- BrAPI URL input field -->
+        <b-form-input v-model="brapiUrl" id="brapiUrl" />
       </b-form-group>
+      <b-form-group label-for="brapiToken" :label="$t('formLabelBrapiToken')" :description="$t('formDescriptionBrapiToken')">
+        <b-form-input id="brapiToken" v-model="brapiToken" />
+      </b-form-group>
+
+      <!-- Button to update the BrAPI URL in the store -->
+      <b-button @click="updateBrapiUrl"><BIconArrowClockwise /> {{ $t('buttonLoad') }}</b-button>
     </b-form>
 
     <!-- Slot that wrapping components can use to fill in their content -->
-    <slot name="content" />
+    <div class="mt-3">
+      <slot name="content" />
+    </div>
   </b-modal>
 </template>
 
@@ -41,7 +43,8 @@ export default {
   },
   data: function () {
     return {
-      brapiUrl: null
+      brapiUrl: null,
+      brapiToken: null
     }
   },
   props: {
@@ -77,6 +80,7 @@ export default {
      */
     show: function () {
       this.brapiUrl = this.storeBrapiConfig && this.storeBrapiConfig.url ? this.storeBrapiConfig.url : null
+      this.brapiToken = this.storeBrapiConfig && this.storeBrapiConfig.token ? this.storeBrapiConfig.token : null
       this.$nextTick(() => this.$refs.brapiModal.show())
     },
     /**
@@ -96,10 +100,11 @@ export default {
      */
     updateBrapiUrl: function () {
       this.$store.commit('ON_BRAPI_CONFIG_CHANGED', {
-        url: this.brapiUrl
+        url: this.brapiUrl,
+        token: this.brapiToken
       })
 
-      this.$nextTick(() => this.$emit('brapi-url-changed', { url: this.brapiUrl }))
+      this.$nextTick(() => this.$emit('brapi-settings-changed', { url: this.brapiUrl, token: this.brapiToken }))
     }
   }
 }

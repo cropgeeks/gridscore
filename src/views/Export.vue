@@ -131,7 +131,7 @@
           </div>
         </div>
       </b-tab>
-      <b-tab>
+      <b-tab lazy>
         <template #title>
           <IconBrapi /> {{ $t('tabTitleExportBrAPI') }}
         </template>
