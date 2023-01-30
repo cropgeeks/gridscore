@@ -12,6 +12,9 @@
         <template v-slot:label>
           <span v-html="$t('formLabelBrapiUrl')" />
         </template>
+        <template slot="description">
+          <span v-html="$t('formDescriptionBrapiUrl')" />
+        </template>
         <!-- BrAPI URL input field -->
         <b-form-input v-model="brapiUrl" id="brapiUrl" />
       </b-form-group>
