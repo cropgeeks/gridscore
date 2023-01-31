@@ -107,6 +107,7 @@
   "formLabelExportBrapiProgram": "Program",
   "formLabelExportBrapiTrial": "Trial",
   "formLabelExportBrapiStudy": "Study",
+  "formLabelExportBrapiStudyType": "Study type",
   "formDescriptionExportGerminateAggregation": "If selected, multi-traits will be aggregated to generate a single value per trait for each plot.",
   "formLabelFieldLayoutRowCol": "Row {row}, Column {col}",
   "formLabelGermplasm": "Germplasm/varieties",

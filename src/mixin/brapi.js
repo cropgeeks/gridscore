@@ -179,6 +179,22 @@ const brapiGetTrials = (params) => {
 }
 
 /**
+ * Retrieves the study types on the BrAPI server
+ * @param {*} params The query parameters
+ * @returns Promise
+ */
+const brapiGetStudyTypes = (params) => {
+  return brapiGet('studytypes', 'studytypes', params, 'get', true)
+    .then(result => {
+      if (result && result.data && result.data.result && result.data.result.data) {
+        return result.data.result.data
+      } else {
+        return []
+      }
+    })
+}
+
+/**
  * Retrieves the studies on the BrAPI server
  * @param {*} params The query parameters
  * @returns Promise
@@ -218,6 +234,7 @@ export {
   brapiGetVariables,
   brapiGetPrograms,
   brapiGetTrials,
+  brapiGetStudyTypes,
   brapiGetStudies,
   brapiGetInfo,
   brapiDefaultCatchHandler

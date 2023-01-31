@@ -19,6 +19,7 @@
         <b-form-input v-model="brapiUrl" id="brapiUrl" />
       </b-form-group>
       <b-form-group label-for="brapiToken" :label="$t('formLabelBrapiToken')" :description="$t('formDescriptionBrapiToken')">
+        <!-- BrAPI token input field -->
         <b-form-input id="brapiToken" v-model="brapiToken" />
       </b-form-group>
 

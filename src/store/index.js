@@ -246,6 +246,8 @@ const storeState = {
 
       if (state.dataset) {
         state.dataset.brapiConfig = newBrapiConfig
+
+        idb.updateDatasetBrapiConfig(state.datasetId, newBrapiConfig)
       } else {
         state.brapiConfig = newBrapiConfig
       }

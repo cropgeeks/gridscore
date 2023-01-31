@@ -193,6 +193,14 @@ export default {
         })
     })
   },
+  updateDatasetBrapiConfig: async function (datasetId, brapiConfig) {
+    const db = await this.getDb()
+
+    const dataset = await this.getDataset(datasetId)
+    dataset.brapiConfig = brapiConfig
+
+    return db.put('datasets', dataset)
+  },
   updateDatasetComment: async function (datasetId, comment) {
     const db = await this.getDb()
 

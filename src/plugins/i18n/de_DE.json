@@ -106,6 +106,7 @@
   "formLabelExportBrapiProgram": "Programm",
   "formLabelExportBrapiTrial": "Versuch",
   "formLabelExportBrapiStudy": "Studie",
+  "formLabelExportBrapiStudyType": "Studientyp",
   "formDescriptionExportGerminateAggregation": "Falls ausgewählt, werden Mehrfachmessungen zusammengerechnet um einen einzigen Wert pro Merkmal und Beet zu erstellen.",
   "formLabelFieldLayoutRowCol": "Reihe {row}, Spalte {col}",
   "formLabelGermplasm": "Keimplasma/Sorten",
