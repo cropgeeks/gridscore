@@ -169,6 +169,17 @@ const storeState = {
             .then(() => emitter.emit('datasets-changed'))
         })
     },
+    ON_DATASET_DATE_UPDATED_MUTATION: function (state, update) {
+      emitter.emit('set-loading', true)
+
+      idb.overwriteDatasetData(update.id, update.data)
+        .then(() => loadDataset(state, update.id, { redirect: false }))
+        .finally(() => {
+          emitter.emit('set-loading', false)
+          emitter.emit('dataset-changed', { redirect: false })
+          emitter.emit('datasets-changed')
+        })
+    },
     ON_DATASET_RESET_MUTATION: function (state, datasetId) {
       emitter.emit('set-loading', true)
 
@@ -466,6 +477,9 @@ const storeState = {
     resetDataset: function ({ commit }, datasetId) {
       emitter.emit('set-loading', true)
       commit('ON_DATASET_RESET_MUTATION', datasetId)
+    },
+    setDatasetData: function ({ commit }, update) {
+      commit('ON_DATASET_DATE_UPDATED_MUTATION', update)
     },
     addTraitToDataset: function ({ commit }, config) {
       commit('ON_ADD_TRAIT_TO_DATASET_MUTATION', config)

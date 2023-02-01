@@ -95,7 +95,7 @@ const brapiDefaultCatchHandler = (err) => {
  * @param {Boolean} infoCheck (Optional) Indicator whether the BrAPI server should be checked for availability of the requested endpoint. (default: `true`)
  * @returns Promise
  */
-const brapiGet = async (url, callName, params = null, method = 'get', infoCheck = true) => {
+const brapiAxios = async (url, callName, params = null, method = 'get', infoCheck = true) => {
   const brapiConfig = store.getters.storeBrapiConfig
   const baseUrl = brapiConfig ? brapiConfig.url : null
   const token = brapiConfig ? brapiConfig.token : null
@@ -113,7 +113,8 @@ const brapiGet = async (url, callName, params = null, method = 'get', infoCheck 
   const axiosParams = {
     baseURL: baseUrl,
     url: url,
-    params: params,
+    params: method === 'get' ? params : null,
+    data: method !== 'get' ? params : null,
     method: method,
     crossDomain: true,
     headers: {
@@ -136,7 +137,7 @@ const brapiGet = async (url, callName, params = null, method = 'get', infoCheck 
  * @returns Promise
  */
 const brapiGetVariables = () => {
-  return brapiGet('variables', 'variables', null, 'get', true)
+  return brapiAxios('variables', 'variables', null, 'get', true)
     .then(result => {
       if (result && result.data && result.data.result && result.data.result.data) {
         return result.data.result.data
@@ -152,7 +153,7 @@ const brapiGetVariables = () => {
  * @returns Promise
  */
 const brapiGetPrograms = (params) => {
-  return brapiGet('programs', 'programs', params, 'get', true)
+  return brapiAxios('programs', 'programs', params, 'get', true)
     .then(result => {
       if (result && result.data && result.data.result && result.data.result.data) {
         return result.data.result.data
@@ -168,7 +169,7 @@ const brapiGetPrograms = (params) => {
  * @returns Promise
  */
 const brapiGetTrials = (params) => {
-  return brapiGet('trials', 'trials', params, 'get', true)
+  return brapiAxios('trials', 'trials', params, 'get', true)
     .then(result => {
       if (result && result.data && result.data.result && result.data.result.data) {
         return result.data.result.data
@@ -184,7 +185,7 @@ const brapiGetTrials = (params) => {
  * @returns Promise
  */
 const brapiGetStudyTypes = (params) => {
-  return brapiGet('studytypes', 'studytypes', params, 'get', true)
+  return brapiAxios('studytypes', 'studytypes', params, 'get', true)
     .then(result => {
       if (result && result.data && result.data.result && result.data.result.data) {
         return result.data.result.data
@@ -200,7 +201,7 @@ const brapiGetStudyTypes = (params) => {
  * @returns Promise
  */
 const brapiGetStudies = (params) => {
-  return brapiGet('studies', 'studies', params, 'get', true)
+  return brapiAxios('studies', 'studies', params, 'get', true)
     .then(result => {
       if (result && result.data && result.data.result && result.data.result.data) {
         return result.data.result.data
@@ -216,7 +217,7 @@ const brapiGetStudies = (params) => {
 const brapiGetInfo = async () => {
   const url = store.getters.storeBrapiConfig ? store.getters.storeBrapiConfig.url : null
   if (url) {
-    await brapiGet('serverinfo', 'serverinfo', null, 'get', false)
+    await brapiAxios('serverinfo', 'serverinfo', null, 'get', false)
       .then(result => {
         if (result && result.data && result.data.result) {
           serverInfos[url] = result.data.result.calls
@@ -229,13 +230,25 @@ const brapiGetInfo = async () => {
   }
 }
 
+const brapiPostGermplasmSearch = (params) => {
+  return brapiAxios('search/germplasm', 'search/germplasm', params, 'post', true)
+    .then(result => {
+      if (result && result.data && result.data.result && result.data.result.data) {
+        return result.data.result.data
+      } else {
+        return []
+      }
+    })
+}
+
 export {
-  brapiGet,
+  brapiAxios,
   brapiGetVariables,
   brapiGetPrograms,
   brapiGetTrials,
   brapiGetStudyTypes,
   brapiGetStudies,
   brapiGetInfo,
+  brapiPostGermplasmSearch,
   brapiDefaultCatchHandler
 }

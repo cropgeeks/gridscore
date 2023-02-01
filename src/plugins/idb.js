@@ -291,6 +291,10 @@ export default {
   deleteDatabase: async function () {
     await deleteDB('gridscore-' + window.location.pathname)
   },
+  overwriteDatasetData: async function (datasetId, data) {
+    await this.deleteDatasetData(datasetId)
+    return this.setDatasetData(datasetId, data)
+  },
   setDatasetData: async function (datasetId, data) {
     const db = await this.getDb()
 
@@ -307,6 +311,7 @@ export default {
             row: y,
             col: x,
             name: d.name,
+            brapiId: d.brapiId,
             rep: d.rep,
             dates: d.dates,
             values: d.values,
