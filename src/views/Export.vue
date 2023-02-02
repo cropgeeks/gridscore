@@ -131,14 +131,14 @@
           </div>
         </div>
       </b-tab>
-      <b-tab lazy>
+      <!-- <b-tab lazy>
         <template #title>
           <IconBrapi /> {{ $t('tabTitleExportBrAPI') }}
         </template>
         <p v-html="$t('modalTextExportBrAPI')" />
 
         <BrapiExportSection />
-      </b-tab>
+      </b-tab> -->
     </b-tabs>
 
     <HelpModal url="https://cropgeeks.github.io/gridscore/exporting-data.html" ref="helpModal" />
@@ -152,8 +152,8 @@ import { mapGetters } from 'vuex'
 
 import TraitHeading from '@/components/TraitHeading'
 import HelpModal from '@/components/modals/HelpModal'
-import IconBrapi from '@/components/IconBrapi'
-import BrapiExportSection from '@/components/BrapiExportSection'
+// import IconBrapi from '@/components/IconBrapi'
+// import BrapiExportSection from '@/components/BrapiExportSection'
 
 import api from '@/mixin/api'
 
@@ -169,9 +169,9 @@ export default {
     BIconQuestionCircleFill,
     BIconGrid3x3,
     BIconGrid3x2Gap,
-    BrapiExportSection,
+    // BrapiExportSection,
     HelpModal,
-    IconBrapi,
+    // IconBrapi,
     TraitHeading
   },
   data: function () {
