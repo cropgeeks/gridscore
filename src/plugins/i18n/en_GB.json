@@ -124,7 +124,7 @@
   "formLabelRowCount": "No rows | One row | {count} rows",
   "formLabelImportExportData": "Data",
   "formDescriptionAddGermplasm": "Enter the germplasm name/identifier.",
-  "formDescriptionBrapiUrl": "The URL of the BrAPI endpoint. Usually of the form <code>{URL}/brapi/v2/</code>",
+  "formDescriptionBrapiUrl": "The URL of the BrAPI endpoint. Usually of the form <code>{URL}/api/brapi/v2/</code>",
   "formDescriptionBrapiToken": "A token may be required for write operations or access limitations",
   "formDescriptionDataEntryMultiPrevValue": "Previous value recorded on {date}: {prevValue}.",
   "formDescriptionImportExportData": "Importing data requires it to be properly formatted. Be careful what you try to import.",

@@ -122,7 +122,7 @@
   "formLabelColCount": "Keine Spalten | Eine Spalte | {count} Spalten",
   "formLabelRowCount": "Keine Zeilen | Eine Zeile | {count} Zeilen",
   "formLabelImportExportData": "Daten",
-  "formDescriptionBrapiUrl": "Die URL des BrAPI-Endpunktes. Normalerweise in der Form <code>{URL}/brapi/v2/</code>",
+  "formDescriptionBrapiUrl": "Die URL des BrAPI-Endpunktes. Normalerweise in der Form <code>{URL}/api/brapi/v2/</code>",
   "formDescriptionBrapiToken": "Ein Token kann benötigt werden für Schreiboperationen oder Zugriffsbeschränkungen",
   "formDescriptionDataEntryMultiPrevValue": "Vorheriger Wert gesetzt am: {date}: {prevValue}.",
   "formDescriptionImportExportData": "Importierte Daten müssen korrekt formattiert sein. Bitte Vorsicht walten lassen beim Importieren von Daten.",
