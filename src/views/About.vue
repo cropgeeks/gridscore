@@ -43,6 +43,20 @@
       <p class="d-flex"><BIconInfoCircleFill class="mt-1" /> <span class="ml-3" v-html="$t('pageAboutDocumentationLink')" /></p>
       <p class="d-flex"><BIconGithub class="mt-1" /> <span class="ml-3" v-html="$t('pageAboutGitHubLink')" /></p>
       <p class="d-flex"><BIconNewspaper class="mt-1" /> <span class="ml-3" v-html="$t('modalTextCitation')" /></p>
+
+      <!-- Funders -->
+      <h2>{{ $t('pageAboutGridScoreFundersTitle') }}<small> - {{ $t('pageAboutGridScoreFundersSubtitle') }}</small></h2>
+      <p>{{ $t('pageAboutGridScoreFundersText') }}</p>
+      <b-row class="funders">
+        <b-col cols=6 sm=4 xl=3 v-for="(funder, i) in funders" :key="'about-funders-' + i" class="text-center pb-5 col-xxl-2">
+          <div class="p-3 p-xl-4 img-container d-flex justify-content-center">
+            <a :href="funder.href" :title="funder.name" target="_blank" rel="noopener noreferrer" class="align-self-center" v-if="funder.href">
+              <b-img-lazy :src="require(`@/assets/${funder.logo}`)" fluid alt="Funder logo" />
+            </a>
+            <b-img-lazy :src="require(`@/assets/${funder.logo}`)" fluid  alt="Funder logo" v-else />
+          </div>
+        </b-col>
+      </b-row>
     </b-container>
 
     <ChangelogModal ref="changelogModal" />
@@ -62,6 +76,47 @@ export default {
     BIconNewspaper,
     BIconTag,
     ChangelogModal
+  },
+  data: function () {
+    return {
+      funders: [
+        {
+          name: 'The James Hutton Institute',
+          href: 'http://www.hutton.ac.uk/',
+          logo: 'funders/hutton.svg'
+        },
+        {
+          name: 'Crop Trust',
+          href: 'https://www.croptrust.org/',
+          logo: 'funders/crop-trust.svg'
+        },
+        {
+          name: 'The Norwegian Agency for Development Coorperation',
+          href: 'https://www.norad.no/en/',
+          logo: 'funders/norad.svg'
+        },
+        {
+          name: 'Norwegian Ministry of Foreign Affairs',
+          href: 'https://www.regjeringen.no/en/dep/ud/id833/',
+          logo: 'funders/norwegian-ministry-of-foreign-affairs.svg'
+        },
+        {
+          name: 'Biotechnology and Biological Sciences Research Council',
+          href: 'https://bbsrc.ukri.org/',
+          logo: 'funders/bbsrc.svg'
+        },
+        {
+          name: 'The Scottish Government',
+          href: 'https://www.gov.scot/',
+          logo: 'funders/scottish-government.svg'
+        },
+        {
+          name: 'International Barley Hub',
+          href: 'http://www.barleyhub.org/',
+          logo: 'funders/ibh.svg'
+        }
+      ]
+    }
   },
   computed: {
     /** Mapgetters exposing the store configuration */
@@ -150,6 +205,15 @@ export default {
   .about-header img {
     max-height: 150px;
   }
+}
+
+.funders .img-container {
+  height: 200px;
+}
+.funders img {
+  height: 150px;
+  width: auto;
+  object-fit: contain;
 }
 
 .hutton-header.row .col {

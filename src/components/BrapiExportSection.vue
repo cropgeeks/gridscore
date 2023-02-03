@@ -3,12 +3,29 @@
     <b-button class="mb-3" @click="showBrapiSettings"><BIconGearFill /> {{ $t('buttonBrapiSettings') }}</b-button>
 
     <b-form @submit.prevent="onSubmit">
-      <h3>{{ $t('pageBrapiExportBrapiIdTitle') }}</h3>
-      <p :class="allGermplasmValidDbId ? 'text-success' : 'text-danger'">{{ $t('pageBrapiExportBrapiIdText', germplasmWithBrapiDbIds) }}</p>
+      <b-row>
+        <b-col cols=12 md=6 class="mb-3 d-flex flex-column align-items-start justify-content-between">
+          <div>
+            <h3>{{ $t('pageBrapiExportBrapiGermplasmIdTitle') }}</h3>
+            <p :class="allGermplasmValidDbId ? 'text-success' : 'text-danger'">{{ $t('pageBrapiExportBrapiGermplasmIdText', germplasmWithBrapiDbIds) }}</p>
+          </div>
 
-      <b-button :disabled="allGermplasmValidDbId" @click="searchBrapiGermplasmMatches"><BIconSearch /> {{ $t('buttonUpdate') }}</b-button>
+          <b-button :variant="allGermplasmValidDbId ? null : 'primary'" :disabled="allGermplasmValidDbId" @click="searchBrapiGermplasmMatches"><BIconSearch /> {{ $t('buttonUpdate') }}</b-button>
+        </b-col>
+        <b-col cols=12 md=6 class="mb-3 d-flex flex-column align-items-start justify-content-between">
+          <div>
+            <h3>{{ $t('pageBrapiExportBrapiTraitIdTitle') }}</h3>
+            <p :class="allTraitsValidDbId ? 'text-success' : 'text-danger'">{{ $t('pageBrapiExportBrapiTraitIdText', traitsWithBrapiDbIds) }}</p>
+          </div>
 
-      <div class="mt-3" v-if="allGermplasmValidDbId">
+          <div>
+            <b-button class="mr-2" :variant="allTraitsValidDbId ? null : 'primary'" :disabled="allTraitsValidDbId" @click="searchBrapiTraitMatches"><BIconSearch /> {{ $t('buttonUpdate') }}</b-button>
+            <span v-b-tooltip="(allTraitsValidDbId || traitLookupRanAtLeastOnce) ? null : $t('tooltipBrapiExportBrapiTraitRunSearch')"><b-button :disabled="!traitLookupRanAtLeastOnce" @click="writeTraitsWithoutBrapiId"><BIconCloudPlus /> {{ $t('buttonUpload') }}</b-button></span>
+          </div>
+        </b-col>
+      </b-row>
+
+      <div class="mt-3" v-if="allGermplasmValidDbId && allTraitsValidDbId">
         <h3>{{ $t('pageBrapiExportFilterTitle') }}</h3>
         <b-row>
           <b-col cols=12 md=4 lg=3>
@@ -33,7 +50,7 @@
           </b-col>
         </b-row>
 
-        <b-button variant="primary" :disabled="!canProceed">{{ $t('buttonSendData') }}</b-button>
+        <b-button @click="sendData" variant="primary" :disabled="!canProceed"><BIconCloudUpload /> {{ $t('buttonSendData') }}</b-button>
       </div>
     </b-form>
   </div>
@@ -42,16 +59,18 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import { BIconGearFill, BIconSearch } from 'bootstrap-vue'
+import { BIconGearFill, BIconSearch, BIconCloudUpload, BIconCloudPlus } from 'bootstrap-vue'
 
-import { brapiGetPrograms, brapiGetTrials, brapiGetStudies, brapiGetStudyTypes, brapiPostGermplasmSearch, brapiDefaultCatchHandler } from '@/mixin/brapi'
+import { brapiGetPrograms, brapiGetTrials, brapiGetStudies, brapiGetStudyTypes, brapiPostObservationUnits, brapiPostGermplasmSearch, brapiPostObservationVariableSearch, brapiDefaultCatchHandler } from '@/mixin/brapi'
 
 const emitter = require('tiny-emitter/instance')
 
 export default {
   components: {
     BIconSearch,
-    BIconGearFill
+    BIconGearFill,
+    BIconCloudUpload,
+    BIconCloudPlus
   },
   data: function () {
     return {
@@ -67,15 +86,23 @@ export default {
         count: 0,
         total: 0,
         germplasmWithoutId: []
-      }
+      },
+      traitsWithBrapiDbIds: {
+        count: 0,
+        total: 0,
+        traitsWithoutId: []
+      },
+      traitLookupRanAtLeastOnce: false
     }
   },
   watch: {
     'brapiConfig.url': function () {
       this.updateBrapiGermplasmDbIdCounts()
+      this.updateBrapiTraitDbIdCounts()
     },
     'brapiConfig.token': function () {
       this.updateBrapiGermplasmDbIdCounts()
+      this.updateBrapiTraitDbIdCounts()
     },
     selectedProgram: function () {
       this.selectedTrial = null
@@ -91,6 +118,9 @@ export default {
       this.selectedStudy = null
 
       this.updateStudies()
+    },
+    storeTraits: function () {
+      this.updateBrapiTraitDbIdCounts()
     }
   },
   computed: {
@@ -103,6 +133,9 @@ export default {
     ]),
     allGermplasmValidDbId: function () {
       return this.germplasmWithBrapiDbIds.count === this.germplasmWithBrapiDbIds.total
+    },
+    allTraitsValidDbId: function () {
+      return this.traitsWithBrapiDbIds.count === this.traitsWithBrapiDbIds.total
     },
     canProceed: function () {
       return this.selectedProgram && this.selectedTrial && this.selectedStudyType && this.selectedStudy && this.allGermplasmValidDbId
@@ -157,6 +190,116 @@ export default {
     }
   },
   methods: {
+    pad: function (num) {
+      return (num < 10 ? '0' : '') + num
+    },
+    toIsoString: function (str) {
+      const date = new Date(str)
+      const tzo = -date.getTimezoneOffset()
+      const dif = tzo >= 0 ? '+' : '-'
+
+      return date.getFullYear() +
+        '-' + this.pad(date.getMonth() + 1) +
+        '-' + this.pad(date.getDate()) +
+        'T' + this.pad(date.getHours()) +
+        ':' + this.pad(date.getMinutes()) +
+        ':' + this.pad(date.getSeconds()) +
+        dif + this.pad(Math.floor(Math.abs(tzo) / 60)) + this.pad(Math.abs(tzo) % 60)
+    },
+    sendData: function () {
+      const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
+      if (storeData && storeData.size > 0) {
+        emitter.emit('set-loading', true)
+
+        const data = []
+
+        for (let y = 0; y < this.storeRows; y++) {
+          // And each field column
+          for (let x = 0; x < this.storeCols; x++) {
+            // Get the data cell
+            const cell = storeData.get(`${y}-${x}`)
+
+            const dp = {
+              germplasmDbId: cell.brapiId,
+              germplasmName: cell.name,
+              observationUnitPosition: {
+                positionCoordinateXType: 'GRID_COL',
+                positionCoordinateX: x + 1,
+                positionCoordinateYType: 'GRID_ROW',
+                positionCoordinateY: y + 1,
+                observationLevel: (cell.rep !== undefined && cell.rep !== null)
+                ? {
+                  levelName: 'rep',
+                  levelCode: cell.rep
+                }
+                : null
+              },
+              programDbId: this.selectedProgram.programDbId,
+              trialDbId: this.selectedTrial.trialDbId,
+              studyDbId: this.selectedStudy.studyDbId,
+              observations: []
+            }
+
+            this.storeTraits.forEach((t, i) => {
+              const value = cell.values[i]
+              const date = cell.dates[i]
+
+              if (t.mType === 'multi') {
+                value.forEach((v, vi) => {
+                  if (v !== undefined && v !== null) {
+                    dp.observations.push({
+                      germplasmDbId: cell.brapiId,
+                      germplasmName: cell.name,
+                      observationVariableDbId: t.brapiId,
+                      observationVariableName: t.name,
+                      studyDbId: this.selectedStudy.studyDbId,
+                      value: v,
+                      observationTimeStamp: this.toIsoString(date[vi])
+                    })
+                  }
+                })
+              } else {
+                if (value !== undefined && value !== null) {
+                  dp.observations.push({
+                    germplasmDbId: cell.brapiId,
+                    germplasmName: cell.name,
+                    observationVariableDbId: t.brapiId,
+                    observationVariableName: t.name,
+                    studyDbId: this.selectedStudy.studyDbId,
+                    value: value,
+                    observationTimeStamp: this.toIsoString(date)
+                  })
+                }
+              }
+            })
+
+            if (dp.observations.length > 0) {
+              data.push(dp)
+            }
+          }
+        }
+
+        brapiPostObservationUnits(data)
+          .then(result => {
+            console.log(result)
+          })
+          .catch(brapiDefaultCatchHandler)
+          .finally(() => emitter.emit('set-loading', false))
+      }
+    },
+    updateBrapiTraitDbIdsInDatabase: function (map) {
+      const traits = JSON.parse(JSON.stringify(this.storeTraits))
+
+      traits.forEach(t => {
+        const brapiId = map.get(t.name.toLowerCase())
+
+        if (brapiId !== undefined && brapiId !== null) {
+          t.brapiId = brapiId
+        }
+      })
+
+      this.$store.dispatch('updateTraitBrapiIds', { datasetId: this.storeDatasetId, traits: traits })
+    },
     updateBrapiGermplasmDbIdsInDatabase: function (map) {
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
       if (storeData && storeData.size > 0) {
@@ -190,6 +333,21 @@ export default {
         this.$store.dispatch('setDatasetData', { data: rows, id: this.storeDatasetId })
       }
     },
+    searchBrapiTraitMatches: function () {
+      brapiPostObservationVariableSearch({
+        observationVariableNames: this.traitsWithBrapiDbIds.traitsWithoutId
+      }).then(result => {
+        this.traitLookupRanAtLeastOnce = true
+        const map = new Map()
+        if (result) {
+          result.forEach(g => {
+            map.set(g.observationVariableName.toLowerCase(), g.observationVariableDbId)
+          })
+
+          this.updateBrapiTraitDbIdsInDatabase(map)
+        }
+      }).catch(brapiDefaultCatchHandler)
+    },
     searchBrapiGermplasmMatches: function () {
       brapiPostGermplasmSearch({
         germplasmNames: this.germplasmWithBrapiDbIds.germplasmWithoutId
@@ -222,7 +380,7 @@ export default {
     },
     updateTrials: function () {
       brapiGetTrials({
-        programDbId: this.selectedProgram.programDbId
+        programDbId: this.selectedProgram ? this.selectedProgram.programDbId : null
       })
         .then(result => {
           this.trials = result
@@ -255,7 +413,7 @@ export default {
     updateStudies: function () {
       brapiGetStudies({
         studyType: this.selectedStudyType,
-        trialDbId: this.selectedTrial.trialDbId
+        trialDbId: this.selectedTrial ? this.selectedTrial.trialDbId : null
       })
         .then(result => {
           this.studies = result
@@ -267,6 +425,25 @@ export default {
           }
         })
         .catch(brapiDefaultCatchHandler)
+    },
+    updateBrapiTraitDbIdCounts: function () {
+      let count = 0
+      const total = this.storeTraits.length
+      const traitsWithoutId = []
+
+      this.storeTraits.forEach(t => {
+        if (t.brapiId !== undefined && t.brapiId !== null) {
+          count++
+        } else {
+          traitsWithoutId.push(t.name)
+        }
+      })
+
+      this.traitsWithBrapiDbIds = {
+        count,
+        total,
+        traitsWithoutId
+      }
     },
     updateBrapiGermplasmDbIdCounts: function () {
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
@@ -310,13 +487,16 @@ export default {
   mounted: function () {
     this.updatePrograms()
     this.updateBrapiGermplasmDbIdCounts()
+    this.updateBrapiTraitDbIdCounts()
 
     emitter.on('brapi-settings-changed', this.updatePrograms)
     emitter.on('dataset-changed', this.updateBrapiGermplasmDbIdCounts)
+    emitter.on('traits-updated', this.updateBrapiTraitDbIdCounts)
   },
   beforeDestroy: function () {
     emitter.off('brapi-settings-changed', this.updatePrograms)
     emitter.off('dataset-changed', this.updateBrapiGermplasmDbIdCounts)
+    emitter.off('traits-updated', this.updateBrapiTraitDbIdCounts)
   }
 }
 </script>

@@ -171,6 +171,20 @@ export default {
         })
     })
   },
+  updateTraitBrapiIds: async function (datasetId, traits) {
+    const db = await this.getDb()
+    const dataset = await this.getDataset(datasetId)
+
+    dataset.traits.forEach(t => {
+      const match = traits.find(ot => ot.name === t.name && ot.type === t.type && ot.mType === t.mType)
+
+      if (match && match.brapiId) {
+        t.brapiId = match.brapiId
+      }
+    })
+
+    return db.put('datasets', dataset)
+  },
   addTraitToDataset: async function (datasetId, trait) {
     const db = await this.getDb()
     const dataset = await this.getDataset(datasetId)

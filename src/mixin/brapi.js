@@ -69,8 +69,8 @@ const brapiDefaultCatchHandler = (err) => {
     // The request was made but no response was received `err.request` is an instance of XMLHttpRequest in the browser
     if (err.request.textStatus === 'timeout') {
       emitter.emit('toast', {
-        message: 'Request to the server timed out.',
-        title: 'Error',
+        message: i18n.t('toastTextBrapiTimeout'),
+        title: i18n.t('toastTitleBrapiError'),
         variant: 'danger',
         autoHideDelay: 5000,
         appendToast: true
@@ -101,11 +101,18 @@ const brapiAxios = async (url, callName, params = null, method = 'get', infoChec
   const token = brapiConfig ? brapiConfig.token : null
 
   if (infoCheck) {
-    if (!serverInfos[baseUrl]) {
+    if (!serverInfos[baseUrl] || Object.keys(serverInfos[baseUrl]).length < 1) {
       await brapiGetInfo()
     }
 
     if (!serverInfos[baseUrl] || !serverInfos[baseUrl].some(c => c.service === callName && c.versions.indexOf('2.1') !== -1)) {
+      emitter.emit('toast', {
+        message: i18n.t('toastTextBrapiCallNotAvailable'),
+        title: i18n.t('toastTitleBrapiError'),
+        variant: 'danger',
+        autoHideDelay: 5000,
+        appendToast: true
+      })
       return Promise.reject(new Error(`BrAPI call not available for the given URL: ${callName}`))
     }
   }
@@ -241,6 +248,28 @@ const brapiPostGermplasmSearch = (params) => {
     })
 }
 
+const brapiPostObservationVariableSearch = (params) => {
+  return brapiAxios('search/variables', 'search/variables', params, 'post', true)
+    .then(result => {
+      if (result && result.data && result.data.result && result.data.result.data) {
+        return result.data.result.data
+      } else {
+        return []
+      }
+    })
+}
+
+const brapiPostObservationUnits = (params) => {
+  return brapiAxios('observationunits', 'observationunits', params, 'post', true)
+    .then(result => {
+      if (result && result.data && result.data.result && result.data.result.data) {
+        return result.data.result.data
+      } else {
+        return []
+      }
+    })
+}
+
 export {
   brapiAxios,
   brapiGetVariables,
@@ -250,5 +279,7 @@ export {
   brapiGetStudies,
   brapiGetInfo,
   brapiPostGermplasmSearch,
+  brapiPostObservationUnits,
+  brapiPostObservationVariableSearch,
   brapiDefaultCatchHandler
 }

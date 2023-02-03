@@ -214,6 +214,19 @@ const storeState = {
           emitter.emit('dataset-changed')
         })
     },
+    ON_TRAIT_BRAPI_IDS_CHANGED_MUTATION: function (state, config) {
+      emitter.emit('set-loading', true)
+
+      if (state.dataset) {
+        Vue.set(state.dataset, 'traits', config.traits)
+      }
+
+      idb.updateTraitBrapiIds(config.datasetId, config.traits)
+        .finally(() => {
+          emitter.emit('set-loading', false)
+          emitter.emit('traits-updated')
+        })
+    },
     ON_ADD_TRAIT_TO_DATASET_MUTATION: function (state, config) {
       emitter.emit('set-loading', true)
 
@@ -256,7 +269,7 @@ const storeState = {
       }
 
       if (state.dataset) {
-        state.dataset.brapiConfig = newBrapiConfig
+        Vue.set(state.dataset, 'brapiConfig', newBrapiConfig)
 
         idb.updateDatasetBrapiConfig(state.datasetId, newBrapiConfig)
       } else {
@@ -480,6 +493,9 @@ const storeState = {
     },
     setDatasetData: function ({ commit }, update) {
       commit('ON_DATASET_DATE_UPDATED_MUTATION', update)
+    },
+    updateTraitBrapiIds: function ({ commit }, config) {
+      commit('ON_TRAIT_BRAPI_IDS_CHANGED_MUTATION', config)
     },
     addTraitToDataset: function ({ commit }, config) {
       commit('ON_ADD_TRAIT_TO_DATASET_MUTATION', config)
