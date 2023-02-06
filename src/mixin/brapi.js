@@ -270,6 +270,17 @@ const brapiPostObservationUnits = (params) => {
     })
 }
 
+const brapiPostObservationVariables = (params) => {
+  return brapiAxios('variables', 'variables', params, 'post', true)
+    .then(result => {
+      if (result && result.data && result.data.result && result.data.result.data) {
+        return result.data.result.data
+      } else {
+        return []
+      }
+    })
+}
+
 export {
   brapiAxios,
   brapiGetVariables,
@@ -280,6 +291,7 @@ export {
   brapiGetInfo,
   brapiPostGermplasmSearch,
   brapiPostObservationUnits,
+  brapiPostObservationVariables,
   brapiPostObservationVariableSearch,
   brapiDefaultCatchHandler
 }

@@ -61,7 +61,7 @@ import { mapGetters } from 'vuex'
 
 import { BIconGearFill, BIconSearch, BIconCloudUpload, BIconCloudPlus } from 'bootstrap-vue'
 
-import { brapiGetPrograms, brapiGetTrials, brapiGetStudies, brapiGetStudyTypes, brapiPostObservationUnits, brapiPostGermplasmSearch, brapiPostObservationVariableSearch, brapiDefaultCatchHandler } from '@/mixin/brapi'
+import { brapiGetPrograms, brapiGetTrials, brapiGetStudies, brapiGetStudyTypes, brapiPostObservationUnits, brapiPostGermplasmSearch, brapiPostObservationVariables, brapiPostObservationVariableSearch, brapiDefaultCatchHandler } from '@/mixin/brapi'
 
 const emitter = require('tiny-emitter/instance')
 
@@ -206,6 +206,68 @@ export default {
         ':' + this.pad(date.getSeconds()) +
         dif + this.pad(Math.floor(Math.abs(tzo) / 60)) + this.pad(Math.abs(tzo) % 60)
     },
+    writeTraitsWithoutBrapiId: function () {
+      if (this.traitsWithBrapiDbIds && this.traitsWithBrapiDbIds.traitsWithoutId && this.traitsWithBrapiDbIds.traitsWithoutId.length > 0) {
+        const newTraits = this.storeTraits.concat().filter(t => this.traitsWithBrapiDbIds.traitsWithoutId.includes(t.name)).map(t => {
+          const newT = {
+            observationVariableName: t.name
+          }
+
+          const scale = {
+            dataType: null,
+            validValues: null
+          }
+
+          switch (t.type) {
+            case 'date':
+              scale.dataType = 'Date'
+              break
+            case 'text':
+              scale.dataType = 'Text'
+              break
+            case 'float':
+              scale.dataType = 'Numeric'
+              break
+            case 'int':
+              scale.dataType = 'Duration'
+              break
+            case 'categorical':
+              scale.dataType = 'Ordinal'
+              break
+            default:
+              scale.dataType = 'Text'
+          }
+
+          if (t.restrictions) {
+            scale.validValues = {}
+            if (t.restrictions.min !== undefined && t.restrictions.min !== null) {
+              scale.validValues.minimumValue = t.restrictions.min
+            }
+            if (t.restrictions.max !== undefined && t.restrictions.max !== null) {
+              scale.validValues.maximumValue = t.restrictions.max
+            }
+            if (t.restrictions.categories && t.restrictions.categories.length > 0) {
+              scale.validValues.categories = t.restrictions.categories.map(c => {
+                return {
+                  label: c,
+                  value: c
+                }
+              })
+            }
+          }
+
+          newT.scale = scale
+
+          return newT
+        })
+
+        brapiPostObservationVariables(newTraits)
+          .then(result => {
+            this.searchBrapiTraitMatches()
+          })
+          .catch(brapiDefaultCatchHandler)
+      }
+    },
     sendData: function () {
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
       if (storeData && storeData.size > 0) {
@@ -291,10 +353,36 @@ export default {
       const traits = JSON.parse(JSON.stringify(this.storeTraits))
 
       traits.forEach(t => {
-        const brapiId = map.get(t.name.toLowerCase())
+        const brapiMatches = map.get(t.name.toLowerCase())
 
-        if (brapiId !== undefined && brapiId !== null) {
-          t.brapiId = brapiId
+        if (brapiMatches && brapiMatches.length > 0) {
+          brapiMatches.forEach(brapiMatch => {
+            if (brapiMatch && brapiMatch.scale) {
+              // Check data type
+              let matches = false
+              switch (brapiMatch.scale.dataType) {
+                case 'Date':
+                  matches = t.type === 'date'
+                  break
+                case 'Text':
+                  matches = t.type === 'text'
+                  break
+                case 'Numeric':
+                  matches = t.type === 'float' || t.type === 'int'
+                  break
+                case 'Duration':
+                  matches = t.type === 'int'
+                  break
+                case 'Ordinal':
+                  matches = t.type === 'categorical'
+                  break
+              }
+
+              if (matches) {
+                t.brapiId = brapiMatch.observationVariableDbId
+              }
+            }
+          })
         }
       })
 
@@ -341,7 +429,15 @@ export default {
         const map = new Map()
         if (result) {
           result.forEach(g => {
-            map.set(g.observationVariableName.toLowerCase(), g.observationVariableDbId)
+            const lower = g.observationVariableName.toLowerCase()
+            let match = map.get(lower)
+            if (!match) {
+              match = []
+            }
+
+            match.push(g)
+
+            map.set(lower, match)
           })
 
           this.updateBrapiTraitDbIdsInDatabase(map)
