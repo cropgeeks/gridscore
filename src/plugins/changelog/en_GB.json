@@ -101,5 +101,16 @@
         "text": "For multi-traits it's now possible to to look at all recorded values over time in the form of a heatmap. For this purpose, we added a new visualization option called 'Show timeline' which will activate a time slider to move through time and see how the multi-trait changed over time."
       }
     ]
+  },
+  {
+    "version": "1.15.0",
+    "date": "2023-02-10",
+    "items": [
+      {
+        "type": "new",
+        "title": "BrAPI export to Germinate",
+        "text": "GridScore now supports export of trials data to Germinate via BrAPI. To use this feature, go to the export section of a trial and then select the 'BrAPI' tab. You'll need to have a valid Germinate API token to upload data and you have to have at least 'Data Curator' permissions."
+      }
+    ]
   }
 ]

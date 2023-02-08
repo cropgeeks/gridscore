@@ -537,7 +537,7 @@ export default {
     }
 
     this.changelogVersionNumber = this.storeChangelogVersionNumber
-    if (this.storeChangelogVersionNumber !== this.gridScoreVersion) {
+    if (this.storeChangelogVersionNumber !== null && this.storeChangelogVersionNumber !== this.gridScoreVersion) {
       this.$refs.changelogModal.show()
       this.$store.dispatch('setChangelogVersionNumber', this.gridScoreVersion)
     }
