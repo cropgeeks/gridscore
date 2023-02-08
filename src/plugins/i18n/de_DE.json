@@ -264,7 +264,7 @@
   "modalTextExportGerminate": "Falls die Daten nach Germinate importiert werden sollen kann GridScore sie im <a href='https://github.com/germinateplatform/germinate-data-templates'>Germinate Data Template Format</a> exportieren. Einfach auf den Knopf unten klicken um die Daten zum GridScore Server zur Bearbeitung zu schicken. Wenn der Download abgeschlossen ist, erscheint ein Download-Link zum Herunterladen.",
   "modalTextExportGerminateMultiSelection": "Bitte eine Zusammenrechnungsmethode für jedes Mehrfach-Merkmal auswählen.",
   "modalTextExportTraits": "Die anfangs definierten Merkmale sind hier zum Exportieren bereitgestellt. Das Exportformat hält sich eng an das von <a href='https://ics.hutton.ac.uk/get-germinate'>Germinate</a> benutzte Format.",
-  "modalTextExportBrAPI": "Daten könne direkt in einen BrAPI-kompatiblen Server exportiert werden unter der Annahme, dass Schreiberechte vorhanden sind. Nutze den Knopf unten um die BrAPI-URL und Authentifikationstoken anzugeben und danach das Programm, Studie und Versuch auszuwählen in die die Daten exportiert werden sollen.",
+  "modalTextExportBrAPI": "Daten könne direkt in einen BrAPI-kompatiblen Server exportiert werden unter der Annahme, dass Schreiberechte vorhanden sind. Nutze den Knopf unten um die BrAPI-URL und Authentifikationstoken anzugeben und danach das Programm, Studie und Versuch auszuwählen in die die Daten exportiert werden sollen. Bitte beachten, dass Bilder, Videos und Kommentare bei Benutzung dieses Mechanismus nicht nach Germinate exportiert werden können.",
   "modalTextImportOr": "ODER",
   "modalTextExportQR": "Untenstehenden QR Code auf dem empfangenden Gerät scannen. Die Konfiguration wird dort dann verfügbar sein.",
   "modalTitleSettings": "Einstellungen",
