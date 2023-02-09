@@ -20,7 +20,7 @@
 
           <div>
             <b-button class="mr-2" :variant="allTraitsValidDbId ? null : 'primary'" :disabled="allTraitsValidDbId" @click="searchBrapiTraitMatches"><BIconSearch /> {{ $t('buttonUpdate') }}</b-button>
-            <span v-b-tooltip="traitLookupRanAtLeastOnce ? '' : $t('tooltipBrapiExportBrapiTraitRunSearch')">
+            <span v-b-tooltip="allTraitsValidDbId || traitLookupRanAtLeastOnce ? '' : $t('tooltipBrapiExportBrapiTraitRunSearch')">
               <b-button :disabled="allTraitsValidDbId || !traitLookupRanAtLeastOnce" @click="writeTraitsWithoutBrapiId"><BIconCloudPlus /> {{ $t('buttonUpload') }}</b-button>
             </span>
           </div>

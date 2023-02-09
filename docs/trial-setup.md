@@ -12,25 +12,15 @@ To set up a new trial hit the `Set up a trial` button on the home screen of Grid
 
 The setup screen is used to define some basic characteristics of your field trial. An ideally unique, but definitely memorable name should be chosen for each trial. The name should make it easy to identify the trial you're looking for. So something like `Drought trial Field A 2021` would be ideal.
 
-Row and column counts as well as a list of germplasm/variety names/identifiers is used to identify each plot uniquely. The identifiers can be provided either in a list - one identifier per row - so that the grid is filled in "reading order" from top left to bottom right, or, simply paste the field plan in tabular form from Excel. Make sure the number of rows and columns match what you specified previously.
+Row and column counts as well as a list of germplasm/variety names/identifiers is used to identify each plot uniquely.
 
-As an example, here are the setups for both row and tab mode that will result in the same field layout:
+The germplasm as well as the rep identifiers can be specified by clicking on the "Define" button in the "Germplasm/varieties" section.
 
-```
-A
-B
-C
+<img src="img/screenshot-setup-germplasm.png" style="max-width: 100%;" alt="Trials setup germplasm definition">
 
-E
-F
-```
+The identifiers can be provided by either entering them into the table at the bottom of the screen or by copying and pasting from a spreadsheet like Excel into the top right as seen in the screenshot. Make sure the number of rows and columns match what you specified previously.
 
-```
-A B C
-  E F
-```
-
-Note how empty/blank cells in your trial can be achieved by leaving the row/cell blank.
+Note that empty/blank cells in your trial can be achieved by leaving the cell blank.
 
 Traits are then defined along with their type which can be one of `integer`, `floating point`, `date`, `text` or `categorical` (pick from a list of options). For numeric traits, minimum and maximum values can be defined to make sure that any data that is recorded falls within these limits. For categorical traits, the actual categories need to be defined. Use the cog wheel button to enter these.
 
