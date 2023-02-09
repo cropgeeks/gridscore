@@ -506,9 +506,9 @@ export default {
     exportToGerminateFormat: function () {
       const storeData = this.$store.state.dataset ? this.$store.state.dataset.data : null
       if (storeData) {
+        emitter.emit('set-loading', true)
         this.synchronizeDataset(this.storeDatasetId)
           .then(dataset => {
-            emitter.emit('set-loading', true)
             return this.axios(`config/${dataset.uuid}/export-g8`, this.multiTraitAggregation ? this.multiTraitSelection : [], 'post')
           })
           .then(result => {

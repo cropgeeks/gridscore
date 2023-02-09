@@ -20,7 +20,9 @@
 
           <div>
             <b-button class="mr-2" :variant="allTraitsValidDbId ? null : 'primary'" :disabled="allTraitsValidDbId" @click="searchBrapiTraitMatches"><BIconSearch /> {{ $t('buttonUpdate') }}</b-button>
-            <span v-b-tooltip="(allTraitsValidDbId || traitLookupRanAtLeastOnce) ? null : $t('tooltipBrapiExportBrapiTraitRunSearch')"><b-button :disabled="!traitLookupRanAtLeastOnce" @click="writeTraitsWithoutBrapiId"><BIconCloudPlus /> {{ $t('buttonUpload') }}</b-button></span>
+            <span v-b-tooltip="traitLookupRanAtLeastOnce ? '' : $t('tooltipBrapiExportBrapiTraitRunSearch')">
+              <b-button :disabled="allTraitsValidDbId || !traitLookupRanAtLeastOnce" @click="writeTraitsWithoutBrapiId"><BIconCloudPlus /> {{ $t('buttonUpload') }}</b-button>
+            </span>
           </div>
         </b-col>
       </b-row>
@@ -226,10 +228,8 @@ export default {
               scale.dataType = 'Text'
               break
             case 'float':
-              scale.dataType = 'Numeric'
-              break
             case 'int':
-              scale.dataType = 'Duration'
+              scale.dataType = 'Numeric'
               break
             case 'categorical':
               scale.dataType = 'Ordinal'
@@ -306,22 +306,25 @@ export default {
               const value = cell.values[i]
               const date = cell.dates[i]
 
-              if (t.mType === 'multi') {
-                value.forEach((v, vi) => {
-                  if (v !== undefined && v !== null) {
-                    dp.observations.push({
-                      germplasmDbId: cell.brapiId,
-                      germplasmName: cell.name,
-                      observationVariableDbId: t.brapiId,
-                      observationVariableName: t.name,
-                      studyDbId: this.selectedStudy.studyDbId,
-                      value: v,
-                      observationTimeStamp: this.toIsoString(date[vi])
-                    })
-                  }
-                })
-              } else {
-                if (value !== undefined && value !== null) {
+              if (value !== undefined && value !== null) {
+                if (t.mType === 'multi') {
+                  value.forEach((v, vi) => {
+                    if (v !== undefined && v !== null) {
+                      dp.observations.push({
+                        germplasmDbId: cell.brapiId,
+                        germplasmName: cell.name,
+                        observationVariableDbId: t.brapiId,
+                        observationVariableName: t.name,
+                        studyDbId: this.selectedStudy.studyDbId,
+                        value: v,
+                        observationTimeStamp: this.toIsoString(date[vi]),
+                        additionalInfo: {
+                          traitMType: t.mType
+                        }
+                      })
+                    }
+                  })
+                } else {
                   dp.observations.push({
                     germplasmDbId: cell.brapiId,
                     germplasmName: cell.name,
@@ -329,7 +332,10 @@ export default {
                     observationVariableName: t.name,
                     studyDbId: this.selectedStudy.studyDbId,
                     value: value,
-                    observationTimeStamp: this.toIsoString(date)
+                    observationTimeStamp: this.toIsoString(date),
+                    additionalInfo: {
+                      traitMType: t.mType
+                    }
                   })
                 }
               }
@@ -343,7 +349,7 @@ export default {
 
         brapiPostObservationUnits(data)
           .then(result => {
-            console.log(result)
+            this.plausibleEvent('dataset-export', { format: 'brapi' })
           })
           .catch(brapiDefaultCatchHandler)
           .finally(() => emitter.emit('set-loading', false))
