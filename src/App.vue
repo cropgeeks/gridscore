@@ -607,7 +607,7 @@ html {
 }
 
 body {
-  overflow-y: scroll !important; /* Show vertical scrollbar */
+  overflow-y: scroll !important; /* Show vertical scrollbar to prevent main canvas from jumping */
   min-height: 100vh !important;
 }
 
