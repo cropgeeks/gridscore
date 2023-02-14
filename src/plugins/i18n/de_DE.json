@@ -98,6 +98,7 @@
   "formLabelAddTraitMType": "Einzel-/Mehrfachmessung",
   "formLabelBrapiUrl": "<a href='https://brapi.org/'>BrAPI</a> URL",
   "formLabelBrapiToken": "Token",
+  "formLabelBrapiTraitSearch": "Merkmalsliste aussieben",
   "formLabelComment": "Kommentar",
   "formLabelExportText": "Exportierte Daten",
   "formLabelExportDatesText": "Exportierte Zeitpunkte",

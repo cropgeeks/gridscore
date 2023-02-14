@@ -6,6 +6,7 @@
            @ok.prevent="$emit('submit')"
            scrollable
            no-fade
+           :size="size"
            ref="brapiModal">
     <b-form @submit.prevent="updateBrapiUrl">
       <b-form-group label-for="brapiUrl">
@@ -70,6 +71,10 @@ export default {
     okDisabled: {
       type: Boolean,
       default: false
+    },
+    size: {
+      type: String,
+      default: 'md'
     }
   },
   computed: {

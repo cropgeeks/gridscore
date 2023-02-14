@@ -4,6 +4,7 @@
               :okTitle="'buttonOk'"
               :cancelTitle="'buttonCancel'"
               :okDisabled="!selectedTraits || selectedTraits.length < 1"
+              size="lg"
               @submit="onSubmit"
               no-fade
               @brapi-settings-changed="getTraits">
@@ -17,11 +18,16 @@
       <!-- Else, show the selection -->
       <b-form @submit.prevent="onSubmit" v-else>
         <p v-if="formState === false" class="text-danger">{{ $t('modalTextWarningBrapiTraitImport') }}</p>
-        <template v-if="traits">
+        <template v-if="traits && traits.length > 0">
+          <b-form-group :label="$t('formLabelBrapiTraitSearch')" label-for="trait-search">
+            <b-form-input id="trait-search" type="search" v-model="searchTerm" />
+          </b-form-group>
+
           <b-button-group>
             <b-button @click="onSelectTraits(true)"><BIconListCheck /> {{ $t('buttonSelectAll') }}</b-button>
             <b-button @click="onSelectTraits(false)"><BIconListUl /> {{ $t('buttonSelectNone') }}</b-button>
           </b-button-group>
+
           <!-- Checkbox group representing the list of traits -->
           <b-form-checkbox-group v-model="selectedTraits"
                                 :options="traitOptions"
@@ -58,14 +64,16 @@ export default {
       errorMessage: null,
       formState: true,
       loading: null,
-      brapiConfig: null
+      brapiConfig: null,
+      searchTerm: null
     }
   },
   computed: {
-    /** The trait options for the checkbox component */
     traitOptions: function () {
-      if (this.traits && this.traits.length > 0) {
-        return this.traits.concat().sort((a, b) => {
+      if (this.traits) {
+        return this.traits.concat()
+          .filter(t => this.searchTerm ? t.observationVariableName.toLowerCase().includes(this.searchTerm.toLowerCase()) : true)
+          .sort((a, b) => {
           // Sort by name
           if (a.observationVariableName < b.observationVariableName) {
             return -1
@@ -138,6 +146,7 @@ export default {
       this.selectedTraits = []
       this.traits = []
       this.errorMessage = null
+      this.searchTerm = null
 
       this.$nextTick(() => this.$refs.brapiTraitImportModal.show())
     },
@@ -185,7 +194,7 @@ export default {
     },
     onSelectTraits: function (selectAll) {
       if (selectAll) {
-        this.selectedTraits = this.traits.concat()
+        this.selectedTraits = this.traitOptions.map(t => t.value).concat()
       } else {
         this.selectedTraits = []
       }

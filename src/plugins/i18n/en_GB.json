@@ -99,6 +99,7 @@
   "formLabelAddTraitMType": "Single/Multi measurement",
   "formLabelBrapiUrl": "<a href='https://brapi.org/'>BrAPI</a> URL",
   "formLabelBrapiToken": "Token",
+  "formLabelBrapiTraitSearch": "Filter trait list",
   "formLabelComment": "Comment",
   "formLabelExportText": "Exported data",
   "formLabelExportDatesText": "Exported dates",
