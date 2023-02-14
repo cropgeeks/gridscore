@@ -174,7 +174,7 @@ export default {
       }, {
         title: () => this.$t('tourTitleSetupGermplasm'),
         text: () => this.$t('tourTextSetupGermplasm'),
-        target: () => '#settings-form #varieties',
+        target: () => '#settings-form #germplasm',
         position: 'top'
       }, {
         title: () => this.$t('tourTitleSetupTraits'),
