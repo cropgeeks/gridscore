@@ -5,9 +5,9 @@
                 ref="traitInput"
                 :state="formState[index]"
                 @keyup.enter="$emit('handleDateInput')"
-                :value="values[index]"
+                :value="currentValue"
                 type="date"
-                :key="values[index]"
+                :key="currentValue"
                 @keyup.exact="(event) => $emit('handleDateInputChar', event)"
                 @change="(event) => $emit('onDateChanged', event)" />
   <!-- For int types, show a number input, apply restrictions -->
@@ -17,7 +17,7 @@
                 class="number-input"
                 :state="formState[index]"
                 @keyup.enter="$emit('enter')"
-                :value="values[index]"
+                :value="currentValue"
                 @change="(event) => $emit('onValueChanged', event !== '' ? +event : null)"
                 @wheel="$event.target.blur()"
                 type="number"
@@ -30,7 +30,7 @@
                 class="number-input"
                 :state="formState[index]"
                 @keyup.enter="$emit('enter')"
-                :value="values[index]"
+                :value="currentValue"
                 @change="(event) => $emit('onValueChanged', event !== '' ? +event : null)"
                 type="number"
                 @wheel="$event.target.blur()"
@@ -43,7 +43,7 @@
                 ref="traitInput"
                 :state="formState[index]"
                 @keyup.enter="$emit('enter')"
-                :value="values[index]"
+                :value="currentValue"
                 @change="(event) => $emit('onValueChanged', event)"
                 type="text" />
   <!-- For categorical traits -->
@@ -53,7 +53,7 @@
                   ref="traitInput"
                   :state="formState[index]"
                   @keyup.enter="$emit('enter')"
-                  :value="values[index]"
+                  :value="currentValue"
                   @change="(event) => $emit('onValueChanged', event)"
                   :options="[{ value: null, text: $t('formSelectCategory') }, ...trait.restrictions.categories]" />
   <!-- Else show a button group for easier selection -->
@@ -65,7 +65,7 @@
                       button-variant="outline-secondary"
                       class="category-options"
                       @keyup.enter="$emit('enter')"
-                      :checked="values[index]"
+                      :checked="currentValue"
                       @change="(event) => $emit('onValueChanged', event)"
                       :options="[...trait.restrictions.categories, { value: null, text: '⦸' }]" />
 </template>
@@ -85,9 +85,8 @@ export default {
       type: Array,
       default: () => {}
     },
-    values: {
-      type: Array,
-      default: () => []
+    currentValue: {
+      default: null
     }
   }
 }

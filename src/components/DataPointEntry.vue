@@ -16,7 +16,7 @@
             <b-button @click="takeImage(index)"><BIconCameraFill /></b-button>
             <b-button @click="decrease(index)" v-if="mapping.trait.type === 'int'">-</b-button>
           </b-input-group-prepend>
-          <DataEntryInput :index="index" :values="values" :trait="mapping.trait" :formState="formState"
+          <DataEntryInput :index="index" :currentValue="values[index]" :trait="mapping.trait" :formState="formState"
                           @enter="traverseForm(index + 1)"
                           @handleDateInput="handleDateInput(index)"
                           @handleDateInputChar="event => handleDateInputChar(index, event)"
@@ -36,6 +36,8 @@
             <b-button v-if="mapping.trait.mType === 'multi' && formDescriptions && formDescriptions[index]" v-b-tooltip="$t('tooltipDataEntryMultiTraitShowValues')" variant="secondary" @click="showMultiTraitModal(index)"><BIconInfoCircle /></b-button>
           </b-input-group-append>
         </b-input-group>
+
+        <b-button size="sm" class="mt-2" variant="outline-secondary" @click="addMultiTraitValue(index)" v-if="mapping.trait.mType === 'multi'"><BIconPlus /> {{ $t('buttonAddTraitValue') }}</b-button>
       </b-form-group>
 
       <!-- User comments -->
@@ -78,7 +80,7 @@ import DataEntryInput from '@/components/DataEntryInput'
 import MultiTraitValueModal from '@/components/modals/MultiTraitValueModal'
 import TraitHeading from '@/components/TraitHeading'
 import { mapGetters } from 'vuex'
-import { BIconCameraFill, BIconMic, BIconInfoCircle, BIconChatRightTextFill, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
+import { BIconCameraFill, BIconMic, BIconPlus, BIconInfoCircle, BIconChatRightTextFill, BIconCaretLeftFill, BIconCaretRightFill, BIconCameraVideoFill, BIconCalendar3, BIconSlashCircle } from 'bootstrap-vue'
 
 const emitter = require('tiny-emitter/instance')
 
@@ -93,6 +95,7 @@ export default {
     BIconInfoCircle,
     BIconCalendar3,
     BIconMic,
+    BIconPlus,
     BIconSlashCircle,
     BIconCameraVideoFill,
     DataEntryInput,
@@ -235,9 +238,9 @@ export default {
             const values = dp.values[t.index]
             const dates = dp.dates[t.index]
             const prevValue = (values && values.length > 0) ? values[values.length - 1] : null
-            const prevDate = (dates && dates.length > 0) ? new Date(dates[dates.length - 1]).toLocaleDateString() : null
+            const prevDate = (dates && dates.length > 0) ? dates[dates.length - 1] : null
             if (prevValue !== null) {
-              return this.$t('formDescriptionDataEntryMultiPrevValue', { prevValue: t.trait.type === 'date' ? new Date(prevValue).toLocaleDateString() : prevValue, date: prevDate })
+              return this.$t('formDescriptionDataEntryMultiPrevValue', { prevValue: prevValue, date: prevDate })
             } else {
               return null
             }
@@ -248,6 +251,36 @@ export default {
       } else {
         this.formDescriptions = null
       }
+    },
+    addMultiTraitValue: function (index) {
+      const value = this.values[index]
+      const date = this.getTodayString()
+
+      this.formState[index] = this.checkTraitValue(this.visibleTraitMapping[index], index)
+
+      // If the form is invalid, return
+      this.formValidated = true
+
+      if (this.formState[index] === false) {
+        return
+      }
+
+      this.$store.commit('ON_MULTI_TRAIT_VALUE_ADDED_MUTATION', {
+        traitIndex: this.visibleTraitMapping[index].index,
+        value: value,
+        date: date,
+        row: this.row,
+        col: this.col
+      })
+      this.updateFormDescriptions()
+
+      this.formValidated = false
+      this.formState[index] = null
+
+      this.values[index] = null
+      this.dates[index] = null
+
+      this.$nextTick(() => this.traverseForm(index))
     },
     multiTraitDataChanged: function (values, dates) {
       this.$store.commit('ON_DATA_POINT_TRAIT_DATA_CHANGED_MUTATION', {
@@ -425,7 +458,20 @@ export default {
       return new Date(today.getTime() + (offset * 60 * 1000))
     },
     getTodayString: function () {
-      return this.getToday().toISOString().split('T')[0]
+      const date = new Date()
+
+      let month = `${date.getMonth() + 1}`
+      let day = `${date.getDate()}`
+      const year = date.getFullYear()
+
+      if (month.length < 2) {
+        month = '0' + month
+      }
+      if (day.length < 2) {
+        day = '0' + day
+      }
+
+      return [year, month, day].join('-')
     },
     reset: function () {
       this.formValidated = false
@@ -533,42 +579,43 @@ export default {
         this.traverseForm(index + 1)
       }
     },
-    verify: function (verifyCallback) {
-      this.formState = this.visibleTraitMapping.map((t, i) => {
-        let valid = true
-        if (this.values[i] === '' || this.values[i] === null) {
+    checkTraitValue: function (t, i) {
+      let valid = true
+      if (this.values[i] === '' || this.values[i] === null) {
+        valid = true
+      } else if (t.trait.restrictions) {
+        if (t.trait.type === 'categorical') {
+          // Check whether the value is one of the pre-defined categories
+          return t.trait.restrictions.categories.indexOf(this.values[i]) !== -1
+        } else if (t.trait.type === 'int' || t.trait.type === 'float') {
+          // Check whether the value lies between the required min and max
           valid = true
-        } else if (t.trait.restrictions) {
-          if (t.trait.type === 'categorical') {
-            // Check whether the value is one of the pre-defined categories
-            return t.trait.restrictions.categories.indexOf(this.values[i]) !== -1
-          } else if (t.trait.type === 'int' || t.trait.type === 'float') {
-            // Check whether the value lies between the required min and max
-            valid = true
-            if (t.trait.restrictions.min !== undefined && t.trait.restrictions.min !== null && t.trait.restrictions.min > this.values[i]) {
-              valid = false
-            }
-            if (t.trait.restrictions.max !== undefined && t.trait.restrictions.max !== null && t.trait.restrictions.max < this.values[i]) {
-              valid = false
-            }
-
-            return valid
-          }
-        }
-
-        if (t.trait.type === 'int') {
-          try {
-            const int = Number(this.values[i])
-            if (isNaN(this.values[i]) || isNaN(int) || !Number.isInteger(int)) {
-              valid = false
-            }
-          } catch (err) {
+          if (t.trait.restrictions.min !== undefined && t.trait.restrictions.min !== null && t.trait.restrictions.min > this.values[i]) {
             valid = false
           }
-        }
+          if (t.trait.restrictions.max !== undefined && t.trait.restrictions.max !== null && t.trait.restrictions.max < this.values[i]) {
+            valid = false
+          }
 
-        return valid
-      })
+          return valid
+        }
+      }
+
+      if (t.trait.type === 'int') {
+        try {
+          const int = Number(this.values[i])
+          if (isNaN(this.values[i]) || isNaN(int) || !Number.isInteger(int)) {
+            valid = false
+          }
+        } catch (err) {
+          valid = false
+        }
+      }
+
+      return valid
+    },
+    verify: function (verifyCallback) {
+      this.formState = this.visibleTraitMapping.map((t, i) => this.checkTraitValue(t, i))
 
       // If the form is invalid, return
       this.formValidated = true

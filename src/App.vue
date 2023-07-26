@@ -84,6 +84,8 @@
 
     <ChangelogModal :prevVersion="changelogVersionNumber" ref="changelogModal" />
 
+    <GridScoreNextModal ref="gridScoreNextModal" />
+
     <BrapiModal ref="brapiSettingsModal"
                 :title="'modalTitleBrapiSettings'"
                 :okTitle="'buttonOk'"
@@ -96,6 +98,7 @@
 
 <script>
 import BrapiModal from '@/components/modals/BrapiModal'
+import GridScoreNextModal from '@/components/modals/GridScoreNextModal'
 import Vue from 'vue'
 import { VuePlausible } from 'vue-plausible'
 import { mapGetters } from 'vuex'
@@ -129,6 +132,7 @@ export default {
     BIconSun,
     BrapiModal,
     ChangelogModal,
+    GridScoreNextModal,
     Tour
   },
   data: function () {
@@ -541,6 +545,8 @@ export default {
       this.$refs.changelogModal.show()
       this.$store.dispatch('setChangelogVersionNumber', this.gridScoreVersion)
     }
+
+    this.$refs.gridScoreNextModal.show()
   },
   destroyed: function () {
     if (this.geolocationWatchId && navigator.geolocation) {

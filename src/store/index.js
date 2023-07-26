@@ -312,6 +312,17 @@ const storeState = {
             })
         })
     },
+    ON_MULTI_TRAIT_VALUE_ADDED_MUTATION: function (state, config) {
+      // To save time, write directly to the temporary dataset object
+      const temp = state.dataset.data.get(`${config.row}-${config.col}`)
+      temp.dates[config.traitIndex].push(config.date)
+      temp.values[config.traitIndex].push(config.value)
+      state.dataset.data.set(`${config.row}-${config.col}`, temp)
+
+      // Then update the database
+      idb.updateDatapoint(state.datasetId, temp)
+        .then(() => emitter.emit('data-point-changed', config.row, config.col))
+    },
     ON_DATA_POINT_TRAIT_DATA_CHANGED_MUTATION: function (state, config) {
       // To save time, write directly to the temporary dataset object
       const temp = state.dataset.data.get(`${config.row}-${config.col}`)

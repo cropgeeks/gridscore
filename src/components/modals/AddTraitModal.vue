@@ -13,6 +13,11 @@
         <b-form-input id="trait-name" v-model="trait.name" required :state="state.name" ref="traitName" />
       </b-form-group>
 
+      <!-- Trait description -->
+      <b-form-group :label="$t('formLabelAddTraitDescription')" label-for="trait-description" :description="$t('formDescriptionSettingsTraitDescription')">
+        <b-form-input id="trait-description" v-model="trait.description" ref="traitDescription" />
+      </b-form-group>
+
       <!-- Trait data type selection -->
       <b-form-group :label="$t('formLabelAddTraitType')" label-for="trait-type">
         <b-input-group class="trait-type-select">
@@ -33,7 +38,7 @@
     </b-form>
 
     <!-- Modal to show configuration options for a selected trait -->
-    <TraitConfigurationModal :trait="trait" v-on:config-changed="updateTraitConfig" ref="traitConfigModal" />
+    <TraitConfigurationModal :showDescription="false" :trait="trait" v-on:config-changed="updateTraitConfig" ref="traitConfigModal" />
   </b-modal>
 </template>
 
@@ -57,6 +62,7 @@ export default {
     return {
       trait: {
         name: null,
+        description: null,
         type: 'date',
         mType: 'single',
         restrictions: null
@@ -64,8 +70,12 @@ export default {
       state: {
         name: null,
         restrictions: null
-      },
-      traitTypes: [{
+      }
+    }
+  },
+  computed: {
+    traitTypes: function () {
+      return [{
         value: 'date',
         text: this.$t('traitTypeDate')
       }, {
@@ -80,8 +90,10 @@ export default {
       }, {
         value: 'categorical',
         text: this.$t('traitTypeCategorical')
-      }],
-      traitMTypes: [{
+      }]
+    },
+    traitMTypes: function () {
+      return [{
         value: 'single',
         text: this.$t('traitMTypeSingle')
       }, {
@@ -97,6 +109,7 @@ export default {
     show: function () {
       this.trait = {
         name: null,
+        description: null,
         type: 'date',
         mType: 'single',
         restrictions: null
@@ -133,6 +146,8 @@ export default {
           }
           break
       }
+
+      this.trait.description = newConfig.description
     },
     onSubmit: function () {
       if (!this.trait.name || this.trait.name.length < 1) {

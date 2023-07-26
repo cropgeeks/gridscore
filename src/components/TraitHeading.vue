@@ -7,18 +7,20 @@
     <BIconCircle v-else />
     <span class="mx-1">{{ trait.name }}</span>
     <b-badge variant="light">{{ getTraitTypeText(trait) }}</b-badge>
+    <BIconCardText class="text-muted ml-1" v-b-tooltip="trait.description" v-if="trait.description" />
   </span>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { BIconCircle, BIconCircleFill, BIconCircleHalf } from 'bootstrap-vue'
+import { BIconCircle, BIconCircleFill, BIconCircleHalf, BIconCardText } from 'bootstrap-vue'
 
 export default {
   components: {
     BIconCircle,
     BIconCircleFill,
-    BIconCircleHalf
+    BIconCircleHalf,
+    BIconCardText
   },
   props: {
     trait: {

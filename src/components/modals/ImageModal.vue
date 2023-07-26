@@ -44,6 +44,7 @@ export default {
   },
   computed: {
     ...mapGetters([
+      'storeGeolocation',
       'storeTraits'
     ]),
     traitOptions: function () {
@@ -109,6 +110,19 @@ export default {
               this.imageGps = {
                 latitude: exif.latitude,
                 longitude: exif.longitude
+              }
+            } else if (this.storeGeolocation) {
+              this.imageGps = {
+                latitude: this.storeGeolocation.lat,
+                longitude: this.storeGeolocation.lng
+              }
+            }
+          })
+          .catch(() => {
+            if (this.storeGeolocation) {
+              this.imageGps = {
+                latitude: this.storeGeolocation.lat,
+                longitude: this.storeGeolocation.lng
               }
             }
           })

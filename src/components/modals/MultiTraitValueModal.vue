@@ -25,7 +25,7 @@
             <b-button size="sm" variant="danger" @click="deleteValue(index)" v-b-tooltip="$t('buttonDelete')"><BIconTrash /></b-button>
           </div>
         </template>
-        <DataEntryInput :values="values" :index="index" :trait="trait" :formState="formState" class="d-block" :id="`input-${index}`"
+        <DataEntryInput :currentValue="values[index]" :index="index" :trait="trait" :formState="formState" class="d-block" :id="`input-${index}`"
                         @handleDateInput="handleDateInput(index)"
                         @handleDateInputChar="event => handleDateInputChar(index, event)"
                         @onDateChanged="event => onDateChanged(event, index)"

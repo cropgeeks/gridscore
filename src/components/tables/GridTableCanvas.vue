@@ -95,7 +95,9 @@ export default {
       markedColumns: null,
       markedRows: null,
       flingInterval: null,
-      followUser: false
+      followUser: false,
+      isResetting: false,
+      isInitting: false
     }
   },
   watch: {
@@ -143,8 +145,6 @@ export default {
       'storeHideToggledTraits',
       'storeHideMarkers',
       'storeIgnoreEmptyCells',
-      'storeInvertNumberingX',
-      'storeInvertNumberingY',
       'storeInvertView',
       'storeMarkers',
       'storeRows',
@@ -504,7 +504,7 @@ export default {
         let counter = 0
         // Define an update interval
         this.flingInterval = setInterval(() => {
-          // Run 50 iterations
+          // Run 25 iterations
           if (counter++ < 25) {
             const i = 1 - counter / 25.0
             // Calculate the velocity in both dimensions
@@ -870,7 +870,7 @@ export default {
       if (this.isResetting) {
         return
       }
-      this.resetting = true
+      this.isResetting = true
 
       this.canvasHeight = window.innerHeight - this.columnHeaderHeight - this.vScrollWidth
       this.canvasWidth = this.$refs.canvasWrapper.offsetWidth - this.rowHeaderWidth - this.hScrollHeight

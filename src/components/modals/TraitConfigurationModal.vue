@@ -7,6 +7,10 @@
            no-fade
            v-if="trait">
     <b-form @submit.prevent="onSubmit" :validated="formValidated">
+      <b-form-group :label="$t('formLabelTraitDescription')" label-for="description" v-if="showDescription">
+        <b-form-textarea id="description" :rows="3" v-model="description" />
+      </b-form-group>
+
       <!-- If it's an `int`, show two number inputs for min and max -->
       <template v-if="trait.type === 'int'">
         <b-form-group :label="$t('formLabelTraitConfigMin')"
@@ -52,6 +56,10 @@ export default {
     trait: {
       type: Object,
       default: () => null
+    },
+    showDescription: {
+      type: Boolean,
+      default: true
     }
   },
   data: function () {
@@ -59,6 +67,7 @@ export default {
       categories: null,
       min: null,
       max: null,
+      description: null,
       formValidated: false,
       formState: {
         categories: null,
@@ -98,6 +107,7 @@ export default {
       this.$emit('config-changed', {
         min: this.min === '' ? null : this.min,
         max: this.max === '' ? null : this.max,
+        description: this.description === '' ? null : this.description,
         categories: this.categories ? this.categories.split('\n').filter(c => c !== undefined && c !== null && c !== '') : null
       })
 
@@ -113,6 +123,7 @@ export default {
         max: null,
         categories: null
       }
+      this.description = null
       this.categories = null
       this.min = null
       this.max = null
@@ -131,6 +142,8 @@ export default {
         this.min = this.trait.restrictions.min
         this.max = this.trait.restrictions.max
       }
+
+      this.description = this.trait.description
 
       this.$nextTick(() => this.$refs.traitConfigModal.show())
     },
