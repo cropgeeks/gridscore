@@ -112,5 +112,16 @@
         "text": "GridScore now supports export of trials data to Germinate via BrAPI. To use this feature, go to the export section of a trial and then select the 'BrAPI' tab. You'll need to have a valid Germinate API token to upload data and you have to have at least 'Data Curator' permissions."
       }
     ]
+  },
+  {
+    "version": "1.16.0",
+    "date": "2023-07-26",
+    "items": [
+      {
+        "type": "new",
+        "title": "GridScore NEXT release",
+        "text": "This marks the last regular release of this version of GridScore. A newer version named 'GridScore NEXT' has been released and will replace this one going forwards. Please follow the instructions on screen when loading GridScore to migrate to the new version."
+      }
+    ]
   }
 ]
